@@ -26,7 +26,7 @@ const HEADERS = [
   "recommend_training",
   "most_valuable_takeaway",
   "improvement_suggestion",
-  "future_support_request",
+  "suggested_ai_automation_use_cases",
   "received_at"
 ];
 
@@ -119,7 +119,7 @@ function upsertScore_(payload) {
     payload.recommend_training || "",
     payload.most_valuable_takeaway || "",
     payload.improvement_suggestion || "",
-    payload.future_support_request || "",
+    payload.suggested_ai_automation_use_cases || payload.future_support_request || "",
     new Date().toISOString()
   ];
 

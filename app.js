@@ -176,7 +176,11 @@
     const fields = [
       ["most_valuable_takeaway", "Most valuable takeaway", "What was the most useful learning or behavior you will apply?"],
       ["improvement_suggestion", "Improvement suggestion", "What should be improved for the next session?"],
-      ["future_support_request", "Follow-up support", "What additional support, practice or material would help you use AI better?"]
+      [
+        "suggested_ai_automation_use_cases",
+        "Suggested AI automation use cases for Advancy",
+        "Which recurring Advancy workflows, analyses or deliverables should be considered for AI automation, and why?"
+      ]
     ];
 
     fields.forEach(([id, labelText, placeholder]) => {

@@ -4,7 +4,7 @@ const ALLOWED_ORIGINS = new Set([
   "http://127.0.0.1:8000"
 ]);
 
-const TEST_IDS = new Set(["advancy-ai-charter", "advancy-ai-usage"]);
+const TEST_IDS = new Set(["advancy-ai-charter", "advancy-ai-usage", "advancy-ai-usage-advanced"]);
 
 const TEXT_FIELDS = [
   "test_id",

@@ -13,6 +13,7 @@ Admin token local file:
 - Public write endpoint: `POST /submit`
 - Private read endpoint: `GET /admin/scores`, protected by `ADMIN_TOKEN`
 - Upsert key: `test_id + first_name + last_name + email`
+- Accepted tests: `advancy-ai-charter`, `advancy-ai-usage`, `advancy-ai-usage-advanced`
 - No public database export or CSV endpoint without the admin token
 - Transactional D1 writes, so concurrent consultant submissions do not race on a shared file
 

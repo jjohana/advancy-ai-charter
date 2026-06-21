@@ -356,6 +356,30 @@ main {
   accent-color: var(--advancy-orange);
 }
 
+.evaluation-confirmation {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-left: 6px solid var(--ok);
+  background: rgba(25, 135, 84, 0.09);
+  color: var(--ink);
+}
+
+.evaluation-confirmation[hidden] {
+  display: none;
+}
+
+.evaluation-confirmation strong {
+  color: var(--advancy-blue);
+  font-size: 1.05rem;
+}
+
+.evaluation-submitted .evaluation-criterion,
+.evaluation-submitted .evaluation-text,
+.evaluation-submitted .evaluation-checkbox {
+  opacity: 0.72;
+}
+
 .quiz-shell {
   min-width: 0;
   background: var(--paper);

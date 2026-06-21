@@ -98,30 +98,32 @@
     };
   }
 
-  function submitResult(payload, statusNode) {
-    if (resultSubmitted) return;
+  function submitResult(payload, statusNode, successMessage) {
+    if (resultSubmitted) return Promise.resolve(false);
     resultSubmitted = true;
 
     if (!config.scoreEndpoint) {
-      statusNode.textContent = "Secure score database is not configured. Please contact the training organizer.";
+      statusNode.textContent = "Thank you. Your response has been recorded on this page, but the secure score database is not configured. Please contact the training organizer.";
       statusNode.classList.add("save-error");
-      return;
+      return Promise.resolve(false);
     }
 
     statusNode.textContent = "Submitting result to the private results database...";
 
-    fetch(config.scoreEndpoint, {
+    return fetch(config.scoreEndpoint, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     }).then(() => {
-      statusNode.textContent = "Result submitted to the private results database.";
+      statusNode.textContent = successMessage || "Thank you. Your result has been submitted to the private results database.";
       statusNode.classList.add("save-ok");
+      return true;
     }).catch(() => {
       resultSubmitted = false;
       statusNode.textContent = "Result submission failed. Please keep this page open and contact the training organizer.";
       statusNode.classList.add("save-error");
+      return false;
     });
   }
 
@@ -213,9 +215,24 @@
     const submit = document.createElement("button");
     submit.type = "submit";
     submit.className = "button button-primary";
-    submit.textContent = "Submit score and evaluation";
+    submit.textContent = "Finalize response";
     actions.appendChild(submit);
     form.appendChild(actions);
+
+    const confirmation = document.createElement("div");
+    confirmation.className = "evaluation-confirmation";
+    confirmation.setAttribute("role", "status");
+    confirmation.setAttribute("aria-live", "polite");
+    confirmation.hidden = true;
+
+    const confirmationTitle = document.createElement("strong");
+    confirmationTitle.textContent = "Thank you for completing the assessment and training evaluation.";
+
+    const confirmationCopy = document.createElement("span");
+    confirmationCopy.textContent = "Your feedback has been captured for the training team and will help improve future Advancy AI enablement sessions.";
+
+    confirmation.append(confirmationTitle, confirmationCopy);
+    form.appendChild(confirmation);
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -236,7 +253,21 @@
       });
 
       submit.disabled = true;
-      submitResult({ ...basePayload, ...extra }, statusNode);
+      submit.textContent = "Response submitted";
+      confirmation.hidden = false;
+      form.classList.add("evaluation-submitted");
+      submitResult(
+        { ...basePayload, ...extra },
+        statusNode,
+        "Thank you. Your score and training evaluation have been submitted privately."
+      ).then((ok) => {
+        if (!ok && config.scoreEndpoint) {
+          submit.disabled = false;
+          submit.textContent = "Finalize response";
+          confirmation.hidden = true;
+          form.classList.remove("evaluation-submitted");
+        }
+      });
     });
 
     section.append(title, intro, scale, form);

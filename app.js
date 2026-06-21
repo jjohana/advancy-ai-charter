@@ -17,7 +17,6 @@
   const progressNode = document.querySelector("#progress");
   const progressFillNode = document.querySelector("#progress-fill");
   const scoreNode = document.querySelector("#score");
-  const sourceNode = document.querySelector("#question-source");
   const resultNode = document.querySelector("#result");
   const restartTopNode = document.querySelector("#restart-top");
   const firstNameNode = document.querySelector("#first-name");
@@ -379,7 +378,6 @@
 
   function renderQuestion() {
     const item = questions[currentIndex];
-    sourceNode.textContent = item.source;
     cardNode.innerHTML = "";
 
     const heading = document.createElement("div");
@@ -392,10 +390,6 @@
     const title = document.createElement("h2");
     title.textContent = item.q;
     heading.append(id, title);
-
-    const note = document.createElement("p");
-    note.className = "rule-note";
-    note.textContent = item.source;
 
     const answersNode = document.createElement("div");
     answersNode.className = "answers";
@@ -458,7 +452,7 @@
     restart.addEventListener("click", restartAssessment);
     actions.appendChild(restart);
 
-    cardNode.append(heading, note, answersNode, correction, actions);
+    cardNode.append(heading, answersNode, correction, actions);
     updateProgress();
     updateParticipantState();
   }

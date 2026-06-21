@@ -398,19 +398,12 @@ main {
   border-bottom: 6px solid var(--advancy-orange);
 }
 
-.quiz-toolbar strong,
-#question-source {
+.quiz-toolbar strong {
   display: block;
 }
 
 .quiz-toolbar strong {
   font-weight: 700;
-}
-
-#question-source {
-  margin-top: 4px;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.86rem;
 }
 
 .toolbar-actions {
@@ -496,14 +489,6 @@ main {
   font-size: clamp(1.25rem, 2.2vw, 1.8rem);
   font-weight: 400;
   line-height: 1.2;
-}
-
-.rule-note {
-  margin: 0;
-  padding: 12px 14px;
-  color: var(--advancy-blue-3);
-  background: var(--surface-strong);
-  border-left: 6px solid var(--advancy-orange);
 }
 
 .answers {

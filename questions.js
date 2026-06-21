@@ -81,29 +81,29 @@ window.quizQuestions = [
     ]
   },
   {
-    q: "A client contract expressly forbids AI use, third-party processing, or cloud processing. Which answer is correct?",
+    q: "A mission document is covered by a client contract or NDA clause that expressly forbids AI use, third-party processing, or cloud processing for that material. What is the correct action?",
     source: "Rule 2 - never use AI where a client, contract, or non-disclosure agreement expressly forbids AI use, third-party processing, or cloud processing.",
     correct: 3,
     options: [
       {
-        text: "Use AI if the mission is otherwise Green.",
-        why: "Incorrect. Rule 2 is an absolute prohibition and overrides ordinary Green mission permissions."
+        text: "Use AI if the mission is otherwise classified Green.",
+        why: "Incorrect. Rule 2 is an absolute prohibition and overrides ordinary Green mission permissions for material covered by the express restriction."
       },
       {
-        text: "Use AI if only a short extract is pasted.",
-        why: "Incorrect. A short extract does not override an express contractual or NDA prohibition."
+        text: "Use AI if only a short extract of the covered document is pasted.",
+        why: "Incorrect. A short extract does not override an express contractual or NDA prohibition on AI use, third-party processing, or cloud processing."
       },
       {
-        text: "Use AI if the tool is in Appendix 1.",
-        why: "Incorrect. Approved-tool status does not override an express client, contract, or NDA prohibition."
+        text: "Use AI if the tool is listed in Appendix 1.",
+        why: "Incorrect. Approved-tool status does not override an express client, contract, or NDA prohibition for the covered material."
       },
       {
-        text: "Do not use AI for the barred material.",
-        why: "Correct. The charter states that the express contractual restriction prevails."
+        text: "Do not paste, upload, summarize, or otherwise process the covered material with AI.",
+        why: "Correct. The charter states that where a client, contract, or NDA expressly forbids AI use, third-party processing, or cloud processing, the express restriction prevails."
       },
       {
-        text: "Use AI if the prompt asks the model not to store the data.",
-        why: "Incorrect. Prompt wording does not remove an express prohibition on AI use or processing."
+        text: "Use AI if the prompt asks the model not to store or reuse the material.",
+        why: "Incorrect. Prompt wording does not remove an express prohibition on AI use, third-party processing, or cloud processing."
       }
     ]
   },

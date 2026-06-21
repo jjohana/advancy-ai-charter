@@ -7,10 +7,10 @@
     failCopy: null,
     quizId: "advancy-assessment",
     quizName: document.title,
+    scoreEndpoint: "",
     ...window.quizConfig
   };
   const letters = ["A", "B", "C", "D", "E"];
-  const storageKey = "advancy-assessment-results:v1";
 
   const cardNode = document.querySelector("#question-card");
   const progressNode = document.querySelector("#progress");
@@ -23,12 +23,11 @@
   const lastNameNode = document.querySelector("#last-name");
   const emailNode = document.querySelector("#email");
   const participantStatusNode = document.querySelector("#participant-status");
-  const downloadResultsNode = document.querySelector("#download-results");
 
   let currentIndex = 0;
   let selectedIndex = null;
   let submitted = false;
-  let resultSaved = false;
+  let resultSubmitted = false;
   const answers = Array(questions.length).fill(null);
 
   function appendText(parent, text) {
@@ -56,72 +55,17 @@
     return item.firstName.length > 0 && item.lastName.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.email);
   }
 
-  function storedResults() {
-    try {
-      const value = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
-      return Array.isArray(value) ? value : [];
-    } catch (error) {
-      return [];
-    }
-  }
-
-  function setStoredResults(rows) {
-    window.localStorage.setItem(storageKey, JSON.stringify(rows));
-  }
-
-  function csvCell(value) {
-    return `"${String(value ?? "").replace(/"/g, '""')}"`;
-  }
-
-  function csvFromRows(rows) {
-    const headers = [
-      "timestamp",
-      "test_id",
-      "test_name",
-      "first_name",
-      "last_name",
-      "email",
-      "correct",
-      "total",
-      "percent",
-      "passed",
-      "answers",
-      "correct_answers"
-    ];
-    const lines = rows.map((row) => headers.map((header) => csvCell(row[header])).join(","));
-    return [headers.join(","), ...lines].join("\r\n");
-  }
-
-  function downloadCsv() {
-    const rows = storedResults();
-    const csv = csvFromRows(rows);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    const stamp = new Date().toISOString().slice(0, 10);
-    link.href = url;
-    link.download = `advancy-ai-assessment-results-${stamp}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  }
-
   function updateParticipantState() {
     if (participantStatusNode) {
       const item = participant();
       participantStatusNode.textContent = participantReady()
-        ? `Results will be saved for ${item.firstName} ${item.lastName}.`
+        ? `Score will be submitted privately for ${item.firstName} ${item.lastName}.`
         : "Enter first name, last name and a valid email before submitting.";
     }
 
     const activeSubmit = document.querySelector("[data-submit-answer='true']");
     if (activeSubmit) {
       activeSubmit.disabled = selectedIndex === null || !participantReady();
-    }
-
-    if (downloadResultsNode) {
-      downloadResultsNode.disabled = storedResults().length === 0;
     }
   }
 
@@ -134,11 +78,9 @@
     scoreNode.textContent = `${score()} / ${answered}`;
   }
 
-  function saveResult(correct, total, percent, passed) {
-    if (resultSaved || !participantReady()) return null;
-
+  function buildResultPayload(correct, total, percent, passed) {
     const item = participant();
-    const row = {
+    return {
       timestamp: new Date().toISOString(),
       test_id: config.quizId,
       test_name: config.quizName,
@@ -152,23 +94,33 @@
       answers: answers.map((answer) => letters[answer] || "").join(" "),
       correct_answers: questions.map((question) => letters[question.correct]).join(" ")
     };
-    const rows = storedResults();
-    const existingIndex = rows.findIndex((existing) =>
-      existing.test_id === row.test_id &&
-      String(existing.first_name || "").trim().toLowerCase() === item.firstName.toLowerCase() &&
-      String(existing.last_name || "").trim().toLowerCase() === item.lastName.toLowerCase() &&
-      String(existing.email || "").trim().toLowerCase() === item.email
-    );
+  }
 
-    if (existingIndex >= 0) {
-      rows[existingIndex] = row;
-    } else {
-      rows.push(row);
+  function submitResult(payload, statusNode) {
+    if (resultSubmitted) return;
+    resultSubmitted = true;
+
+    if (!config.scoreEndpoint) {
+      statusNode.textContent = "Secure score database is not configured. Please contact the training organizer.";
+      statusNode.classList.add("save-error");
+      return;
     }
-    setStoredResults(rows);
-    resultSaved = true;
-    updateParticipantState();
-    return row;
+
+    statusNode.textContent = "Submitting score to the private results database...";
+
+    fetch(config.scoreEndpoint, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).then(() => {
+      statusNode.textContent = "Score submitted to the private results database.";
+      statusNode.classList.add("save-ok");
+    }).catch(() => {
+      resultSubmitted = false;
+      statusNode.textContent = "Score submission failed. Please keep this page open and contact the training organizer.";
+      statusNode.classList.add("save-error");
+    });
   }
 
   function setResult() {
@@ -178,7 +130,7 @@
     const passMark = Math.ceil(total * config.passThreshold);
     const thresholdPercent = Math.round(config.passThreshold * 100);
     const passed = correct >= passMark;
-    saveResult(correct, total, percent, passed);
+    const payload = buildResultPayload(correct, total, percent, passed);
     resultNode.className = passed ? "pass" : "fail";
     resultNode.style.display = "block";
     resultNode.innerHTML = "";
@@ -194,16 +146,10 @@
       : (config.failCopy || `Candidate needs at least ${passMark} correct answers to pass.`);
 
     const saved = document.createElement("p");
-    saved.className = "result-copy";
-    saved.textContent = "Result saved in this browser. Download the CSV to collect scores across consultants and tests.";
+    saved.className = "result-copy save-status";
 
-    const download = document.createElement("button");
-    download.type = "button";
-    download.className = "button button-primary";
-    download.textContent = "Download CSV";
-    download.addEventListener("click", downloadCsv);
-
-    resultNode.append(title, copy, saved, download);
+    resultNode.append(title, copy, saved);
+    submitResult(payload, saved);
     resultNode.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -348,7 +294,7 @@
     currentIndex = 0;
     selectedIndex = null;
     submitted = false;
-    resultSaved = false;
+    resultSubmitted = false;
     answers.fill(null);
     clearResult();
     renderQuestion();
@@ -359,6 +305,5 @@
   firstNameNode?.addEventListener("input", updateParticipantState);
   lastNameNode?.addEventListener("input", updateParticipantState);
   emailNode?.addEventListener("input", updateParticipantState);
-  downloadResultsNode?.addEventListener("click", downloadCsv);
   renderQuestion();
 })();

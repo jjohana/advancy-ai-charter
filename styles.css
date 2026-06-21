@@ -242,6 +242,19 @@ main {
   font-size: 0.84rem;
 }
 
+.save-status {
+  margin-top: 10px;
+  font-weight: 700;
+}
+
+.save-ok {
+  color: var(--ok);
+}
+
+.save-error {
+  color: var(--bad);
+}
+
 .quiz-shell {
   min-width: 0;
   background: var(--paper);

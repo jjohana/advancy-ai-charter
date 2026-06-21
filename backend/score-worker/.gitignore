@@ -1,0 +1,7 @@
+node_modules/
+.wrangler/
+.dev.vars
+.admin-token
+*.log
+advancy-ai-results-*.csv
+advancy-ai-results-*.json

@@ -25,6 +25,7 @@
   const emailNode = document.querySelector("#email");
   const participantStatusNode = document.querySelector("#participant-status");
 
+  const attemptStartedAt = new Date();
   let currentIndex = 0;
   let selectedIndex = null;
   let submitted = false;
@@ -56,17 +57,25 @@
     return item.firstName.length > 0 && item.lastName.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.email);
   }
 
+  function collectorReady() {
+    return typeof config.scoreEndpoint === "string" && /^https:\/\//.test(config.scoreEndpoint);
+  }
+
   function updateParticipantState() {
     if (participantStatusNode) {
       const item = participant();
-      participantStatusNode.textContent = participantReady()
-        ? `Score will be submitted privately for ${item.firstName} ${item.lastName}.`
-        : "Enter first name, last name and a valid email before submitting.";
+      if (!collectorReady()) {
+        participantStatusNode.textContent = "Private score database is not configured yet. The assessment is locked until the secure collector is active.";
+      } else {
+        participantStatusNode.textContent = participantReady()
+          ? `Score will be submitted privately for ${item.firstName} ${item.lastName}.`
+          : "Enter first name, last name and a valid email before submitting.";
+      }
     }
 
     const activeSubmit = document.querySelector("[data-submit-answer='true']");
     if (activeSubmit) {
-      activeSubmit.disabled = selectedIndex === null || !participantReady();
+      activeSubmit.disabled = selectedIndex === null || !participantReady() || !collectorReady();
     }
   }
 
@@ -83,6 +92,9 @@
     const item = participant();
     return {
       timestamp: new Date().toISOString(),
+      attempt_started_at: attemptStartedAt.toISOString(),
+      completed_at: new Date().toISOString(),
+      duration_seconds: Math.round((Date.now() - attemptStartedAt.getTime()) / 1000),
       test_id: config.quizId,
       test_name: config.quizName,
       first_name: item.firstName,
@@ -94,6 +106,8 @@
       passed: passed ? "yes" : "no",
       answers: answers.map((answer) => letters[answer] || "").join(" "),
       correct_answers: questions.map((question) => letters[question.correct]).join(" "),
+      source_url: window.location.href,
+      user_agent: window.navigator.userAgent,
       ...extra
     };
   }
@@ -102,8 +116,8 @@
     if (resultSubmitted) return Promise.resolve(false);
     resultSubmitted = true;
 
-    if (!config.scoreEndpoint) {
-      statusNode.textContent = "Thank you. Your response has been recorded on this page, but the secure score database is not configured. Please contact the training organizer.";
+    if (!collectorReady()) {
+      statusNode.textContent = "Private score database is not configured. Please contact the training organizer before using this assessment.";
       statusNode.classList.add("save-error");
       return Promise.resolve(false);
     }
@@ -112,10 +126,13 @@
 
     return fetch(config.scoreEndpoint, {
       method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
-    }).then(() => {
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("Private database rejected the submission.");
+      }
       statusNode.textContent = successMessage || "Thank you. Your result has been submitted to the private results database.";
       statusNode.classList.add("save-ok");
       return true;
@@ -405,7 +422,7 @@
       submit.className = "button button-primary";
       submit.textContent = "Submit answer";
       submit.dataset.submitAnswer = "true";
-      submit.disabled = selectedIndex === null || !participantReady();
+      submit.disabled = selectedIndex === null || !participantReady() || !collectorReady();
       submit.addEventListener("click", () => {
         submitted = true;
         answers[currentIndex] = selectedIndex;

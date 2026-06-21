@@ -1,0 +1,10 @@
+name = "advancy-ai-score-api"
+main = "src/index.js"
+compatibility_date = "2026-06-21"
+workers_dev = true
+preview_urls = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "advancy-ai-results"
+database_id = "a35b83f7-1b54-4ceb-9038-484fbebe3962"

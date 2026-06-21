@@ -1,6 +1,7 @@
 window.quizConfig = {
   "quizId": "advancy-ai-charter",
-  "quizName": "Advancy AI Charter Assessment"
+  "quizName": "Advancy AI Charter Assessment",
+  "scoreEndpoint": "https://advancy-ai-score-api.advancy-ai-training.workers.dev/submit"
 };
 
 window.quizQuestions = [

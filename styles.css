@@ -255,6 +255,107 @@ main {
   color: var(--bad);
 }
 
+.training-evaluation {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.training-evaluation h3 {
+  margin: 0;
+  color: var(--advancy-blue);
+  font-size: 1.22rem;
+}
+
+.training-evaluation p,
+.evaluation-scale {
+  margin: 0;
+  color: var(--muted);
+}
+
+.evaluation-form {
+  display: grid;
+  gap: 14px;
+}
+
+.evaluation-criterion {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.evaluation-criterion legend {
+  color: var(--advancy-blue);
+  font-weight: 700;
+}
+
+.rating-group {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
+  gap: 8px;
+}
+
+.rating-group label {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--advancy-blue);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rating-group input {
+  accent-color: var(--advancy-orange);
+}
+
+.evaluation-text {
+  display: grid;
+  gap: 7px;
+  color: var(--advancy-blue);
+  font-weight: 700;
+}
+
+.evaluation-text textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 86px;
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--surface);
+  font: inherit;
+  font-weight: 400;
+}
+
+.evaluation-text textarea:focus {
+  outline: 2px solid rgba(238, 115, 48, 0.35);
+  border-color: var(--advancy-orange);
+  background: #fff;
+}
+
+.evaluation-checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: start;
+  color: var(--ink);
+}
+
+.evaluation-checkbox input {
+  margin-top: 4px;
+  accent-color: var(--advancy-orange);
+}
+
 .quiz-shell {
   min-width: 0;
   background: var(--paper);

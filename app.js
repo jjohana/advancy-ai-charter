@@ -8,6 +8,7 @@
     quizId: "advancy-assessment",
     quizName: document.title,
     scoreEndpoint: "",
+    trainingEvaluation: null,
     ...window.quizConfig
   };
   const letters = ["A", "B", "C", "D", "E"];
@@ -78,7 +79,7 @@
     scoreNode.textContent = `${score()} / ${answered}`;
   }
 
-  function buildResultPayload(correct, total, percent, passed) {
+  function buildResultPayload(correct, total, percent, passed, extra = {}) {
     const item = participant();
     return {
       timestamp: new Date().toISOString(),
@@ -92,7 +93,8 @@
       percent,
       passed: passed ? "yes" : "no",
       answers: answers.map((answer) => letters[answer] || "").join(" "),
-      correct_answers: questions.map((question) => letters[question.correct]).join(" ")
+      correct_answers: questions.map((question) => letters[question.correct]).join(" "),
+      ...extra
     };
   }
 
@@ -106,7 +108,7 @@
       return;
     }
 
-    statusNode.textContent = "Submitting score to the private results database...";
+    statusNode.textContent = "Submitting result to the private results database...";
 
     fetch(config.scoreEndpoint, {
       method: "POST",
@@ -114,13 +116,127 @@
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     }).then(() => {
-      statusNode.textContent = "Score submitted to the private results database.";
+      statusNode.textContent = "Result submitted to the private results database.";
       statusNode.classList.add("save-ok");
     }).catch(() => {
       resultSubmitted = false;
-      statusNode.textContent = "Score submission failed. Please keep this page open and contact the training organizer.";
+      statusNode.textContent = "Result submission failed. Please keep this page open and contact the training organizer.";
       statusNode.classList.add("save-error");
     });
+  }
+
+  function createTrainingEvaluation(basePayload, statusNode) {
+    const evaluation = config.trainingEvaluation;
+    const section = document.createElement("section");
+    section.className = "training-evaluation";
+    section.setAttribute("aria-labelledby", "training-evaluation-title");
+
+    const title = document.createElement("h3");
+    title.id = "training-evaluation-title";
+    title.textContent = evaluation.title || "Training evaluation";
+
+    const intro = document.createElement("p");
+    intro.textContent = evaluation.intro || "Please evaluate the training before submitting your result.";
+
+    const form = document.createElement("form");
+    form.className = "evaluation-form";
+
+    const scale = document.createElement("div");
+    scale.className = "evaluation-scale";
+    scale.textContent = evaluation.scaleLabel || "Scale: 1 = insufficient, 5 = excellent.";
+
+    const criteria = evaluation.criteria || [];
+    criteria.forEach((criterion, criterionIndex) => {
+      const field = document.createElement("fieldset");
+      field.className = "evaluation-criterion";
+
+      const legend = document.createElement("legend");
+      legend.textContent = criterion.label;
+      field.appendChild(legend);
+
+      const group = document.createElement("div");
+      group.className = "rating-group";
+
+      [1, 2, 3, 4, 5].forEach((value) => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = `evaluation-${criterion.id}`;
+        input.value = String(value);
+        input.required = true;
+        label.appendChild(input);
+        appendText(label, String(value));
+        group.appendChild(label);
+      });
+
+      field.appendChild(group);
+      form.appendChild(field);
+    });
+
+    const fields = [
+      ["most_valuable_takeaway", "Most valuable takeaway", "What was the most useful learning or behavior you will apply?"],
+      ["improvement_suggestion", "Improvement suggestion", "What should be improved for the next session?"],
+      ["future_support_request", "Follow-up support", "What additional support, practice or material would help you use AI better?"]
+    ];
+
+    fields.forEach(([id, labelText, placeholder]) => {
+      const label = document.createElement("label");
+      label.className = "evaluation-text";
+      label.setAttribute("for", id);
+      label.textContent = labelText;
+
+      const textarea = document.createElement("textarea");
+      textarea.id = id;
+      textarea.name = id;
+      textarea.rows = 3;
+      textarea.placeholder = placeholder;
+
+      form.append(label, textarea);
+    });
+
+    const recommend = document.createElement("label");
+    recommend.className = "evaluation-checkbox";
+    const recommendInput = document.createElement("input");
+    recommendInput.type = "checkbox";
+    recommendInput.name = "recommend_training";
+    recommendInput.value = "yes";
+    recommend.appendChild(recommendInput);
+    appendText(recommend, " I would recommend this training to another consultant.");
+    form.appendChild(recommend);
+
+    const actions = document.createElement("div");
+    actions.className = "question-actions";
+    const submit = document.createElement("button");
+    submit.type = "submit";
+    submit.className = "button button-primary";
+    submit.textContent = "Submit score and evaluation";
+    actions.appendChild(submit);
+    form.appendChild(actions);
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (resultSubmitted) return;
+
+      const data = new FormData(form);
+      const extra = {
+        evaluation_submitted_at: new Date().toISOString(),
+        recommend_training: data.get("recommend_training") === "yes" ? "yes" : "no"
+      };
+
+      criteria.forEach((criterion) => {
+        extra[criterion.id] = data.get(`evaluation-${criterion.id}`) || "";
+      });
+
+      fields.forEach(([id]) => {
+        extra[id] = String(data.get(id) || "").trim();
+      });
+
+      submit.disabled = true;
+      submitResult({ ...basePayload, ...extra }, statusNode);
+    });
+
+    section.append(title, intro, scale, form);
+    return section;
   }
 
   function setResult() {
@@ -149,7 +265,12 @@
     saved.className = "result-copy save-status";
 
     resultNode.append(title, copy, saved);
-    submitResult(payload, saved);
+    if (config.trainingEvaluation) {
+      resultNode.appendChild(createTrainingEvaluation(payload, saved));
+      saved.textContent = "Complete the training evaluation below to submit your score privately.";
+    } else {
+      submitResult(payload, saved);
+    }
     resultNode.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 

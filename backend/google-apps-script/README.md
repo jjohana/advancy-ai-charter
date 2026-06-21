@@ -6,6 +6,7 @@ Security model:
 - The Google Sheet is private to the owner.
 - Participants never receive the sheet URL and cannot download a CSV from the quiz.
 - The public web app endpoint accepts submissions and upserts one row per `test_id + first_name + last_name + email`.
+- For the AI Usage test, the same row also stores training-evaluation ratings and comments.
 - The endpoint cannot expose the database contents because it implements only `doPost`.
 
 Deployment steps:

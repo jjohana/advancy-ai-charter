@@ -14,6 +14,19 @@ const HEADERS = [
   "passed",
   "answers",
   "correct_answers",
+  "evaluation_submitted_at",
+  "training_relevance",
+  "conceptual_clarity",
+  "practical_applicability",
+  "governance_confidence",
+  "codex_workflow_confidence",
+  "materials_quality",
+  "pace_and_depth",
+  "overall_satisfaction",
+  "recommend_training",
+  "most_valuable_takeaway",
+  "improvement_suggestion",
+  "future_support_request",
   "received_at"
 ];
 
@@ -94,6 +107,19 @@ function upsertScore_(payload) {
     payload.passed,
     payload.answers,
     payload.correct_answers,
+    payload.evaluation_submitted_at || "",
+    payload.training_relevance || "",
+    payload.conceptual_clarity || "",
+    payload.practical_applicability || "",
+    payload.governance_confidence || "",
+    payload.codex_workflow_confidence || "",
+    payload.materials_quality || "",
+    payload.pace_and_depth || "",
+    payload.overall_satisfaction || "",
+    payload.recommend_training || "",
+    payload.most_valuable_takeaway || "",
+    payload.improvement_suggestion || "",
+    payload.future_support_request || "",
     new Date().toISOString()
   ];
 

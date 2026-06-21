@@ -224,7 +224,7 @@
     recommendInput.name = "recommend_training";
     recommendInput.value = "yes";
     recommend.appendChild(recommendInput);
-    appendText(recommend, " I would recommend this training to another consultant.");
+    appendText(recommend, " I would recommend this training to another participant.");
     form.appendChild(recommend);
 
     const actions = document.createElement("div");

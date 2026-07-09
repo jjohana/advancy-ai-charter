@@ -3,6 +3,16 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
 const questionsSource = readFileSync("questions.js", "utf8");
+const expectedEvaluationCriteria = [
+  { id: "training_relevance", label: "Relevance to consulting work and day-to-day delivery" },
+  { id: "conceptual_clarity", label: "Clarity of LLM fundamentals, agent concepts and tool-routing principles" },
+  { id: "practical_applicability", label: "Practical applicability of examples, workflows and exercises" },
+  { id: "governance_confidence", label: "Confidence in applying governance, permissions and human-review gates" },
+  { id: "codex_workflow_confidence", label: "Confidence in knowing when and how to switch to Codex-style coding agents" },
+  { id: "materials_quality", label: "Quality, structure and professionalism of the training materials" },
+  { id: "pace_and_depth", label: "Balance between pace, depth and time for questions" },
+  { id: "overall_satisfaction", label: "Overall satisfaction with the training session" }
+];
 
 function loadQuestionContext(search) {
   const location = { search, pathname: "/", href: "https://example.test/" + search };
@@ -21,6 +31,12 @@ function validateQuestionSet(config, questions, expectedLength, label) {
     "https://advancy-ai-score-api.advancy-ai-training.workers.dev",
     label + " production apiBase must use the approved Worker origin"
   );
+  assert.ok(config.trainingEvaluation && typeof config.trainingEvaluation === "object",
+    label + " must retain the post-QCM training evaluation");
+  assert.equal(config.trainingEvaluation.title, "Training evaluation",
+    label + " has an unexpected post-QCM evaluation title");
+  assert.deepEqual(JSON.parse(JSON.stringify(config.trainingEvaluation.criteria)), expectedEvaluationCriteria,
+    label + " must retain every post-QCM rating question");
   assert.ok(Array.isArray(questions), label + " quizQuestions must be an array");
   assert.equal(questions.length, expectedLength, label + " assessment has an unexpected question count");
 
@@ -97,6 +113,23 @@ for (const contract of [
 }
 
 const app = readFileSync("app.js", "utf8");
+for (const feedbackContract of [
+  "most_valuable_takeaway",
+  "Most valuable takeaway (optional)",
+  "improvement_suggestion",
+  "Improvement suggestion (optional)",
+  "suggested_ai_automation_use_cases",
+  "Suggested AI automation use cases (optional)",
+  "recommend_training",
+  "I would recommend this training."
+]) {
+  assert.ok(app.includes(feedbackContract), "app.js is missing post-QCM feedback field: " + feedbackContract);
+}
+const resultStart = app.indexOf("function setResult");
+const restartStart = app.indexOf("function restartAssessment", resultStart);
+assert.ok(resultStart >= 0 && restartStart > resultStart &&
+  app.slice(resultStart, restartStart).includes("createTrainingEvaluation(status)"),
+  "the post-QCM result screen must render the training evaluation before secure submission");
 for (const forbidden of ["correct_answers", "user_agent", "source_url", "raw_json", "enrollment_token"]) {
   assert.ok(!app.includes(forbidden), "app.js must not send " + forbidden);
 }

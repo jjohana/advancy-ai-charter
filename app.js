@@ -69,7 +69,6 @@
   const modeLandingNode = document.querySelector("#mode-landing");
   const assessmentExperienceNode = document.querySelector("#assessment-experience");
   const modeLandingTitleNode = document.querySelector("#mode-landing-title");
-  const modeInviteStatusNode = document.querySelector("#mode-invite-status");
   const questionCountMetricNode = document.querySelector("#question-count-metric");
   const quizTitleNode = document.querySelector("#quiz-title");
   const selectedModeLabelNode = document.querySelector("#selected-mode-label");
@@ -152,7 +151,7 @@
   }
 
   function renderModeLanding() {
-    const invite = captureInviteToken();
+    captureInviteToken();
     if (assessmentExperienceNode) assessmentExperienceNode.hidden = true;
     if (modeLandingNode) modeLandingNode.hidden = false;
     const normalTitle = document.querySelector("#mode-normal-title");
@@ -169,13 +168,6 @@
       }
       link.setAttribute("href", "?" + params.toString());
     });
-    if (modeInviteStatusNode) {
-      modeInviteStatusNode.textContent = invite
-        ? "Your secure invitation is ready in this tab. Choose a mode to continue."
-        : state.enrollmentToken
-          ? "Registration is ready in this tab. Choose a mode to register and continue."
-          : "Choose a mode to continue. A valid invitation or protected registration link is required.";
-    }
     document.title = "Choose assessment mode - Advancy";
     window.requestAnimationFrame(function () {
       if (modeLandingTitleNode) modeLandingTitleNode.focus();

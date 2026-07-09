@@ -134,13 +134,6 @@ main {
   color: var(--muted);
 }
 
-.mode-invite-status {
-  padding: 11px 13px;
-  border-left: 5px solid var(--advancy-orange-action);
-  background: var(--surface-strong);
-  color: var(--ink) !important;
-}
-
 .mode-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

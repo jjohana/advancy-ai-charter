@@ -1,0 +1,38 @@
+name: Validate assessment
+
+on:
+  pull_request:
+  push:
+    branches: ["main", "codex/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node scripts/build-unified-questions.mjs --check
+      - run: node --check app.js
+      - run: node scripts/validate-quiz.mjs
+      - run: node scripts/validate-full-contract.mjs
+
+  worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/score-worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: backend/score-worker/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx wrangler deploy --dry-run --outdir .wrangler/ci-dry-run

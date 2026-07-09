@@ -1,0 +1,7 @@
+# Copy to .dev.vars for local development only. Never commit real secrets.
+ADMIN_TOKEN=replace-with-at-least-32-random-characters
+ENROLLMENT_TOKEN=enr_0123456789012345678901234567890123456789012
+ALLOWED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000
+ALLOWED_EMAIL_DOMAINS=
+LEGACY_SUBMISSIONS_ENABLED=false
+SELF_ENROLLMENT_ENABLED=true

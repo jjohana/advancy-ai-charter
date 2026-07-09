@@ -1,0 +1,727 @@
+{
+  "source_id": "advancy-ai-usage-advanced",
+  "config": {
+    "quizId": "advancy-ai-usage-advanced",
+    "quizName": "Advancy AI Usage Advanced Assessment",
+    "quizVersion": "2026-07-09",
+    "privacyNoticeVersion": "2026-07-09",
+    "apiBase": "https://advancy-ai-score-api.advancy-ai-training.workers.dev",
+    "correctionTitle": "Correction from the advanced training material",
+    "trainingEvaluation": {
+      "title": "Training evaluation",
+      "intro": "Please provide a concise evaluation of the training. Your feedback is submitted privately with your assessment result and is used to improve future sessions.",
+      "scaleLabel": "Rating scale: 1 = insufficient, 2 = needs improvement, 3 = satisfactory, 4 = strong, 5 = excellent.",
+      "criteria": [
+        {
+          "id": "training_relevance",
+          "label": "Relevance to consulting work and day-to-day delivery"
+        },
+        {
+          "id": "conceptual_clarity",
+          "label": "Clarity of LLM fundamentals, agent concepts and tool-routing principles"
+        },
+        {
+          "id": "practical_applicability",
+          "label": "Practical applicability of examples, workflows and exercises"
+        },
+        {
+          "id": "governance_confidence",
+          "label": "Confidence in applying governance, permissions and human-review gates"
+        },
+        {
+          "id": "codex_workflow_confidence",
+          "label": "Confidence in knowing when and how to switch to Codex-style coding agents"
+        },
+        {
+          "id": "materials_quality",
+          "label": "Quality, structure and professionalism of the training materials"
+        },
+        {
+          "id": "pace_and_depth",
+          "label": "Balance between pace, depth and time for questions"
+        },
+        {
+          "id": "overall_satisfaction",
+          "label": "Overall satisfaction with the training session"
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "q": "A team asks an LLM to build a source-backed market-entry recommendation from public articles, public investor decks, and a few uploaded documents already authorized as Green or otherwise permitted for AI use. Which setup best follows the advanced routing discipline?",
+      "source": "Advanced model routing and AI-use charter compatibility - combine a reasoning model with only the necessary approved tools, use only public or Green/permitted documents, define the source perimeter and output schema, sample-check first, and keep human review.",
+      "correct": 3,
+      "options": [
+        {
+          "text": "Use instant mode without tools, because the inputs are public or authorized and the final answer can be checked later.",
+          "why": "Incorrect. Public or authorized inputs do not remove the need for source-aware tools, deliberate reasoning, and controlled evidence review."
+        },
+        {
+          "text": "Enable every connector and let the model decide which sources are relevant.",
+          "why": "Incorrect. The training emphasizes least-necessary tooling and an explicit source perimeter, not maximum autonomy."
+        },
+        {
+          "text": "Use image generation to draft the market-entry story, then infer the evidence from the visual.",
+          "why": "Incorrect. Image generation is not an evidence workflow and cannot replace source-backed analysis."
+        },
+        {
+          "text": "Use a reasoning model with required tools, an authorized source perimeter, a fixed schema, sample checks, and human review.",
+          "why": "Correct. This combines model routing, source discipline, charter-compatible document authorization, schema discipline, and the human review gate."
+        },
+        {
+          "text": "Use GPT Pro for every step and skip the source perimeter because the model is more capable.",
+          "why": "Incorrect. Higher-capability models do not remove source boundaries, tool boundaries, sample checks, or review."
+        }
+      ]
+    },
+    {
+      "q": "An LLM produces a confident market-size calculation with a neat table but no traceable sources or formula audit. What is the right status of that output?",
+      "source": "LLM fundamentals - LLM output is a draft hypothesis, not proof; sources, logic, numbers, and confidentiality must be checked before use.",
+      "correct": 0,
+      "options": [
+        {
+          "text": "A draft hypothesis requiring checks of evidence, logic, calculations, and confidentiality.",
+          "why": "Correct. The training explicitly warns that fluent and confident output is not proof."
+        },
+        {
+          "text": "A validated answer because the table is structured and the model sounds confident.",
+          "why": "Incorrect. Formatting and confidence do not validate facts, formulas, assumptions, or sources."
+        },
+        {
+          "text": "A final internal answer because only external deliverables require verification.",
+          "why": "Incorrect. Internal work product can still create downstream risk and must be reviewed."
+        },
+        {
+          "text": "A source-backed analysis because market sizing is a standard LLM strength.",
+          "why": "Incorrect. LLMs can assist with structure and drafts, but the answer is not source-backed unless evidence is actually checked."
+        },
+        {
+          "text": "A safe answer if the prompt asked the model not to hallucinate.",
+          "why": "Incorrect. Prompt wording does not guarantee factuality or numerical correctness."
+        }
+      ]
+    },
+    {
+      "q": "A practice wants a weekly public deal-radar assistant that scans defined public sources, outputs a structured shortlist, and is reviewed by a named owner before sharing. Which deployment surface best fits?",
+      "source": "No-code agents - recurring source-backed work can be packaged as a saved assistant with role, knowledge, method, output checks, owner, tests, and sharing controls.",
+      "correct": 4,
+      "options": [
+        {
+          "text": "A one-off chat, because any saved workflow would be over-governed.",
+          "why": "Incorrect. Recurrence, defined sources, and repeated output make this a strong candidate for a governed saved agent."
+        },
+        {
+          "text": "A fully autonomous agent that emails the shortlist directly to clients every week.",
+          "why": "Incorrect. The training keeps review gates before sharing and does not support autonomous business actions without approval."
+        },
+        {
+          "text": "A coding agent by default, because every recurring workflow requires file edits and commands.",
+          "why": "Incorrect. Coding agents fit file edits, commands, scale, and evidence generation; a source-backed recurring assistant can be no-code if bounded and reviewable."
+        },
+        {
+          "text": "A personal browser extension chosen by the participant, because the data is public.",
+          "why": "Incorrect. Tool approval and governance still matter even when the source material is public."
+        },
+        {
+          "text": "A governed no-code shared agent with approved sources, tests, an owner, monitoring, and revocation.",
+          "why": "Correct. This matches the no-code agent and shared deployment controls described in the training."
+        }
+      ]
+    },
+    {
+      "q": "A coding-agent workflow must extract fields for 80 companies. The pilot works on two companies, but the output schema is still changing. What should happen before parallel runs?",
+      "source": "Industrialized coding agents - scale only after scope, schema, tools, stop rules, logs, and sample QA are fixed.",
+      "correct": 1,
+      "options": [
+        {
+          "text": "Start parallel runs immediately so the final schema emerges from the full batch.",
+          "why": "Incorrect. Parallelization before schema stability multiplies rework and error propagation."
+        },
+        {
+          "text": "Freeze scope, schema, tools, stop rules, logs, and QA criteria before scaling.",
+          "why": "Correct. The advanced scaling rule is to lock the operating system before multiplying the run."
+        },
+        {
+          "text": "Delete pilot logs so the batch starts from a clean state.",
+          "why": "Incorrect. Logs are evidence and should be retained for review and troubleshooting."
+        },
+        {
+          "text": "Move directly to client delivery if the first two examples look polished.",
+          "why": "Incorrect. Polished output is not enough; the reviewer needs evidence, checks, and residual-risk review."
+        },
+        {
+          "text": "Switch to instant mode because repeated extraction is mechanical.",
+          "why": "Incorrect. Repetition increases the need for schema discipline and checks; it does not justify reducing control."
+        }
+      ]
+    },
+    {
+      "q": "A proposed MCP connector would let an agent read CRM records that are authorized for this workflow, write notes, and open follow-up tasks. What is the most complete governance answer before use?",
+      "source": "MCP and connector governance - connectors expose allowed data, tools, or actions while access remains governed by authentication, permissions, logs, review, monitoring, revocation, and any AI-use charter restrictions on the underlying records.",
+      "correct": 2,
+      "options": [
+        {
+          "text": "Approve it if the agent prompt says not to change important records.",
+          "why": "Incorrect. Prompt wording is not a permission, logging, or revocation control."
+        },
+        {
+          "text": "Approve it because MCP connectors are designed to bypass manual authentication.",
+          "why": "Incorrect. The training states that authentication and permissions remain central."
+        },
+        {
+          "text": "Approve scoped data and actions with authentication, authorization, least privilege, logs, review, monitoring, and revocation.",
+          "why": "Correct. This captures the full connector-control model and the required compatibility check for the underlying data."
+        },
+        {
+          "text": "Allow read and write access to all CRM objects so the agent can discover the right workflow.",
+          "why": "Incorrect. Broad access violates least privilege and scope discipline."
+        },
+        {
+          "text": "Use the connector only in a personal run, because personal runs do not need deployment controls.",
+          "why": "Incorrect. Personal runs still require appropriate permissions and review; sharing adds more controls but does not eliminate baseline governance."
+        }
+      ]
+    },
+    {
+      "q": "A coding agent needs one authorized workbook stored in a Documents folder that also contains unrelated client files. What is the least-privilege setup?",
+      "source": "Permission gates and least privilege - isolate or name only the authorized files, define allowed actions, and identify the reviewer instead of exposing a broad mixed folder.",
+      "correct": 4,
+      "options": [
+        {
+          "text": "Approve it because broad search is often needed at the start of a coding-agent run.",
+          "why": "Incorrect. Initial exploration still needs a bounded workspace or explicit approval."
+        },
+        {
+          "text": "Approve it if the command is read-only, because read-only commands cannot create risk.",
+          "why": "Incorrect. Read-only access can still expose unrelated or sensitive information and must respect scope."
+        },
+        {
+          "text": "Approve it if the agent promises not to edit unrelated files.",
+          "why": "Incorrect. The scope boundary must be clear before the command, not inferred from the agent's promise."
+        },
+        {
+          "text": "Run it first and inspect logs afterward.",
+          "why": "Incorrect. Logs are not a substitute for permission and boundary clarity."
+        },
+        {
+          "text": "Create a dedicated workspace with only authorized files, then define allowed actions and reviewer.",
+          "why": "Correct. Isolating the authorized workbook prevents access to unrelated client files and makes the action and review boundaries explicit."
+        }
+      ]
+    },
+    {
+      "q": "A participant mixes an internal PDF corpus that is approved and Green/permitted for AI use with current public web news in one analysis. Which tool distinction must be preserved?",
+      "source": "Agent tools and AI-use charter compatibility - file_search retrieves from approved Green/permitted files or corpora; web_search provides current public web information and citations.",
+      "correct": 1,
+      "options": [
+        {
+          "text": "Use file_search for both, because web_search and file_search are interchangeable retrieval tools.",
+          "why": "Incorrect. The training gives them different access routes and evidence implications."
+        },
+        {
+          "text": "Use file_search for authorized internal files and web_search for current public sources; review both source trails.",
+          "why": "Correct. This preserves the routing distinction, the document authorization requirement, and the evidence-review requirement."
+        },
+        {
+          "text": "Use web_search for those Green/permitted internal PDFs because it is the only tool that provides citations.",
+          "why": "Incorrect. Internal files that are approved and Green/permitted for AI use should be retrieved through file search or approved corpus tooling."
+        },
+        {
+          "text": "Avoid both tools and ask the base model to remember the documents and news.",
+          "why": "Incorrect. The base model cannot be treated as a controlled source retrieval system."
+        },
+        {
+          "text": "Use image generation to summarize charts from the PDFs before checking sources.",
+          "why": "Incorrect. Image generation is not the route for source retrieval or evidence validation."
+        }
+      ]
+    },
+    {
+      "q": "Which advanced task most clearly belongs to code_interpreter rather than web_search or a no-code saved assistant, assuming the files used are authorized as Green or otherwise permitted for AI use?",
+      "source": "Agent tools and AI-use charter compatibility - code_interpreter is sandboxed Python for authorized data, charts, file processing, reconciliation, and checks.",
+      "correct": 3,
+      "options": [
+        {
+          "text": "Finding the latest public article on a sector trend with citations.",
+          "why": "Incorrect. Current public information with citations belongs to web_search."
+        },
+        {
+          "text": "Packaging a recurring qualitative memo workflow with fixed public sources and review rules.",
+          "why": "Incorrect. That is a no-code agent candidate if bounded, recurring, and reviewable."
+        },
+        {
+          "text": "Drafting a short email that does not require files, calculations, or source retrieval.",
+          "why": "Incorrect. A simple low-risk language task can usually stay in chat."
+        },
+        {
+          "text": "Reconciling authorized Excel extracts, detecting duplicates, charting results, and checking formulas.",
+          "why": "Correct. This is authorized data/file processing and validation, which maps to code_interpreter."
+        },
+        {
+          "text": "Creating a conceptual slide background from a prompt.",
+          "why": "Incorrect. Visual generation is an image-generation task, not code_interpreter by default."
+        }
+      ]
+    },
+    {
+      "q": "In the phrase 'no evidence, no scale', what counts as evidence in the coding-agent workflow?",
+      "source": "Review gate and conclusion - decisions come from artifacts, logs, checks, screenshots, metrics, QA notes, and unresolved risks, not confidence.",
+      "correct": 0,
+      "options": [
+        {
+          "text": "Artifacts, logs, checks, metrics, QA notes, and residual risks.",
+          "why": "Correct. These are the concrete artifacts a reviewer can inspect before scaling."
+        },
+        {
+          "text": "The agent's confidence, plus a concise verbal summary.",
+          "why": "Incorrect. Confidence is specifically not the basis for scaling decisions."
+        },
+        {
+          "text": "A clean-looking final deliverable, even if intermediate logs are unavailable.",
+          "why": "Incorrect. A polished output alone does not prove scope, source, or execution quality."
+        },
+        {
+          "text": "The absence of user complaints after the first run.",
+          "why": "Incorrect. Lack of complaints is not a pre-scale review artifact."
+        },
+        {
+          "text": "A model-generated statement that all instructions were followed.",
+          "why": "Incorrect. The reviewer needs inspectable evidence, not self-certification."
+        }
+      ]
+    },
+    {
+      "q": "Monitoring shows that a shared agent started answering excluded client-data questions after its knowledge base was updated. What should the owner do?",
+      "source": "Shared deployment incident response - monitoring and revocation must let the owner stop access, preserve evidence, restore the approved source perimeter, retest, and authorize any return to service.",
+      "correct": 2,
+      "options": [
+        {
+          "text": "Leave the agent available while users report any other problematic answers.",
+          "why": "Incorrect. Continued access can expose more excluded material; the owner should contain the issue first."
+        },
+        {
+          "text": "Delete the monitoring logs and rebuild the agent from memory.",
+          "why": "Incorrect. Logs are evidence needed to understand the incident and validate the correction."
+        },
+        {
+          "text": "Pause access, preserve logs, restore the approved perimeter, retest, and obtain owner approval.",
+          "why": "Correct. This uses monitoring and revocation to contain the issue, retain evidence, correct the source boundary, and require controlled re-approval."
+        },
+        {
+          "text": "Remove the excluded answers manually but keep the broadened knowledge base connected.",
+          "why": "Incorrect. Editing outputs does not fix the unauthorized retrieval perimeter that caused the incident."
+        },
+        {
+          "text": "Add a prompt telling the agent to ignore client data and resume access immediately.",
+          "why": "Incorrect. Prompt wording alone is not a reliable access control and does not replace containment, investigation, and retesting."
+        }
+      ]
+    },
+    {
+      "q": "An agent brief says: 'Review these authorized sources, identify acquisition targets, enrich with evidence, and draft a memo.' Which missing element most directly prevents a controlled run?",
+      "source": "Brief discipline - define objective, authorized inputs, boundaries, output schema, evidence, stop rules, and owner/reviewer before execution.",
+      "correct": 1,
+      "options": [
+        {
+          "text": "The prompt does not ask the agent to be creative.",
+          "why": "Incorrect. Creativity is not the missing control for this governed workflow."
+        },
+        {
+          "text": "Explicit source boundaries, schema, evidence requirements, stop rules, and a reviewer.",
+          "why": "Correct. Even with authorized sources, without these controls the run cannot be reviewed or scaled safely."
+        },
+        {
+          "text": "The brief mentions both evidence and memo drafting, which should never be combined.",
+          "why": "Incorrect. Multi-step workflows can be split and governed; the issue is missing controls."
+        },
+        {
+          "text": "The brief should avoid any output schema because target screening requires judgment.",
+          "why": "Incorrect. Judgment-heavy work benefits from schema and evidence discipline."
+        },
+        {
+          "text": "The brief should let the agent choose the reviewer after seeing the output.",
+          "why": "Incorrect. The reviewer should be identified before execution."
+        }
+      ]
+    },
+    {
+      "q": "For a coding-agent run, what does the 'permission' step in the five-decision flow mainly decide?",
+      "source": "Five-decision flow - switch, permission, brief, review, deploy; permission controls scope, authorized files, commands, external access, and reviewer acceptance.",
+      "correct": 4,
+      "options": [
+        {
+          "text": "Whether the agent's answer is strategically correct.",
+          "why": "Incorrect. Strategic correctness is assessed at review, not granted at permission."
+        },
+        {
+          "text": "Whether the slides are visually attractive.",
+          "why": "Incorrect. Visual quality is not the core permission decision."
+        },
+        {
+          "text": "Whether the user personally likes the proposed workflow.",
+          "why": "Incorrect. Preference is not the same as scope, access, and command authorization."
+        },
+        {
+          "text": "Whether the task should become a no-code agent instead.",
+          "why": "Incorrect. Surface choice is the switch decision; permission is about allowed access and action."
+        },
+        {
+          "text": "Authorized files, commands, external access, and reviewer responsibility.",
+          "why": "Correct. This is the operational control point before the agent acts, and it must respect document authorization."
+        }
+      ]
+    },
+    {
+      "q": "Which output schema is strongest for repeated target-company profiling by a coding agent?",
+      "source": "Long and repeated runs - clarify prompt, sources, output schema, sample-check first, and retain evidence.",
+      "correct": 2,
+      "options": [
+        {
+          "text": "A free-form paragraph for each company, because flexibility improves quality.",
+          "why": "Incorrect. Free-form output is harder to validate, compare, and scale."
+        },
+        {
+          "text": "A slide-ready story only, with no source fields because citations can be added later.",
+          "why": "Incorrect. Evidence should be captured during the run, not retrofitted."
+        },
+        {
+          "text": "A fixed schema with required fields, source URLs, missing-data flags, and no invented values.",
+          "why": "Correct. This creates comparable, reviewable, and auditable output for repeated work."
+        },
+        {
+          "text": "A model-generated confidence score only, because confidence summarizes quality.",
+          "why": "Incorrect. Confidence without evidence fields and missing-data handling is not enough."
+        },
+        {
+          "text": "A screenshot of the agent's final answer.",
+          "why": "Incorrect. A screenshot may be evidence of output, but it is not a structured extraction schema."
+        }
+      ]
+    },
+    {
+      "q": "When is GPT Pro or the highest-capability model the right default choice under the training logic?",
+      "source": "Model routing - GPT Pro is positioned for the hardest or longest high-value analyses, not every standard task.",
+      "correct": 0,
+      "options": [
+        {
+          "text": "Hard, high-value analysis where added depth justifies cost and latency, with review.",
+          "why": "Correct. This is the disciplined routing logic for the most capable model."
+        },
+        {
+          "text": "For every consulting task, because higher capability removes routing decisions.",
+          "why": "Incorrect. The training explicitly routes by task type rather than always using the highest model."
+        },
+        {
+          "text": "For simple wording edits, because short tasks benefit most from maximum reasoning.",
+          "why": "Incorrect. Simple low-risk language tasks can often use faster, lighter modes."
+        },
+        {
+          "text": "Whenever the output includes citations, because GPT Pro validates sources automatically.",
+          "why": "Incorrect. Source validation remains a human and tooling responsibility."
+        },
+        {
+          "text": "Whenever the task uses authorized files, because file access alone determines model selection.",
+          "why": "Incorrect. Authorized files influence tool setup, but model choice still depends on complexity and value."
+        }
+      ]
+    },
+    {
+      "q": "Two public sources conflict on a market metric. What should a governed agent or LLM workflow do?",
+      "source": "Evidence discipline - when sources matter, verify sources; when evidence conflicts, surface the conflict rather than fabricate certainty.",
+      "correct": 3,
+      "options": [
+        {
+          "text": "Average the two numbers silently so the deliverable has one clean answer.",
+          "why": "Incorrect. Silent averaging hides source conflict and may create false precision."
+        },
+        {
+          "text": "Choose the number that best supports the emerging storyline.",
+          "why": "Incorrect. Evidence should constrain the storyline, not be selected to fit it."
+        },
+        {
+          "text": "Ask the model to invent a more plausible midpoint without citations.",
+          "why": "Incorrect. Fabricating a midpoint violates source and evidence discipline."
+        },
+        {
+          "text": "Cite both sources, explain the conflict, and require human judgment.",
+          "why": "Correct. This keeps the evidence trail intact and makes the judgment explicit."
+        },
+        {
+          "text": "Drop both sources and rely on the base model's prior knowledge.",
+          "why": "Incorrect. The base model is not a substitute for reviewed source evidence."
+        }
+      ]
+    },
+    {
+      "q": "A no-code agent is well written, but its knowledge base includes a broad mixed client drive that has not been classified as Green/permitted for AI use and has no exclusions. What is the core defect?",
+      "source": "No-code sharing controls and AI-use charter compatibility - approved Green/permitted sources, exclusions, only required tools, expected cases, and failure cases must be defined before sharing.",
+      "correct": 2,
+      "options": [
+        {
+          "text": "The role layer is always more important than the knowledge layer.",
+          "why": "Incorrect. Role matters, but broad uncontrolled knowledge access is itself a serious defect."
+        },
+        {
+          "text": "No-code agents cannot use files under any circumstances.",
+          "why": "Incorrect. They can use approved files or corpora when properly scoped."
+        },
+        {
+          "text": "The source perimeter, AI-use permission, and exclusions are undefined.",
+          "why": "Correct. This violates source governance and AI-use charter compatibility before sharing."
+        },
+        {
+          "text": "The agent should be converted to image generation because files are visual assets.",
+          "why": "Incorrect. The issue is access governance, not visual generation."
+        },
+        {
+          "text": "The only defect is that the agent has not been branded.",
+          "why": "Incorrect. Branding is irrelevant to source and permission control."
+        }
+      ]
+    },
+    {
+      "q": "A coding agent's automated tests pass, but the change log shows edits outside the authorized files. What should the reviewer decide?",
+      "source": "Review gate and permission boundary - passing checks are only part of the evidence; the reviewer must also verify scope and unrelated changes, then accept, revise, pause, or reject the result.",
+      "correct": 3,
+      "options": [
+        {
+          "text": "Accept the result because passing automated tests prove that the extra edits are safe.",
+          "why": "Incorrect. Tests do not authorize out-of-scope changes or prove that unrelated edits are acceptable."
+        },
+        {
+          "text": "Approve the authorized-file changes and ignore the other edits because they are outside the requested deliverable.",
+          "why": "Incorrect. The reviewer must account for every change and cannot ignore a permission-boundary breach."
+        },
+        {
+          "text": "Ask the agent whether the extra edits were useful and accept them if it says yes.",
+          "why": "Incorrect. Agent self-justification is not authorization or independent review evidence."
+        },
+        {
+          "text": "Pause the result, safely undo the agent's unrelated edits, narrow scope, rerun checks, and review again.",
+          "why": "Correct. The scope breach must be contained and corrected even though the automated tests passed."
+        },
+        {
+          "text": "Keep the result but document the scope breach only after deployment.",
+          "why": "Incorrect. Evidence review and resolution of out-of-scope changes must happen before acceptance or deployment."
+        }
+      ]
+    },
+    {
+      "q": "Why is image generation not an acceptable substitute for evidence in a consulting analysis?",
+      "source": "Agent tools - image_generation drafts or edits visuals when allowed; evidence workflows require sources, data, calculations, and review.",
+      "correct": 0,
+      "options": [
+        {
+          "text": "It creates visuals, not validated sources, calculations, assumptions, or claims.",
+          "why": "Correct. Visual quality and evidentiary validity are different controls."
+        },
+        {
+          "text": "Because image generation is never allowed in any professional workflow.",
+          "why": "Incorrect. The training allows visual generation or editing when appropriate and permitted."
+        },
+        {
+          "text": "Because image tools can access every source automatically, making citations redundant.",
+          "why": "Incorrect. Image generation is not source retrieval or citation validation."
+        },
+        {
+          "text": "Because visuals do not need review if they are only internal.",
+          "why": "Incorrect. AI-generated visuals still require review before use or sharing."
+        },
+        {
+          "text": "Because image generation is the same as code_interpreter, but less precise.",
+          "why": "Incorrect. The tools serve different workflows."
+        }
+      ]
+    },
+    {
+      "q": "Why do monitoring and revocation matter more once an agent is shared?",
+      "source": "Shared deployment - sharing adds allowed users, monitoring, and revocation to the governed agent package.",
+      "correct": 4,
+      "options": [
+        {
+          "text": "They allow the agent to run without an owner.",
+          "why": "Incorrect. Monitoring and revocation complement ownership; they do not replace it."
+        },
+        {
+          "text": "They make source review unnecessary after launch.",
+          "why": "Incorrect. Source and output review remain necessary."
+        },
+        {
+          "text": "They are mainly cosmetic features for stakeholder reassurance.",
+          "why": "Incorrect. They are operational controls for shared access and behavior."
+        },
+        {
+          "text": "They let all users modify the agent instructions freely.",
+          "why": "Incorrect. Shared deployment should preserve controlled instructions and ownership."
+        },
+        {
+          "text": "They reveal drift and let the owner revoke access.",
+          "why": "Correct. Monitoring and revocation are core shared-deployment safeguards."
+        }
+      ]
+    },
+    {
+      "q": "Which task should most likely stay in ordinary chat rather than become a no-code or coding-agent workflow?",
+      "source": "Switch rule - chat is enough for simple draft or review tasks; use agents or coding agents for recurrence, tools, files, commands, checks, scale, or evidence generation.",
+      "correct": 1,
+      "options": [
+        {
+          "text": "A recurring public-source target radar with fixed output checks and a named reviewer.",
+          "why": "Incorrect. Recurrence and defined review make this a no-code agent candidate."
+        },
+        {
+          "text": "A short, low-risk rewrite requiring no files, tools, recurrence, or evidence log.",
+          "why": "Correct. This fits ordinary chat rather than a heavier workflow."
+        },
+        {
+          "text": "A 70-company extraction requiring JSON outputs, logs, and sample QA.",
+          "why": "Incorrect. Scale, files, and checks point to a coding-agent workflow."
+        },
+        {
+          "text": "A connector-enabled workflow that reads authorized CRM records and opens tasks.",
+          "why": "Incorrect. Even when records are authorized, connectors and actions require agent governance."
+        },
+        {
+          "text": "A formula reconciliation across multiple workbooks.",
+          "why": "Incorrect. Data/file processing and checks point to code_interpreter or coding-agent support."
+        }
+      ]
+    },
+    {
+      "q": "During a controlled 10-company coding-agent batch, sample QA finds that one profile has no source links and contains an unsupported value. What should happen next?",
+      "source": "Industrialized coding agents - retain logs and apply sample QA and stop rules during scaled runs; when evidence or schema checks fail, pause, investigate, correct the workflow, and obtain reviewer sign-off before resuming.",
+      "correct": 0,
+      "options": [
+        {
+          "text": "Pause, preserve evidence, correct the workflow, rerun sample QA, and obtain reviewer approval.",
+          "why": "Correct. Missing provenance and an unsupported value trigger the stop rule; evidence must be preserved and the corrected workflow revalidated."
+        },
+        {
+          "text": "Let all remaining batches finish, because stopping would make the dataset inconsistent.",
+          "why": "Incorrect. Continuing after a material QA failure can multiply the same defect across the remaining batch."
+        },
+        {
+          "text": "Correct that profile manually and continue without changing or retesting the workflow.",
+          "why": "Incorrect. A manual patch hides the symptom but does not establish whether the workflow will repeat the defect."
+        },
+        {
+          "text": "Delete the failed profile and its log, then continue with the other companies.",
+          "why": "Incorrect. Deleting evidence prevents root-cause review and does not resolve the underlying control failure."
+        },
+        {
+          "text": "Continue because one failed sample is acceptable whenever the batch size is ten.",
+          "why": "Incorrect. No such automatic tolerance is defined; an unsupported value and missing sources require the agreed stop and review process."
+        }
+      ]
+    },
+    {
+      "q": "Which failure case is most important to test before sharing a source-backed no-code agent?",
+      "source": "Before sharing - expected and failure cases must be checked, with approved sources and exclusions, required tools only, and named owner/reviewer.",
+      "correct": 2,
+      "options": [
+        {
+          "text": "Whether the agent can generate a more attractive logo.",
+          "why": "Incorrect. Visual branding is not the core failure mode for a source-backed workflow."
+        },
+        {
+          "text": "Whether the agent can answer faster if all tools are enabled.",
+          "why": "Incorrect. Tool discipline is more important than unrestricted speed."
+        },
+        {
+          "text": "Off-scope requests, excluded sources, missing evidence, and unsupported claims.",
+          "why": "Correct. These are the failures that protect source quality and governance."
+        },
+        {
+          "text": "Whether users can bypass the owner by rewording the prompt.",
+          "why": "Incorrect. That would be a risk to prevent, not a successful test outcome."
+        },
+        {
+          "text": "Whether the agent can answer without source logs.",
+          "why": "Incorrect. Source logs are part of reviewability, not a feature to remove."
+        }
+      ]
+    },
+    {
+      "q": "Which briefing style is weakest for a coding agent under the training's operating model and the AI-use charter requirement that documents be authorized before use?",
+      "source": "Coding-agent brief and AI-use charter compatibility - define objective, authorized files/folders in scope, allowed commands, output, evidence, stop conditions, and reviewer.",
+      "correct": 1,
+      "options": [
+        {
+          "text": "Inspect only this folder, update these two files, run these checks, and report changed files and test output.",
+          "why": "Incorrect. This is a controlled and reviewable brief."
+        },
+        {
+          "text": "Make the project better; use whatever files and commands you need, then tell me when it looks good.",
+          "why": "Correct. It lacks boundary, allowed actions, evidence, stop rules, and review criteria."
+        },
+        {
+          "text": "Generate a CSV using this schema from these authorized sources, stop on missing fields, and keep a log of exclusions.",
+          "why": "Incorrect. This defines authorized sources, scope, schema, stop rules, and evidence."
+        },
+        {
+          "text": "Run a pilot on three records, compare to manual QA, and wait for approval before batching.",
+          "why": "Incorrect. This follows the sample-check and review-gate discipline."
+        },
+        {
+          "text": "Do not access external sources; use only the provided Green/permitted files and list any ambiguous assumptions.",
+          "why": "Incorrect. This explicitly constrains source access, document authorization, and ambiguity handling."
+        }
+      ]
+    },
+    {
+      "q": "A combined analysis uses public web pages and approved internal files, but its extraction table does not show which source supports each field. What is the correct review response?",
+      "source": "Evidence provenance and AI-use charter compatibility - the reviewer must be able to trace claims or fields to their source route, verify internal-file authorization, and see missing or conflicting evidence before approval.",
+      "correct": 3,
+      "options": [
+        {
+          "text": "Approve it because both the public pages and internal files came from permitted source categories.",
+          "why": "Incorrect. Permitted sources do not make an untraceable extraction table reviewable or evidence-backed."
+        },
+        {
+          "text": "Add one general bibliography at the end without linking sources to individual fields.",
+          "why": "Incorrect. A general bibliography does not show which evidence supports each extracted value or claim."
+        },
+        {
+          "text": "Infer the source of each value from the surrounding narrative and approve the table if the numbers look plausible.",
+          "why": "Incorrect. Plausibility and reviewer inference are not a reliable evidence trail."
+        },
+        {
+          "text": "Withhold approval; require claim-level provenance, expose evidence gaps, and verify internal-file authorization.",
+          "why": "Correct. The result becomes reviewable only when its evidence is traceable and the authorization of internal sources is confirmed."
+        },
+        {
+          "text": "Replace references to internal files with the model's prior knowledge so only public citations remain.",
+          "why": "Incorrect. Model memory is not evidence and cannot replace the authorized internal sources used in the analysis."
+        }
+      ]
+    },
+    {
+      "q": "What is the most precise meaning of automation in the coding-agent conclusion?",
+      "source": "Conclusion - automation is repeated agent execution with logs, stop rules, owner, and human decision ownership; the agent can run the workflow, Advancy owns the decision.",
+      "correct": 4,
+      "options": [
+        {
+          "text": "Removing the human reviewer once a workflow has succeeded once.",
+          "why": "Incorrect. Success once does not remove the review gate."
+        },
+        {
+          "text": "Letting the model decide when a workflow is mature enough to scale.",
+          "why": "Incorrect. Scale decisions are made by humans using evidence."
+        },
+        {
+          "text": "Replacing logs with a final status message to save time.",
+          "why": "Incorrect. Logs are part of automation control."
+        },
+        {
+          "text": "Running every task through a coding agent, even simple chat tasks.",
+          "why": "Incorrect. The switch rule keeps simple draft or review tasks in chat."
+        },
+        {
+          "text": "Repeated execution with fixed controls, logs, ownership, and human approval.",
+          "why": "Correct. This captures controlled automation rather than uncontrolled autonomy."
+        }
+      ]
+    }
+  ]
+}

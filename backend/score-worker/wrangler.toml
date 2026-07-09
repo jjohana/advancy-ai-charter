@@ -4,7 +4,42 @@ compatibility_date = "2026-06-21"
 workers_dev = true
 preview_urls = false
 
+[vars]
+ALLOWED_ORIGINS = "https://jjohana.github.io"
+ALLOWED_EMAIL_DOMAINS = "advancy.com"
+INVITATION_TTL_DAYS = "90"
+MAX_ATTEMPTS_PER_QUIZ = "3"
+PRIVACY_NOTICE_VERSION = "2026-07-09"
+RETENTION_DAYS = "365"
+LEGACY_SUBMISSIONS_ENABLED = "false"
+SELF_ENROLLMENT_ENABLED = "true"
+SELF_ENROLLMENT_COHORT_ID = "ai-training-2026"
+SELF_ENROLLMENT_COHORT_NAME = "Advancy AI Training 2026"
+SELF_ENROLLMENT_COHORT_EXPIRES_AT = "2026-12-31T23:59:59.000Z"
+
+[observability]
+enabled = true
+head_sampling_rate = 1.0
+
+[observability.logs]
+enabled = true
+invocation_logs = true
+head_sampling_rate = 1.0
+
+[triggers]
+crons = ["17 3 * * *"]
+
+[[ratelimits]]
+name = "PUBLIC_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 600, period = 60 }
+
+[[ratelimits]]
+name = "ENROLLMENT_RATE_LIMITER"
+namespace_id = "1002"
+simple = { limit = 5, period = 60 }
+
 [[d1_databases]]
 binding = "DB"
-database_name = "advancy-ai-results"
-database_id = "a35b83f7-1b54-4ceb-9038-484fbebe3962"
+database_name = "advancy-ai-results-eu"
+database_id = "10c690e6-abc5-45aa-a13a-f1a32e63d44c"

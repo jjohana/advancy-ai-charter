@@ -1,15 +1,20 @@
 {
   "name": "advancy-ai-score-worker",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
-    "db:create": "wrangler d1 create advancy-ai-results",
-    "db:migrate": "wrangler d1 execute advancy-ai-results --remote --file=./schema.sql",
-    "dev": "wrangler dev"
+    "db:create": "wrangler d1 create advancy-ai-results-eu --jurisdiction=eu",
+    "db:legacy-schema:local": "wrangler d1 execute DB --local --file=./schema.sql",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "dev": "wrangler dev",
+    "test": "node --test",
+    "smoke:local": "node scripts/load-smoke.mjs",
+    "smoke:shared-link": "node scripts/shared-link-smoke.mjs"
   },
   "devDependencies": {
-    "wrangler": "^4.103.0"
+    "wrangler": "4.110.0"
   }
 }

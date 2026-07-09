@@ -77,6 +77,7 @@ for (const contract of [
   'id="session-status"',
   'id="participant-name"',
   'id="privacy-acknowledged"',
+  'class="privacy-confirmation" hidden',
   'id="mode-landing"',
   'href="?mode=normal"',
   'href="?mode=advanced"',
@@ -134,6 +135,7 @@ for (const reliabilityContract of [
   "enrollmentPattern",
   'params.has("enroll")',
   "renderEnrollmentForm",
+  "privacyConfirmationNode",
   "submitEnrollment",
   'quiz_id: config.quizId',
   'privacy_notice_version: config.privacyNoticeVersion',
@@ -190,9 +192,13 @@ assert.ok(!app.includes("safeLocalSet(enrollmentIdempotencyStorageKey") &&
   !app.includes("safeLocalGet(enrollmentIdempotencyStorageKey"),
   "the enrollment idempotency key must never use persistent localStorage");
 
+const enrollmentRenderStart = app.indexOf("function renderEnrollmentForm");
 const enrollmentPayloadStart = app.indexOf("function enrollmentFormPayload");
 const enrollmentSubmitStart = app.indexOf("async function submitEnrollment", enrollmentPayloadStart);
 const enrollmentSubmitEnd = app.indexOf("function renderCompletedGate", enrollmentSubmitStart);
+assert.ok(enrollmentRenderStart >= 0 && enrollmentPayloadStart > enrollmentRenderStart &&
+  app.slice(enrollmentRenderStart, enrollmentPayloadStart).includes("privacyConfirmationNode.hidden = true"),
+  "protected registration must hide the duplicate sidebar privacy acknowledgement");
 assert.ok(enrollmentPayloadStart >= 0 && enrollmentSubmitStart > enrollmentPayloadStart && enrollmentSubmitEnd > enrollmentSubmitStart,
   "app.js must define the enrollment form and submission flow");
 const enrollmentPayloadBuilder = app.slice(enrollmentPayloadStart, enrollmentSubmitStart);
@@ -225,6 +231,9 @@ const sessionRequestStart = app.indexOf("const base = apiBase();", sessionLoader
 assert.ok(sessionLoaderStart >= 0 && sessionRequestStart > sessionLoaderStart &&
   app.slice(sessionLoaderStart, sessionRequestStart).includes("renderEnrollmentForm();"),
   "an enrollment credential must render registration before any session request");
+assert.ok(app.slice(sessionLoaderStart, app.indexOf("function renderAccessGate", sessionLoaderStart))
+  .includes("privacyConfirmationNode.hidden = !state.sessionReady"),
+  "the sidebar privacy acknowledgement must appear only for a verified session");
 assert.ok(
   app.includes("postWithRetry(state.lastSubmissionBody, statusNode)"),
   "explicit and automatic submission retries must reuse the exact serialized payload"

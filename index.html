@@ -6,80 +6,113 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Advancy AI Charter - Assessment</title>
-  <meta name="description" content="Advancy AI Charter knowledge assessment with question-by-question correction." />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://advancy-ai-score-api.advancy-ai-training.workers.dev; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
+  <title>Advancy AI Assessment</title>
+  <meta name="description" content="Advancy AI knowledge assessment with Normal and Advanced learning paths." />
   <link rel="icon" href="assets/advancy-logo.png" />
-  <link rel="stylesheet" href="styles.css?v=20260621-3" />
+  <link rel="stylesheet" href="styles.css?v=20260710-1" />
 </head>
 <body>
   <header class="topline">
     <div class="wrap masthead">
       <img class="logo" src="assets/advancy-logo.png" alt="Advancy - Driving strategy to results" />
       <div class="headline">
-        <div class="eyebrow">AI usage charter</div>
+        <div class="eyebrow">AI usage assessment</div>
         <h1>Knowledge assessment</h1>
-        <p class="tagline">Question-by-question assessment based on the Advancy Charter for the Professional Use of Artificial Intelligence, effective 1 May 2026.</p>
+        <p class="tagline">Choose a Normal or Advanced 50-question path. Both include the AI Charter section followed by the selected learning module.</p>
       </div>
     </div>
     <div class="orange-rule" aria-hidden="true"></div>
   </header>
 
   <main>
-    <div class="wrap assessment-grid">
+    <section id="mode-landing" class="wrap mode-landing" aria-labelledby="mode-landing-title" hidden>
+      <div class="mode-landing-card">
+        <div class="eyebrow mode-eyebrow">Choose your path</div>
+        <h2 id="mode-landing-title" tabindex="-1">Select an assessment mode</h2>
+        <p>Each path contains 50 questions: 25 on the Advancy AI Charter, then 25 on the selected module.</p>
+        <p id="mode-invite-status" class="mode-invite-status" role="status" aria-live="polite"></p>
+        <ul class="mode-options" aria-label="Assessment modes">
+          <li><a class="mode-option" data-testid="mode-normal" data-mode="normal" href="?mode=normal">
+            <strong id="mode-normal-title">Normal</strong>
+            <span>AI Charter plus the Normal AI usage module.</span>
+            <span class="mode-option-action">Choose Normal</span>
+          </a></li>
+          <li><a class="mode-option" data-testid="mode-advanced" data-mode="advanced" href="?mode=advanced">
+            <strong id="mode-advanced-title">Advanced</strong>
+            <span>AI Charter plus the Advanced AI usage module.</span>
+            <span class="mode-option-action">Choose Advanced</span>
+          </a></li>
+        </ul>
+      </div>
+    </section>
+
+    <div id="assessment-experience" hidden>
+      <div class="wrap assessment-grid">
       <aside class="side-panel" aria-labelledby="assessment-summary">
         <h2 id="assessment-summary">Assessment setup</h2>
-        <p>Submit one answer at a time. The correction explains why every option is right or wrong under the charter.</p>
+        <p>Submit one answer at a time. The correction explains why every option is right or wrong under the selected learning material.</p>
         <div class="metrics" aria-label="Assessment metrics">
-          <div class="metric"><strong>25</strong><span>Questions</span></div>
+          <div class="metric"><strong id="question-count-metric">50</strong><span>Questions</span></div>
           <div class="metric"><strong>A-E</strong><span>Five choices each</span></div>
           <div class="metric"><strong>1</strong><span>Correct answer</span></div>
-          <div class="metric"><strong>70%</strong><span>Pass threshold</span></div>
+          <div class="metric"><strong>70%</strong><span>Required in each section</span></div>
         </div>
         <div class="status-block">
-          <p id="progress">Question 1 / 25</p>
+          <p id="progress">Question 1 / 50</p>
           <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
         <div class="score-card" aria-live="polite">
           <span>Current score</span>
           <strong id="score">0 / 0</strong>
         </div>
-        <div class="participant-card">
-          <h3>Participant</h3>
-          <label for="first-name">First name</label>
-          <input id="first-name" name="first-name" type="text" autocomplete="given-name" />
-          <label for="last-name">Last name</label>
-          <input id="last-name" name="last-name" type="text" autocomplete="family-name" />
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" />
-          <p id="participant-status">Enter first name, last name and a valid email before submitting.</p>
+        <div class="participant-card secure-access-card" data-testid="secure-access">
+          <h3>Secure participant access</h3>
+          <strong id="participant-name">Invitation required</strong>
+          <p id="session-status" class="session-status" data-testid="session-status" role="status" aria-live="polite">Verifying your secure invitation...</p>
+          <p id="attempt-status"></p>
+          <div class="privacy-confirmation">
+            <label for="privacy-acknowledged">
+              <input id="privacy-acknowledged" data-testid="privacy-acknowledged" type="checkbox" disabled />
+              <span>I have read the <a href="privacy.html" target="_blank" rel="noopener noreferrer">assessment privacy notice</a>.</span>
+            </label>
+            <p>Do not enter client, transaction, confidential, personal, or market-sensitive information in optional feedback.</p>
+          </div>
         </div>
       </aside>
 
       <section class="quiz-shell" aria-labelledby="quiz-title">
         <div class="quiz-toolbar">
           <div>
-            <strong id="quiz-title">Advancy AI Charter Questionnaire</strong>
+            <strong id="quiz-title">Advancy AI Assessment</strong>
+            <span id="selected-mode-label" class="selected-mode-label"></span>
+            <span id="section-label" class="section-label" aria-live="polite"></span>
           </div>
           <div class="toolbar-actions">
-            <button type="button" class="button button-secondary" id="restart-top">Restart</button>
+            <button type="button" class="button button-secondary" id="change-mode" data-testid="change-mode">Change mode</button>
+            <button type="button" class="button button-secondary" id="restart-top" disabled>Restart</button>
           </div>
         </div>
         <div id="question-card" class="question-card"></div>
       </section>
-    </div>
-    <div class="wrap">
-      <section id="result" aria-live="polite"></section>
+      </div>
+      <div class="wrap">
+        <section id="result" aria-live="polite" aria-atomic="false"></section>
+      </div>
     </div>
   </main>
 
   <footer class="footer">
     <div class="wrap">
-      <span>Advancy AI Charter Assessment</span>
-      <a href="https://www.advancy.com/">advancy.com</a>
+      <span>Advancy AI Assessment</span>
+      <span><a href="privacy.html">Privacy notice</a> · <a href="https://www.advancy.com/">advancy.com</a></span>
     </div>
   </footer>
 
-  <script src="questions.js?v=20260621-3"></script>
-  <script src="app.js?v=20260621-3"></script>
+  <noscript><p class="noscript">JavaScript is required to verify the invitation and run this assessment.</p></noscript>
+  <script src="questions.js?v=20260710-1"></script>
+  <script src="app.js?v=20260710-2"></script>
 </body>
 </html>

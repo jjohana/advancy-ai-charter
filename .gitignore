@@ -1,0 +1,6 @@
+_site/
+*.log
+participants*.csv
+invite-links-*.csv
+*.sqlite
+*.sqlite3

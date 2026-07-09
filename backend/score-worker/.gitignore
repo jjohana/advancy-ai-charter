@@ -4,6 +4,7 @@ node_modules/
 .admin-token
 *.log
 *.csv
-*.json
 advancy-ai-results-*.csv
 advancy-ai-results-*.json
+invite-links-*.json
+load-test-results-*.json

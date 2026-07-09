@@ -106,12 +106,13 @@ Passed:
 
 - Both generated 50-question modes and all 75 source questions.
 - Exact client/server answer-key parity.
-- Thirteen backend unit/contract tests.
+- Fourteen backend unit/contract tests, including canonical millisecond timestamps for browser-validated receipts.
 - Fresh legacy schema plus both additive v2 migrations.
 - Clean `npm ci`, zero known dependency vulnerabilities and Wrangler 4.110.0 production dry-run.
 - PowerShell syntax validation for all admin tools.
 - Production security checks: healthy DB-aware endpoint, bad origin 403, missing enrollment token 401, and legacy submission endpoint 410.
 - In-app browser QA: enrollment-fragment scrubbing, mode landing, accessible registration, Normal and Advanced session resolution, progress/recovery, section results, another-attempt flow, accessibility focus and compatibility redirect.
+- Full production browser attempt: 50 Normal questions, server persistence, section-safe 10/50 result, canonical receipt timestamp, and secure receipt recovery.
 - Exhaustive choice QA: all 500 displayed question/option combinations, 500 choose/submit/correction flows, 2,500 option states, 2,500 feedback states, and all 1,352 section-score combinations.
 - Production shared-link smoke: ten synthetic participants covering both modes and all five constant answer positions, enrollment replay, submission replay, authoritative scores, and complete participant/attempt cleanup.
 - Section-safe failure: 15/25 Charter + 20/25 module = 35/50 (70%) but correctly fails.

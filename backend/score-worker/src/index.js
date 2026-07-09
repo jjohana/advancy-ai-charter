@@ -388,9 +388,11 @@ export function validateSubmission(payload, expectedPrivacyVersion) {
   };
 }
 
-function sqliteTimestamp(value) {
+export function sqliteTimestamp(value) {
   if (!value) return null;
-  return value.includes("T") ? value : `${value.replace(" ", "T")}Z`;
+  const normalized = value.includes("T") ? value : `${value.replace(" ", "T")}Z`;
+  const timestamp = Date.parse(normalized);
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null;
 }
 
 function receiptFromAttempt(row) {

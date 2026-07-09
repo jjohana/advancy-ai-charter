@@ -132,11 +132,13 @@ try {
         body: submissionBody
       };
       const { body: submitted } = await request("/v2/submit", submitOptions);
+      assert.match(submitted.submitted_at, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
       assertScore(submitted.score, expected);
       submissions += 1;
       const { body: replayed } = await request("/v2/submit", submitOptions);
       assert.equal(replayed.idempotent_replay, true);
       assert.equal(replayed.receipt_id, submitted.receipt_id);
+      assert.equal(replayed.submitted_at, submitted.submitted_at);
       assertScore(replayed.score, expected);
       replays += 1;
     }

@@ -8,6 +8,7 @@ import {
   encodeCursor,
   enrollmentFingerprint,
   rejectExistingEnrollment,
+  sqliteTimestamp,
   validateEnrollmentPayload,
   validateImport,
   validateSubmission
@@ -228,6 +229,12 @@ test("enrollment recovery derives stable tokens and normalized fingerprints with
   assert.match(fingerprint, /^[0-9a-f]{64}$/);
   assert.equal(fingerprint, await enrollmentFingerprint({ ...input }, cohortId));
   assert.notEqual(fingerprint, await enrollmentFingerprint({ ...input, quizId: "advancy-ai-assessment-advanced" }, cohortId));
+});
+
+test("database timestamps are canonical ISO strings accepted by the browser contract", () => {
+  assert.equal(sqliteTimestamp("2026-07-09 23:33:43"), "2026-07-09T23:33:43.000Z");
+  assert.equal(sqliteTimestamp("2026-07-09T23:33:43Z"), "2026-07-09T23:33:43.000Z");
+  assert.equal(sqliteTimestamp(null), null);
 });
 
 test("CSV cells neutralize spreadsheet formulas and escape delimiters", () => {

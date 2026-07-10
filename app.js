@@ -1322,7 +1322,7 @@
     const fields = [
       ["most_valuable_takeaway", "Most valuable takeaway (optional)", "What will you apply?"],
       ["improvement_suggestion", "Improvement suggestion (optional)", "What should be improved?"],
-      ["suggested_ai_automation_use_cases", "Suggested AI automation use cases (optional)", "Describe only non-confidential workflow ideas."]
+      ["suggested_ai_automation_use_cases", "Suggested AI automation use cases (optional)", "Describe workflow ideas."]
     ];
     fields.forEach(function (definition) {
       const label = document.createElement("label");

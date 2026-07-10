@@ -11,8 +11,8 @@ The three former 25-question quiz IDs remain accepted only for an explicitly ass
 
 The single canonical GitHub Pages site is a static client. D1 is bound only to the Worker and remains independent of front-end deployments. Browsers cannot query D1 directly.
 
-1. The organizer shares one common URL containing a 256-bit `enr_...` enrollment credential in the URL fragment. The client removes it immediately and never sends it to GitHub.
-2. `POST /v2/enroll` exchanges that shared credential once per cohort/email for a participant-specific 256-bit `inv_...` token. Neither raw token is logged or stored in D1; only the participant token's SHA-256 hash is persisted.
+1. The organizer shares the clean canonical URL. It opens rate-limited public cohort registration without putting a bearer credential in the page or URL.
+2. `POST /v2/public-enroll` validates the allowed email domain and exchanges the registration once per cohort/email for a participant-specific 256-bit `inv_...` token. The Worker uses its private `ENROLLMENT_TOKEN` only as an HMAC key; raw tokens are not logged or stored in D1, and only the participant token's SHA-256 hash is persisted.
 3. By default, the participant token authorizes both combined modes; the participant chooses Normal or Advanced on the canonical landing page.
 4. The participant token remains only in `sessionStorage`. Roster import and individual invitation links remain available as an administrator-controlled recovery path.
 5. The Worker derives identity from the token, validates the cohort and invitation window, computes the score from its versioned answer key, and inserts an append-only attempt.
@@ -34,15 +34,14 @@ The v2 schema deliberately does **not** store raw enrollment/invitation tokens, 
 
 ## Public v2 contract
 
-All public calls require an exact allowed `Origin` and `Authorization: Bearer inv_...`.
+All browser calls require an exact allowed `Origin`. Session and submission calls require `Authorization: Bearer inv_...`; public cohort registration intentionally does not carry a browser-side bearer.
 
-### Exchange the shared enrollment link
+### Register from the common URL
 
-Enrollment uses a distinct bearer credential and is enabled only when `SELF_ENROLLMENT_ENABLED=true`:
+Common-link registration is enabled only when both `SELF_ENROLLMENT_ENABLED=true` and `PUBLIC_SELF_ENROLLMENT_ENABLED=true`:
 
 ```http
-POST /v2/enroll
-Authorization: Bearer <enr_ plus 43 base64url characters>
+POST /v2/public-enroll
 Idempotency-Key: <random UUID persisted until enrollment succeeds>
 Content-Type: application/json
 
@@ -69,7 +68,7 @@ The payload is exact: unknown fields, non-Advancy domains, stale privacy consent
 }
 ```
 
-Enrollment is one-time per cohort/email. The client must reuse the exact UUID and normalized payload after an ambiguous failure: the Worker derives the same `inv_...` token with HMAC-SHA256 and returns the same participant, token, and expiry without storing either raw credential. Reusing a key with changed enrollment data returns `409 IDEMPOTENCY_KEY_REUSED`; a different key for an enrolled email returns `409 ENROLLMENT_USED`. An inactive or revoked participant returns `403 PARTICIPANT_REVOKED` and cannot self-reactivate. Recovery requires an administrator to issue a new individual invitation. The shared enrollment credential limits access to the cohort but does not prove mailbox ownership; use email verification or Advancy SSO if the result will have certification or employment consequences.
+Enrollment is one-time per cohort/email. The client must reuse the exact UUID and normalized payload after an ambiguous failure: the Worker derives the same `inv_...` token with HMAC-SHA256 and returns the same participant, token, and expiry without storing either raw credential. Reusing a key with changed enrollment data returns `409 IDEMPOTENCY_KEY_REUSED`; a different key for an enrolled email returns `409 ENROLLMENT_USED`. An inactive or revoked participant returns `403 PARTICIPANT_REVOKED` and cannot self-reactivate. Recovery requires an administrator to issue a new individual invitation. Public registration validates an allowed email format but does not prove mailbox ownership; use email verification or Advancy SSO if the result will have certification or employment consequences. The protected `POST /v2/enroll` bearer flow remains available as a recovery path.
 
 ### Resolve a quiz session
 
@@ -186,7 +185,7 @@ Committed production defaults are in `wrangler.toml`:
 - maximum attempts: 3 unless a participant override is imported
 - default retention: 365 days, copied into each cohort
 - legacy unauthenticated submissions: disabled
-- shared self-enrollment: enabled, one-time per cohort/email, using the configured cohort id/name/expiry
+- public cohort registration: explicitly enabled, one-time per cohort/email, using the configured cohort id/name/expiry and the server-side enrollment secret
 - Worker logs/metrics: enabled, with structured request completion records and no payload/identity fields
 - per-source public API rate limit: 600 requests/minute (high enough for a shared office pilot while bounding simple abuse)
 - enrollment limit: 5 attempts/minute for each source/email pair
@@ -220,7 +219,7 @@ Production sequence:
 2. Run `npm run db:migrate:remote`. Migration `0001` does not alter or drop `scores`.
 3. Set and verify the distinct `ADMIN_TOKEN` and `ENROLLMENT_TOKEN` secrets; verify the self-enrollment cohort expiry is still in the future.
 4. Deploy the Worker with `/v2/*`; do not enable the legacy flag unless an explicitly timed cutover window requires it.
-5. Deploy the canonical client pointing to `/v2/enroll`, `/v2/session`, and `/v2/submit`; run synthetic, non-production-token smoke tests.
+5. Deploy the canonical client pointing to `/v2/public-enroll`, `/v2/session`, and `/v2/submit`; retain `/v2/enroll` for protected recovery links and run synthetic smoke tests.
 6. Pilot the common link with a small synthetic group, verify both selectable combined modes and admin reconciliation, then share it with the approximately 300-person cohort.
 7. Confirm `LEGACY_SUBMISSIONS_ENABLED=false`. If it was temporarily enabled, disable it immediately after client cutover and schedule deletion of the legacy handler.
 
@@ -228,4 +227,4 @@ Production sequence:
 
 ## Capacity and cost posture
 
-For roughly 300 participants choosing one combined mode, the expected first-attempt volume is 300 submissions and the configured three-attempt ceiling is 900. If everyone completes both assigned modes, those figures are 600 and 1,800. Each attempt stores 50 selected-answer indexes, but storage and request volume remain tiny for Workers/D1. The operational risks are credential distribution, accidental public-token sharing, quota abuse, and recovery; database capacity is not the concern. Monitor Worker errors, D1 latency/write failures, `401/409/429` trends, and daily health; configure Cloudflare account budget alerts before sharing broadly.
+For roughly 300 participants choosing one combined mode, the expected first-attempt volume is 300 submissions and the configured three-attempt ceiling is 900. If everyone completes both assigned modes, those figures are 600 and 1,800. Each attempt stores 50 selected-answer indexes, but storage and request volume remain tiny for Workers/D1. The operational risks are public-registration abuse, identity denial through pre-registration, quota abuse, and recovery; database capacity is not the concern. Monitor Worker errors, D1 latency/write failures, `400/409/429` trends, and daily health; configure Cloudflare account budget alerts before sharing broadly.

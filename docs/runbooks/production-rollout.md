@@ -1,6 +1,6 @@
 # Production rollout runbook
 
-This runbook covers the canonical Advancy AI assessment site and its shared Cloudflare Worker/D1 service for a cohort of approximately 300 participants. One protected common registration link opens a landing page where each trainee chooses one of two 50-question modes: Charter + Usage Normal or Charter + Usage Advanced.
+This runbook covers the canonical Advancy AI assessment site and its shared Cloudflare Worker/D1 service for a cohort of approximately 300 participants. One clean common URL opens public cohort registration and a landing page where each trainee chooses one of two 50-question modes: Charter + Usage Normal or Charter + Usage Advanced.
 
 ## 1. Approval gate
 
@@ -9,7 +9,7 @@ Before any real participant is imported:
 - Confirm that the question content may remain publicly downloadable. Invitation authentication protects submissions and identity, not the static question bank. Use private hosting/SSO if the content itself must be internal.
 - Have Advancy HR/DPO approve the controller wording, processing purpose, legal basis, recipients, the cohort retention period (hard maximum: 365 days after cohort close), and the participant notice in `privacy.html`.
 - Name at least two production operators. Require 2FA on the GitHub and Cloudflare accounts and move ownership to an Advancy-controlled organization if it is currently personal.
-- Decide whether a shared registration credential plus participant-specific invitations are sufficient. The common link does not verify mailbox ownership; use Advancy SSO for consequential certification or employment use.
+- Decide whether public cohort registration plus participant-specific invitations are sufficient. The registration form validates an allowed email format but does not verify mailbox ownership; use Advancy SSO for consequential certification or employment use.
 - GitHub Pages cannot supply a project-defined `frame-ancestors` response header. If clickjacking protection is a launch requirement, serve the static artifact from an Advancy-controlled host that supports security response headers.
 
 ## 2. Create EU-restricted D1
@@ -49,16 +49,16 @@ Validate the assembled 50-question Normal and Advanced banks in the canonical de
 2. Deploy the Worker with `/v2/enroll`, `/v2/session`, and `/v2/submit` only after both additive migrations are applied.
 3. Keep `LEGACY_SUBMISSIONS_ENABLED=false` unless a short, explicitly timed transition is unavoidable.
 4. Deploy the canonical site as a canary through the manual Pages workflow.
-5. Verify that the common `#enroll=enr_...` fragment is scrubbed, registration is one-time per email, an ambiguous enrollment response replays the same participant invitation, and on-site Normal/Advanced selection works.
+5. Verify that the clean base URL opens registration in a fresh browser, registration is one-time per email, an ambiguous enrollment response replays the same participant invitation, and on-site Normal/Advanced selection works. Also verify that optional protected recovery fragments are scrubbed and survive the landing-to-mode handoff.
 6. Complete all 50 questions in each mode and verify optional feedback, server score, receipt, submission idempotency, admin count/export and participant deletion. Both combined IDs must advertise quiz/privacy version `2026-07-09`. Verify `score.sections` uses the confirmed Charter + Normal/Advanced order, and that 15/25 Charter plus 20/25 module fails despite a 70% aggregate.
-7. Deploy and test the two former questionnaire sites as compatibility redirects to the canonical mode chooser, including strict invitation and enrollment-fragment transfer.
+7. Deploy and test the two former questionnaire sites as compatibility redirects to the canonical mode chooser, including clean public registration and strict private-invitation fragment transfer.
 8. Confirm the three 25-question IDs remain accepted only for participants explicitly assigned during cutover, and confirm the unauthenticated legacy endpoint returns `410`.
 
 If a temporary legacy window is used, enable it only after recording the owner and stop time. Disable it immediately after the last cached old client is no longer in use.
 
 ## 5. Pilot and cohort access
 
-Generate a distinct 256-bit `ENROLLMENT_TOKEN`, store it only as a Worker secret, and distribute one canonical URL whose fragment is `#enroll=enr_...`. The fragment is intentionally shared with the cohort, is removed from the address bar immediately, and is never sent to GitHub Pages. Rotate it after the cohort closes or immediately after unintended disclosure.
+Generate a distinct 256-bit `ENROLLMENT_TOKEN` and store it only as a Worker secret. Enable `PUBLIC_SELF_ENROLLMENT_ENABLED` only for the approved cohort window, then distribute the clean canonical URL. The Worker uses the secret to derive participant invitations; it is never placed in the website or participant link. Disable public registration and rotate the secret after the cohort closes.
 
 Pilot with 5-10 authorized users across both combined modes. Reconcile registrations, invitations, attempts and receipts before distributing the link to the full cohort. Shared-link registration is limited to the configured email domain and is one-time for each cohort/email.
 

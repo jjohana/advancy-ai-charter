@@ -90,6 +90,7 @@ for (const contract of [
   'id="session-status"',
   'id="participant-name"',
   'id="privacy-acknowledged"',
+  'name="advancy-public-enrollment"',
   'class="privacy-confirmation" hidden',
   'id="mode-landing"',
   'href="?mode=normal"',
@@ -108,6 +109,8 @@ for (const contract of [
 ]) {
   assert.ok(html.includes(contract), "index.html is missing " + contract);
 }
+assert.ok(html.includes('<meta name="advancy-public-enrollment" content="enabled" />'),
+  "index.html must explicitly enable public cohort registration");
 
 const app = readFileSync("app.js", "utf8");
 for (const feedbackContract of [
@@ -166,6 +169,7 @@ for (const reliabilityContract of [
   "enrollmentStorageKey",
   "enrollmentIdempotencyStorageKey",
   "enrollmentPattern",
+  "publicEnrollmentMetaNode",
   'params.has("enroll")',
   "renderEnrollmentForm",
   "privacyConfirmationNode",
@@ -195,7 +199,12 @@ assert.ok(app.includes("questions.length !== 50"), "selected modes must fail clo
 assert.ok(app.includes("sections.every(function (section) { return section.passed; })"),
   "combined pass must require both authoritative section results to pass");
 assert.ok(app.slice(app.indexOf("function renderModeLanding"), app.indexOf("function configureSelectedMode")).includes("captureInviteToken()"),
-  "the landing must secure and scrub the invitation before mode navigation");
+  "the landing must initialize shared or private access before mode navigation");
+const modeLandingContract = app.slice(app.indexOf("function renderModeLanding"), app.indexOf("function configureSelectedMode"));
+for (const handoffContract of ["handoffFragment", '"#invite="', '"#enroll="']) {
+  assert.ok(modeLandingContract.includes(handoffContract),
+    "mode navigation must preserve access across browser-context handoff: " + handoffContract);
+}
 const modeGuard = app.lastIndexOf("if (!selectedAssessmentMode)");
 const finalSessionLoad = app.lastIndexOf("loadSession();");
 assert.ok(modeGuard >= 0 && finalSessionLoad > modeGuard && app.slice(modeGuard, finalSessionLoad).includes("return;"),
@@ -211,6 +220,16 @@ assert.ok(captureStart >= 0 && captureEnd > captureStart &&
   captureContract.includes("window.history.replaceState") &&
   captureContract.includes("window.location.pathname + window.location.search"),
   "invite and enrollment fragments must be scrubbed immediately after capture");
+for (const sharedAccessContract of [
+  "validInviteFragment",
+  "validEnrollmentFragment",
+  "state.enrollmentToken = inviteToken ? \"\" : enrollmentToken",
+  "state.publicEnrollment = !hasCredentialFragment",
+  'publicEnrollmentMetaNode.getAttribute("content") === "enabled"'
+]) {
+  assert.ok(captureContract.includes(sharedAccessContract),
+    "shared access capture is missing resilient fallback behavior: " + sharedAccessContract);
+}
 for (const idempotencyCaptureContract of [
   "previousEnrollment !== fromEnrollmentFragment",
   "safeSessionGet(enrollmentIdempotencyStorageKey)",
@@ -243,8 +262,9 @@ for (const forbiddenField of ["invite_token", "enrollment_token", "idempotency_k
 }
 const enrollmentSubmit = app.slice(enrollmentSubmitStart, enrollmentSubmitEnd);
 for (const enrollmentContract of [
-  'apiBase() + "/v2/enroll"',
-  '"Authorization": "Bearer " + state.enrollmentToken',
+  'state.publicEnrollment ? "/v2/public-enroll" : "/v2/enroll"',
+  "apiBase() + registrationPath",
+  'registrationHeaders.Authorization = "Bearer " + state.enrollmentToken',
   '"Idempotency-Key": state.enrollmentIdempotencyKey',
   "body: JSON.stringify(prepared.payload)",
   "validate: validateEnrollmentResponse",
@@ -253,6 +273,7 @@ for (const enrollmentContract of [
   "safeSessionRemove(enrollmentIdempotencyStorageKey)",
   'state.enrollmentToken = ""',
   'state.enrollmentIdempotencyKey = ""',
+  "state.publicEnrollment = false",
   "loadSession()"
 ]) {
   assert.ok(enrollmentSubmit.includes(enrollmentContract), "enrollment submission is missing contract: " + enrollmentContract);
@@ -262,8 +283,9 @@ assert.ok(app.includes('new Set(["ok", "participant_id", "invite_token", "partic
 const sessionLoaderStart = app.indexOf("async function loadSession");
 const sessionRequestStart = app.indexOf("const base = apiBase();", sessionLoaderStart);
 assert.ok(sessionLoaderStart >= 0 && sessionRequestStart > sessionLoaderStart &&
+  app.slice(sessionLoaderStart, sessionRequestStart).includes("state.enrollmentToken || state.publicEnrollment") &&
   app.slice(sessionLoaderStart, sessionRequestStart).includes("renderEnrollmentForm();"),
-  "an enrollment credential must render registration before any session request");
+  "shared or credentialed enrollment must render registration before any session request");
 assert.ok(app.slice(sessionLoaderStart, app.indexOf("function renderAccessGate", sessionLoaderStart))
   .includes("privacyConfirmationNode.hidden = !state.sessionReady"),
   "the sidebar privacy acknowledgement must appear only for a verified session");
@@ -287,13 +309,25 @@ assert.ok((app.match(/clearPendingSubmission\(\);/g) || []).length >= 4,
 
 const css = readFileSync("styles.css", "utf8");
 const privacy = readFileSync("privacy.html", "utf8");
+const worker = readFileSync("backend/score-worker/src/index.js", "utf8");
+const wrangler = readFileSync("backend/score-worker/wrangler.toml", "utf8");
+for (const publicEnrollmentContract of [
+  'path === "/v2/public-enroll"',
+  "validatePublicEnrollmentConfiguration",
+  "PUBLIC_SELF_ENROLLMENT_ENABLED"
+]) {
+  assert.ok(worker.includes(publicEnrollmentContract) || wrangler.includes(publicEnrollmentContract),
+    "public cohort registration is missing backend contract: " + publicEnrollmentContract);
+}
 for (const privacyContract of [
   "supplied through protected registration or by the authorized cohort administrator",
-  "immediately removed from the browser address",
-  "held only in session storage for the current browser tab",
-  "random registration transaction identifier is stored beside the registration credential",
+  "common cohort link opens registration without a private link credential",
+  "work in any browser",
+  "Registration remains restricted to authorized work-email domains",
+  "removed from the browser address after capture",
+  "random registration transaction identifier may be held in session storage",
   "reload or interrupted request reuses the same registration",
-  "both are removed after exchange for a participant invitation or when an invalid access link is opened"
+  "removed after successful exchange or when invalid access is detected"
 ]) {
   assert.ok(privacy.includes(privacyContract), "privacy.html is missing enrollment disclosure: " + privacyContract);
 }

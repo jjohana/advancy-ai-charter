@@ -66,6 +66,7 @@
   const participantNameNode = document.querySelector("#participant-name");
   const attemptStatusNode = document.querySelector("#attempt-status");
   const privacyInput = document.querySelector("#privacy-acknowledged");
+  const privacyConfirmationNode = document.querySelector(".privacy-confirmation");
   const modeLandingNode = document.querySelector("#mode-landing");
   const assessmentExperienceNode = document.querySelector("#assessment-experience");
   const modeLandingTitleNode = document.querySelector("#mode-landing-title");
@@ -787,6 +788,7 @@
       });
       state.session = payload;
       state.sessionReady = !sessionBlocked(payload);
+      if (privacyConfirmationNode) privacyConfirmationNode.hidden = !state.sessionReady;
       displaySession(payload);
       if (privacyInput) privacyInput.disabled = !state.sessionReady;
       state.progressKey = progressStorageKey(payload.session_id);
@@ -958,6 +960,7 @@
 
   function renderEnrollmentForm() {
     if (!cardNode || !state.enrollmentToken) return;
+    if (privacyConfirmationNode) privacyConfirmationNode.hidden = true;
     cardNode.replaceChildren();
     cardNode.setAttribute("aria-busy", state.enrollmentPending ? "true" : "false");
     if (sectionLabelNode) sectionLabelNode.textContent = modeLabel(selectedAssessmentMode) + " mode · Protected registration";

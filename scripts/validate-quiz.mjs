@@ -3,6 +3,16 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
 const questionsSource = readFileSync("questions.js", "utf8");
+const expectedEvaluationCriteria = [
+  { id: "training_relevance", label: "Relevance to consulting work and day-to-day delivery" },
+  { id: "conceptual_clarity", label: "Clarity of LLM fundamentals, agent concepts and tool-routing principles" },
+  { id: "practical_applicability", label: "Practical applicability of examples, workflows and exercises" },
+  { id: "governance_confidence", label: "Confidence in applying governance, permissions and human-review gates" },
+  { id: "codex_workflow_confidence", label: "Confidence in knowing when and how to switch to Codex-style coding agents" },
+  { id: "materials_quality", label: "Quality, structure and professionalism of the training materials" },
+  { id: "pace_and_depth", label: "Balance between pace, depth and time for questions" },
+  { id: "overall_satisfaction", label: "Overall satisfaction with the training session" }
+];
 
 function loadQuestionContext(search) {
   const location = { search, pathname: "/", href: "https://example.test/" + search };
@@ -21,6 +31,12 @@ function validateQuestionSet(config, questions, expectedLength, label) {
     "https://advancy-ai-score-api.advancy-ai-training.workers.dev",
     label + " production apiBase must use the approved Worker origin"
   );
+  assert.ok(config.trainingEvaluation && typeof config.trainingEvaluation === "object",
+    label + " must retain the post-QCM training evaluation");
+  assert.equal(config.trainingEvaluation.title, "Training evaluation",
+    label + " has an unexpected post-QCM evaluation title");
+  assert.deepEqual(JSON.parse(JSON.stringify(config.trainingEvaluation.criteria)), expectedEvaluationCriteria,
+    label + " must retain every post-QCM rating question");
   assert.ok(Array.isArray(questions), label + " quizQuestions must be an array");
   assert.equal(questions.length, expectedLength, label + " assessment has an unexpected question count");
 
@@ -77,6 +93,7 @@ for (const contract of [
   'id="session-status"',
   'id="participant-name"',
   'id="privacy-acknowledged"',
+  'class="privacy-confirmation" hidden',
   'id="mode-landing"',
   'href="?mode=normal"',
   'href="?mode=advanced"',
@@ -96,6 +113,23 @@ for (const contract of [
 }
 
 const app = readFileSync("app.js", "utf8");
+for (const feedbackContract of [
+  "most_valuable_takeaway",
+  "Most valuable takeaway (optional)",
+  "improvement_suggestion",
+  "Improvement suggestion (optional)",
+  "suggested_ai_automation_use_cases",
+  "Suggested AI automation use cases (optional)",
+  "recommend_training",
+  "I would recommend this training."
+]) {
+  assert.ok(app.includes(feedbackContract), "app.js is missing post-QCM feedback field: " + feedbackContract);
+}
+const resultStart = app.indexOf("function setResult");
+const restartStart = app.indexOf("function restartAssessment", resultStart);
+assert.ok(resultStart >= 0 && restartStart > resultStart &&
+  app.slice(resultStart, restartStart).includes("createTrainingEvaluation(status)"),
+  "the post-QCM result screen must render the training evaluation before secure submission");
 for (const forbidden of ["correct_answers", "user_agent", "source_url", "raw_json", "enrollment_token"]) {
   assert.ok(!app.includes(forbidden), "app.js must not send " + forbidden);
 }
@@ -134,6 +168,7 @@ for (const reliabilityContract of [
   "enrollmentPattern",
   'params.has("enroll")',
   "renderEnrollmentForm",
+  "privacyConfirmationNode",
   "submitEnrollment",
   'quiz_id: config.quizId',
   'privacy_notice_version: config.privacyNoticeVersion',
@@ -190,9 +225,13 @@ assert.ok(!app.includes("safeLocalSet(enrollmentIdempotencyStorageKey") &&
   !app.includes("safeLocalGet(enrollmentIdempotencyStorageKey"),
   "the enrollment idempotency key must never use persistent localStorage");
 
+const enrollmentRenderStart = app.indexOf("function renderEnrollmentForm");
 const enrollmentPayloadStart = app.indexOf("function enrollmentFormPayload");
 const enrollmentSubmitStart = app.indexOf("async function submitEnrollment", enrollmentPayloadStart);
 const enrollmentSubmitEnd = app.indexOf("function renderCompletedGate", enrollmentSubmitStart);
+assert.ok(enrollmentRenderStart >= 0 && enrollmentPayloadStart > enrollmentRenderStart &&
+  app.slice(enrollmentRenderStart, enrollmentPayloadStart).includes("privacyConfirmationNode.hidden = true"),
+  "protected registration must hide the duplicate sidebar privacy acknowledgement");
 assert.ok(enrollmentPayloadStart >= 0 && enrollmentSubmitStart > enrollmentPayloadStart && enrollmentSubmitEnd > enrollmentSubmitStart,
   "app.js must define the enrollment form and submission flow");
 const enrollmentPayloadBuilder = app.slice(enrollmentPayloadStart, enrollmentSubmitStart);
@@ -225,6 +264,9 @@ const sessionRequestStart = app.indexOf("const base = apiBase();", sessionLoader
 assert.ok(sessionLoaderStart >= 0 && sessionRequestStart > sessionLoaderStart &&
   app.slice(sessionLoaderStart, sessionRequestStart).includes("renderEnrollmentForm();"),
   "an enrollment credential must render registration before any session request");
+assert.ok(app.slice(sessionLoaderStart, app.indexOf("function renderAccessGate", sessionLoaderStart))
+  .includes("privacyConfirmationNode.hidden = !state.sessionReady"),
+  "the sidebar privacy acknowledgement must appear only for a verified session");
 assert.ok(
   app.includes("postWithRetry(state.lastSubmissionBody, statusNode)"),
   "explicit and automatic submission retries must reuse the exact serialized payload"

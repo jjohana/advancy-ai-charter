@@ -29,18 +29,6 @@
           "label": "Confidence in applying governance, permissions and human-review gates"
         },
         {
-          "id": "codex_workflow_confidence",
-          "label": "Confidence in knowing when and how to switch to Codex-style coding agents"
-        },
-        {
-          "id": "materials_quality",
-          "label": "Quality, structure and professionalism of the training materials"
-        },
-        {
-          "id": "pace_and_depth",
-          "label": "Balance between pace, depth and time for questions"
-        },
-        {
           "id": "overall_satisfaction",
           "label": "Overall satisfaction with the training session"
         }

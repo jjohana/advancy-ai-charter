@@ -38,6 +38,16 @@ const canonicalBanks = {
   normal: banks.normal.questions.map((question, index) => moveCorrectOption(question, rotatedNormalKey[index])),
   advanced: banks.advanced.questions
 };
+assert.deepEqual(
+  banks.normal.config.trainingEvaluation,
+  banks.advanced.config.trainingEvaluation,
+  "Normal and Advanced must use the same post-QCM evaluation"
+);
+assert.equal(
+  banks.normal.config.trainingEvaluation?.criteria?.length,
+  5,
+  "the post-QCM evaluation must contain exactly five rating questions"
+);
 const evaluation = banks.normal.config.trainingEvaluation || banks.advanced.config.trainingEvaluation || null;
 const sourceLiteral = JSON.stringify({ banks: canonicalBanks, evaluation });
 const output = [

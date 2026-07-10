@@ -8,9 +8,6 @@ const expectedEvaluationCriteria = [
   { id: "conceptual_clarity", label: "Clarity of LLM fundamentals, agent concepts and tool-routing principles" },
   { id: "practical_applicability", label: "Practical applicability of examples, workflows and exercises" },
   { id: "governance_confidence", label: "Confidence in applying governance, permissions and human-review gates" },
-  { id: "codex_workflow_confidence", label: "Confidence in knowing when and how to switch to Codex-style coding agents" },
-  { id: "materials_quality", label: "Quality, structure and professionalism of the training materials" },
-  { id: "pace_and_depth", label: "Balance between pace, depth and time for questions" },
   { id: "overall_satisfaction", label: "Overall satisfaction with the training session" }
 ];
 
@@ -120,11 +117,14 @@ for (const feedbackContract of [
   "Improvement suggestion (optional)",
   "suggested_ai_automation_use_cases",
   "Suggested AI automation use cases (optional)",
+  "Describe workflow ideas.",
   "recommend_training",
   "I would recommend this training."
 ]) {
   assert.ok(app.includes(feedbackContract), "app.js is missing post-QCM feedback field: " + feedbackContract);
 }
+assert.ok(!app.includes("Describe only non-confidential workflow ideas."),
+  "the use-case prompt must not contain the removed non-confidential qualifier");
 const resultStart = app.indexOf("function setResult");
 const restartStart = app.indexOf("function restartAssessment", resultStart);
 assert.ok(resultStart >= 0 && restartStart > resultStart &&

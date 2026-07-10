@@ -15,13 +15,13 @@ The GitHub Pages site is a static client. It has no database credentials and can
 ```text
 Participant browser
   -> GitHub Pages static client
-  -> authenticated Cloudflare Worker API
+  -> rate-limited Cloudflare Worker API
   -> private Cloudflare D1 database
 ```
 
-A protected common registration link carries a 256-bit enrollment credential in its URL fragment. The client removes the fragment immediately, then exchanges the credential, the participant's Advancy identity, and a retry-safe idempotency key for a participant-specific invitation. Raw enrollment and invitation credentials are never stored in D1. The private invitation remains only in the browser-tab session and authorizes both combined modes. Individual administrator-issued invitations remain available as a recovery path.
+A clean common URL opens rate-limited public cohort registration. The Worker validates the participant's Advancy identity and a retry-safe idempotency key, then uses its server-side enrollment secret to derive a participant-specific invitation. Raw enrollment and invitation credentials are never stored in D1. The private invitation remains only in the browser-tab session and authorizes both combined modes. Protected enrollment fragments and individual administrator-issued invitations remain available as recovery paths.
 
-The Worker resolves identity, enforces one-time registration, cohort windows and attempt limits, and computes all authoritative scores. Each combined result requires at least 18/25 in both the Charter and selected module. Because shared-link registration verifies possession of the link and an allowed email format rather than the mailbox itself, use Advancy SSO for consequential certification or employment decisions.
+The Worker resolves identity, enforces one-time registration, cohort windows and attempt limits, and computes all authoritative scores. Each combined result requires at least 18/25 in both the Charter and selected module. Public cohort registration validates an allowed email format rather than mailbox ownership, so use Advancy SSO for consequential certification or employment decisions.
 
 ## Question sources
 
@@ -61,11 +61,11 @@ The local synthetic load suite has passed at the configured ceiling with 300 par
 
 Production rollout remains deliberate and manual:
 
-1. obtain DPO/HR approval and decide whether the protected common link is sufficient or Advancy SSO is required;
+1. obtain DPO/HR approval and decide whether public cohort registration is sufficient or Advancy SSO is required;
 2. use the EU-jurisdiction D1 database, retain an encrypted/checksummed legacy backup, and apply additive migrations before the Worker;
-3. keep `ADMIN_TOKEN` and the shared `ENROLLMENT_TOKEN` distinct and outside source control;
+3. keep `ADMIN_TOKEN` and the server-side `ENROLLMENT_TOKEN` distinct and outside source control;
 4. deploy and test the Worker, canonical site, and both compatibility redirects;
 5. pilot with synthetic identities, then a small authorized group before distributing the common link to approximately 300 people;
-6. keep the unauthenticated legacy submission endpoint disabled and rotate the shared enrollment credential after the cohort closes.
+6. keep the unauthenticated legacy submission endpoint disabled and rotate the server-side enrollment secret after the cohort closes.
 
 The detailed sequence, monitoring, rollback, and deletion procedures are in `docs/runbooks/production-rollout.md`.

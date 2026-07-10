@@ -11,6 +11,7 @@ import {
   sqliteTimestamp,
   validateEnrollmentPayload,
   validateImport,
+  validatePublicEnrollmentConfiguration,
   validateSubmission
 } from "../src/index.js";
 import { DEFAULT_QUIZ_IDS, LEGACY_QUIZ_IDS, QUIZ_IDS, QUIZ_VERSION, findQuiz, scoreAnswers } from "../src/quizzes.js";
@@ -198,6 +199,23 @@ test("shared-link enrollment accepts only the exact current combined-assessment 
   assert.throws(() => validateEnrollmentPayload({ ...payload, email: "alice@example.com" }, env), { code: "EMAIL_DOMAIN_NOT_ALLOWED" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, privacy_notice_version: "old" }, env), { code: "PRIVACY_NOTICE_REQUIRED" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, extra: true }, env), { code: "UNKNOWN_FIELD" });
+});
+
+test("public cohort registration requires an explicit flag and a server-side enrollment secret", () => {
+  const env = {
+    SELF_ENROLLMENT_ENABLED: "true",
+    PUBLIC_SELF_ENROLLMENT_ENABLED: "true",
+    ENROLLMENT_TOKEN: "enr_0123456789012345678901234567890123456789012"
+  };
+  assert.equal(validatePublicEnrollmentConfiguration(env), true);
+  assert.throws(
+    () => validatePublicEnrollmentConfiguration({ ...env, PUBLIC_SELF_ENROLLMENT_ENABLED: "false" }),
+    { status: 404, code: "PUBLIC_ENROLLMENT_DISABLED" }
+  );
+  assert.throws(
+    () => validatePublicEnrollmentConfiguration({ ...env, ENROLLMENT_TOKEN: "invalid" }),
+    { status: 503, code: "SELF_ENROLLMENT_NOT_CONFIGURED" }
+  );
 });
 
 test("self-enrollment is one-time and revoked participants fail closed", () => {

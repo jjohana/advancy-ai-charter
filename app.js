@@ -67,6 +67,7 @@
   const attemptStatusNode = document.querySelector("#attempt-status");
   const privacyInput = document.querySelector("#privacy-acknowledged");
   const privacyConfirmationNode = document.querySelector(".privacy-confirmation");
+  const publicEnrollmentMetaNode = document.querySelector('meta[name="advancy-public-enrollment"]');
   const modeLandingNode = document.querySelector("#mode-landing");
   const assessmentExperienceNode = document.querySelector("#assessment-experience");
   const modeLandingTitleNode = document.querySelector("#mode-landing-title");
@@ -81,6 +82,7 @@
     enrollmentToken: "",
     enrollmentIdempotencyKey: "",
     enrollmentPending: false,
+    publicEnrollment: false,
     session: null,
     sessionReady: false,
     sessionLoading: false,
@@ -152,7 +154,10 @@
   }
 
   function renderModeLanding() {
-    captureInviteToken();
+    const invite = captureInviteToken();
+    const handoffFragment = invite
+      ? "#invite=" + encodeURIComponent(invite)
+      : state.enrollmentToken ? "#enroll=" + encodeURIComponent(state.enrollmentToken) : "";
     if (assessmentExperienceNode) assessmentExperienceNode.hidden = true;
     if (modeLandingNode) modeLandingNode.hidden = false;
     const normalTitle = document.querySelector("#mode-normal-title");
@@ -167,7 +172,7 @@
       if (localHost && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(localApiBase)) {
         params.set("apiBase", localApiBase);
       }
-      link.setAttribute("href", "?" + params.toString());
+      link.setAttribute("href", "?" + params.toString() + handoffFragment);
     });
     document.title = "Choose assessment mode - Advancy";
     window.requestAnimationFrame(function () {
@@ -349,13 +354,16 @@
     const params = new URLSearchParams(hash);
     const fromInviteFragment = params.get("invite") || "";
     const fromEnrollmentFragment = params.get("enroll") || "";
+    const hasCredentialFragment = params.has("invite") || params.has("enroll");
+    const validInviteFragment = invitePattern.test(fromInviteFragment);
+    const validEnrollmentFragment = enrollmentPattern.test(fromEnrollmentFragment);
     const previousEnrollment = safeSessionGet(enrollmentStorageKey);
-    if (params.has("invite") || params.has("enroll")) {
-      if (invitePattern.test(fromInviteFragment)) {
+    if (hasCredentialFragment) {
+      if (validInviteFragment) {
         safeSessionSet(inviteStorageKey, fromInviteFragment);
         safeSessionRemove(enrollmentStorageKey);
         safeSessionRemove(enrollmentIdempotencyStorageKey);
-      } else if (enrollmentPattern.test(fromEnrollmentFragment)) {
+      } else if (validEnrollmentFragment) {
         safeSessionSet(enrollmentStorageKey, fromEnrollmentFragment);
         safeSessionRemove(inviteStorageKey);
         if (previousEnrollment !== fromEnrollmentFragment) {
@@ -370,8 +378,16 @@
     }
     const storedInvite = safeSessionGet(inviteStorageKey);
     const storedEnrollment = safeSessionGet(enrollmentStorageKey);
-    state.enrollmentToken = enrollmentPattern.test(storedEnrollment) ? storedEnrollment : "";
-    if (state.enrollmentToken) {
+    const inviteToken = validInviteFragment
+      ? fromInviteFragment
+      : invitePattern.test(storedInvite) ? storedInvite : "";
+    const enrollmentToken = validEnrollmentFragment
+      ? fromEnrollmentFragment
+      : enrollmentPattern.test(storedEnrollment) ? storedEnrollment : "";
+    state.enrollmentToken = inviteToken ? "" : enrollmentToken;
+    state.publicEnrollment = !hasCredentialFragment && !inviteToken && !state.enrollmentToken &&
+      Boolean(publicEnrollmentMetaNode && publicEnrollmentMetaNode.getAttribute("content") === "enabled");
+    if (state.enrollmentToken || state.publicEnrollment) {
       const storedIdempotencyKey = safeSessionGet(enrollmentIdempotencyStorageKey);
       state.enrollmentIdempotencyKey = uuidPattern.test(storedIdempotencyKey) ? storedIdempotencyKey : createId();
       safeSessionSet(enrollmentIdempotencyStorageKey, state.enrollmentIdempotencyKey);
@@ -379,7 +395,7 @@
       state.enrollmentIdempotencyKey = "";
       safeSessionRemove(enrollmentIdempotencyStorageKey);
     }
-    return invitePattern.test(storedInvite) ? storedInvite : "";
+    return inviteToken;
   }
 
   function privacyAcknowledged() {
@@ -746,7 +762,7 @@
     const capturedInvite = captureInviteToken();
     state.inviteToken = capturedInvite || (invitePattern.test(state.inviteToken) ? state.inviteToken : "");
     if (!state.inviteToken) {
-      if (state.enrollmentToken) {
+      if (state.enrollmentToken || state.publicEnrollment) {
         state.sessionLoading = false;
         if (cardNode) cardNode.setAttribute("aria-busy", "false");
         renderEnrollmentForm();
@@ -837,8 +853,9 @@
       enrollment_expired: "This protected registration link has expired. Request a new link from the training organizer.",
       enrollment_used: "This work email is already registered. Continue in the original browser tab or contact the training organizer.",
       enrollment_rate_limited: "Too many registration attempts were made. Wait briefly and try again.",
-      self_enrollment_disabled: "Protected registration is closed. Contact the training organizer.",
-      self_enrollment_not_configured: "Protected registration is temporarily unavailable. Contact the training organizer.",
+      public_enrollment_disabled: "Registration is closed. Contact the training organizer.",
+      self_enrollment_disabled: "Registration is closed. Contact the training organizer.",
+      self_enrollment_not_configured: "Registration is temporarily unavailable. Contact the training organizer.",
       email_domain_not_allowed: "Use your @advancy.com work email to register.",
       identity_conflict: "These registration details could not be verified. Contact the training organizer.",
       idempotency_key_reused: "Use the same details as your first registration attempt or contact the training organizer.",
@@ -959,14 +976,14 @@
   }
 
   function renderEnrollmentForm() {
-    if (!cardNode || !state.enrollmentToken) return;
+    if (!cardNode || (!state.enrollmentToken && !state.publicEnrollment)) return;
     if (privacyConfirmationNode) privacyConfirmationNode.hidden = true;
     cardNode.replaceChildren();
     cardNode.setAttribute("aria-busy", state.enrollmentPending ? "true" : "false");
-    if (sectionLabelNode) sectionLabelNode.textContent = modeLabel(selectedAssessmentMode) + " mode · Protected registration";
+    if (sectionLabelNode) sectionLabelNode.textContent = modeLabel(selectedAssessmentMode) + " mode · Shared registration";
     if (participantNameNode) participantNameNode.textContent = "Registration required";
     if (attemptStatusNode) attemptStatusNode.textContent = "Register with your Advancy work identity to continue.";
-    setSessionStatus("Complete the protected registration form to verify your invitation.", "session-loading");
+    setSessionStatus("Complete the registration form to verify your invitation.", "session-loading");
 
     const section = document.createElement("section");
     section.className = "enrollment-card";
@@ -976,7 +993,7 @@
     title.tabIndex = -1;
     title.textContent = "Register for the assessment";
     const intro = document.createElement("p");
-    intro.textContent = "Use your @advancy.com work email. Your protected registration link will be exchanged for a private participant invitation.";
+    intro.textContent = "Use your @advancy.com work email. This shared cohort access will be exchanged for a private participant invitation.";
     const form = document.createElement("form");
     form.className = "enrollment-form";
     form.dataset.testid = "enrollment-form";
@@ -1072,9 +1089,9 @@
   }
 
   async function submitEnrollment(form, statusNode) {
-    if (state.enrollmentPending || !state.enrollmentToken) return;
+    if (state.enrollmentPending || (!state.enrollmentToken && !state.publicEnrollment)) return;
     if (!uuidPattern.test(state.enrollmentIdempotencyKey)) {
-      statusNode.textContent = "The protected registration session could not be initialized. Reopen the registration link.";
+      statusNode.textContent = "The registration session could not be initialized. Reopen the assessment link.";
       statusNode.className = "enrollment-status save-error";
       return;
     }
@@ -1091,17 +1108,19 @@
     statusNode.textContent = "Registering securely...";
     statusNode.className = "enrollment-status";
     try {
-      const response = await fetchJsonWithRetry(apiBase() + "/v2/enroll", {
+      const registrationHeaders = {
+        "Idempotency-Key": state.enrollmentIdempotencyKey,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      };
+      if (state.enrollmentToken) registrationHeaders.Authorization = "Bearer " + state.enrollmentToken;
+      const registrationPath = state.publicEnrollment ? "/v2/public-enroll" : "/v2/enroll";
+      const response = await fetchJsonWithRetry(apiBase() + registrationPath, {
         method: "POST",
         mode: "cors",
         cache: "no-store",
         referrerPolicy: "no-referrer",
-        headers: {
-          "Authorization": "Bearer " + state.enrollmentToken,
-          "Idempotency-Key": state.enrollmentIdempotencyKey,
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
+        headers: registrationHeaders,
         body: JSON.stringify(prepared.payload),
         validate: validateEnrollmentResponse
       }, function (attempt, maximum, delay) {
@@ -1113,6 +1132,7 @@
       state.inviteToken = response.invite_token;
       state.enrollmentToken = "";
       state.enrollmentIdempotencyKey = "";
+      state.publicEnrollment = false;
       state.enrollmentPending = false;
       if (privacyInput) privacyInput.checked = true;
       if (participantNameNode) participantNameNode.textContent = response.participant.display_name;

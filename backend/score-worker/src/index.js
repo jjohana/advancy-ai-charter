@@ -1,6 +1,6 @@
 import { DEFAULT_QUIZ_IDS, QUIZ_IDS, QUIZ_VERSION, findQuiz, scoreAnswers } from "./quizzes.js";
 
-const API_VERSION = "2.0.0";
+const API_VERSION = "2.1.0";
 const PUBLIC_HEADERS = new Set(["authorization", "content-type", "idempotency-key", "x-request-id"]);
 const ENROLLMENT_KEYS = new Set([
   "first_name",
@@ -281,6 +281,17 @@ async function requireEnrollmentAccess(request, env) {
   if (!ENROLLMENT_TOKEN_RE.test(supplied) || !(await safeSecretEqual(supplied, configured))) {
     throw new HttpError(401, "ENROLLMENT_UNAUTHORIZED", "The enrollment credential is invalid.");
   }
+}
+
+export function validatePublicEnrollmentConfiguration(env) {
+  if (!envBoolean(env.SELF_ENROLLMENT_ENABLED, false) ||
+      !envBoolean(env.PUBLIC_SELF_ENROLLMENT_ENABLED, false)) {
+    throw new HttpError(404, "PUBLIC_ENROLLMENT_DISABLED", "Public cohort registration is not available.");
+  }
+  if (!ENROLLMENT_TOKEN_RE.test(String(env.ENROLLMENT_TOKEN || ""))) {
+    throw new HttpError(503, "SELF_ENROLLMENT_NOT_CONFIGURED", "Self-enrollment is not configured.");
+  }
+  return true;
 }
 
 async function requireEnrollmentRateLimit(request, env, email) {
@@ -643,8 +654,9 @@ function selfEnrollmentConfig(env) {
   }
 }
 
-async function handleEnrollment(request, env, requestId) {
-  await requireEnrollmentAccess(request, env);
+async function handleEnrollment(request, env, requestId, publicAccess = false) {
+  if (publicAccess) validatePublicEnrollmentConfiguration(env);
+  else await requireEnrollmentAccess(request, env);
   const idempotencyKey = validateIdempotencyKey(request);
   const payload = await readJson(request, 10_000);
   const input = validateEnrollmentPayload(payload, env);
@@ -1094,14 +1106,15 @@ async function preflight(request, env, requestId) {
 async function routeRequest(request, env, requestId) {
   const url = new URL(request.url);
   const path = url.pathname;
-  if (request.method === "OPTIONS" && (path === "/v2/enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit")) return preflight(request, env, requestId);
+  if (request.method === "OPTIONS" && (path === "/v2/enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit")) return preflight(request, env, requestId);
   if (request.method === "GET" && path === "/health") return handleHealth(env, requestId);
 
-  if (path === "/v2/enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit") {
+  if (path === "/v2/enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit") {
     const origin = requirePublicOrigin(request, env);
     await requirePublicRateLimit(request, env);
     let response;
     if (request.method === "POST" && path === "/v2/enroll") response = await handleEnrollment(request, env, requestId);
+    else if (request.method === "POST" && path === "/v2/public-enroll") response = await handleEnrollment(request, env, requestId, true);
     else if (request.method === "GET" && path === "/v2/session") response = await handleSession(request, env, requestId);
     else if (request.method === "POST" && path === "/v2/submit") response = await handleSubmit(request, env, requestId);
     else if (request.method === "POST" && path === "/submit") response = await legacySubmit(request, env, requestId);

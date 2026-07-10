@@ -6,7 +6,7 @@ Date: 10 July 2026
 
 The implementation is technically ready for controlled production sharing with approximately 300 trainees. The Worker is deployed, the EU-jurisdiction D1 database is migrated, the six legacy results are preserved, and the static release is validated for the canonical site and both compatibility redirects.
 
-One protected common registration URL opens the canonical website with two choices:
+One clean common registration URL opens the canonical website with two choices:
 
 - **Normal:** 25 AI Charter questions + 25 Normal AI usage questions
 - **Advanced:** 25 AI Charter questions + 25 Advanced AI usage questions
@@ -18,7 +18,7 @@ The former Normal and Advanced URLs are compatibility redirects to the canonical
 ```text
 GitHub Pages (static HTML/CSS/JavaScript)
         |
-        | HTTPS + exact allowed Origin + protected enrollment/invitation bearer
+        | HTTPS + exact allowed Origin + public registration or private invitation bearer
         v
 Cloudflare Worker API v2
         |
@@ -29,7 +29,7 @@ Cloudflare D1 (persistent participant, assignment, attempt and receipt data)
 
 The database is independent of the frontend. Updating or rolling back GitHub Pages does not delete or replace D1. Browsers never receive D1 credentials and cannot query D1 directly.
 
-The common 256-bit enrollment credential is exchanged once per cohort/email for a participant-specific invitation. Both credentials arrive only in URL fragments and are scrubbed immediately. The Worker, not the browser, resolves identity, validates cohort/quiz authorization, applies the attempt limit, computes scores from versioned answer keys, and creates append-only receipts. Combined assessments pass only when both 25-question sections score at least 18/25.
+The clean common URL opens public cohort registration once per cohort/email. The Worker keeps the enrollment secret server-side, derives a participant-specific invitation after registration, validates cohort/quiz authorization, applies the attempt limit, computes scores from versioned answer keys, and creates append-only receipts. Private invitation or protected recovery fragments are scrubbed immediately. Combined assessments pass only when both 25-question sections score at least 18/25.
 
 ## Questionnaire coherence
 
@@ -106,12 +106,12 @@ Passed:
 
 - Both generated 50-question modes and all 75 source questions.
 - Exact client/server answer-key parity.
-- Fourteen backend unit/contract tests, including canonical millisecond timestamps for browser-validated receipts.
+- Fifteen backend unit/contract tests, including public-registration configuration and canonical millisecond timestamps for browser-validated receipts.
 - Fresh legacy schema plus both additive v2 migrations.
 - Clean `npm ci`, zero known dependency vulnerabilities and Wrangler 4.110.0 production dry-run.
 - PowerShell syntax validation for all admin tools.
-- Production security checks: healthy DB-aware endpoint, bad origin 403, missing enrollment token 401, and legacy submission endpoint 410.
-- In-app browser QA: enrollment-fragment scrubbing, mode landing, accessible registration, Normal and Advanced session resolution, progress/recovery, section results, another-attempt flow, accessibility focus and compatibility redirect.
+- Production security checks: healthy DB-aware endpoint, bad origin 403, protected enrollment without a token 401, public-registration gating, and legacy submission endpoint 410.
+- In-app browser QA: clean-link public registration, private-fragment scrubbing and mode handoff, accessible registration, Normal and Advanced session resolution, progress/recovery, section results, another-attempt flow, accessibility focus and compatibility redirect.
 - Full production browser attempt: 50 Normal questions, server persistence, section-safe 10/50 result, canonical receipt timestamp, and secure receipt recovery.
 - Exhaustive choice QA: all 500 displayed question/option combinations, 500 choose/submit/correction flows, 2,500 option states, 2,500 feedback states, and all 1,352 section-score combinations.
 - Production shared-link smoke: ten synthetic participants covering both modes and all five constant answer positions, enrollment replay, submission replay, authoritative scores, and complete participant/attempt cleanup.
@@ -135,6 +135,6 @@ Official references:
 ## Organizational controls
 
 1. Advancy DPO/HR should approve the processing purpose, legal basis, recipients, retention and participant notice before real trainee data is collected.
-2. The common link verifies possession of the link and an allowed email format, not mailbox ownership. Use Advancy SSO for consequential certification or employment use.
+2. Public cohort registration validates an allowed email format, not mailbox ownership. Use Advancy SSO for consequential certification or employment use.
 3. Move GitHub/Cloudflare ownership to Advancy-controlled accounts if still personal; require 2FA, protected branches and reviewed deployment environments.
-4. Pilot with a small authorized group, monitor `401/409/429/5xx` rates, and rotate the shared enrollment credential after the cohort closes or after unintended disclosure.
+4. Pilot with a small authorized group, monitor `400/409/429/5xx` rates, and disable public registration after the cohort closes.

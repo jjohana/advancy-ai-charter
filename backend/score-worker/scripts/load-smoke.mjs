@@ -1,4 +1,10 @@
-import { DEFAULT_QUIZ_IDS, QUIZ_IDS, QUIZ_VERSION, findQuiz } from "../src/quizzes.js";
+import {
+  DEFAULT_QUIZ_IDS,
+  LEGACY_QUIZ_VERSION,
+  QUIZ_IDS,
+  QUIZ_VERSION,
+  findQuiz
+} from "../src/quizzes.js";
 
 function integerFlag(name, fallback, min, max) {
   const index = process.argv.indexOf(name);
@@ -27,6 +33,7 @@ const participantCount = integerFlag("--participants", 10, 1, 300);
 const concurrency = integerFlag("--concurrency", 10, 1, 50);
 const attemptsPerQuiz = integerFlag("--attempts-per-quiz", 1, 1, 3);
 const quizIds = process.argv.includes("--include-legacy") ? QUIZ_IDS : DEFAULT_QUIZ_IDS;
+const quizVersion = (quizId) => quizId === "advancy-ai-assessment-normal" ? QUIZ_VERSION : LEGACY_QUIZ_VERSION;
 const expectedAttempts = participantCount * quizIds.length * attemptsPerQuiz;
 const runId = crypto.randomUUID().slice(0, 8);
 const cohortId = `load-${runId}`;
@@ -79,7 +86,7 @@ if (imported.length !== participantCount || imported.some((participant) => !part
 const jobs = [];
 for (let participantIndex = 0; participantIndex < imported.length; participantIndex += 1) {
   const participant = imported[participantIndex];
-  for (const quizId of quizIds) jobs.push({ participant, participantIndex, quizId });
+  for (const quizId of quizIds) jobs.push({ participant, participantIndex, quizId, version: quizVersion(quizId) });
 }
 
 let nextJob = 0;
@@ -90,17 +97,17 @@ async function runner() {
     const jobIndex = nextJob;
     nextJob += 1;
     if (jobIndex >= jobs.length) return;
-    const { participant, participantIndex, quizId } = jobs[jobIndex];
+    const { participant, participantIndex, quizId, version } = jobs[jobIndex];
     const originHeaders = {
       Authorization: `Bearer ${participant.token}`,
       Origin: "https://jjohana.github.io",
       // The local-only synthetic address distributes requests across limiter keys.
       "CF-Connecting-IP": `198.18.${Math.floor(participantIndex / 250)}.${(participantIndex % 250) + 1}`
     };
-    const { body: session } = await apiRequest(`/v2/session?test_id=${encodeURIComponent(quizId)}&quiz_version=${QUIZ_VERSION}`, {
+    const { body: session } = await apiRequest(`/v2/session?test_id=${encodeURIComponent(quizId)}&quiz_version=${version}`, {
       headers: originHeaders
     });
-    const quiz = findQuiz(quizId, QUIZ_VERSION);
+    const quiz = findQuiz(quizId, version);
     for (let attempt = 0; attempt < attemptsPerQuiz; attempt += 1) {
       const started = new Date(now.getTime() + attempt * 1000);
       const idempotencyKey = crypto.randomUUID();
@@ -110,7 +117,7 @@ async function runner() {
         body: JSON.stringify({
           session_id: session.session_id,
           test_id: quizId,
-          quiz_version: QUIZ_VERSION,
+          quiz_version: version,
           answers: quiz.answerKey,
           attempt_started_at: started.toISOString(),
           completed_at: new Date(started.getTime() + 600_000).toISOString(),

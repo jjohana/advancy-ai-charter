@@ -7,12 +7,6 @@
     return;
   }
 
-  const assessmentModes = window.assessmentModes && typeof window.assessmentModes === "object"
-    ? window.assessmentModes
-    : {};
-  const selectedAssessmentMode = ["normal", "advanced"].includes(String(window.selectedAssessmentMode || "").toLowerCase())
-    ? String(window.selectedAssessmentMode).toLowerCase()
-    : "";
   const questions = Array.isArray(window.quizQuestions) ? window.quizQuestions : [];
   const config = {
     correctionTitle: "Correction from the charter",
@@ -48,13 +42,8 @@
     "schema_version", "session_id", "test_id", "quiz_version", "baseline_attempts_used",
     "idempotency_key", "serialized_payload", "created_at", "expires_at"
   ]);
-  const evaluationRatingKeys = new Set([
-    "training_relevance", "conceptual_clarity", "practical_applicability", "governance_confidence",
-    "codex_workflow_confidence", "materials_quality", "pace_and_depth", "overall_satisfaction"
-  ]);
-  const evaluationTextKeys = new Set([
-    "most_valuable_takeaway", "improvement_suggestion", "suggested_ai_automation_use_cases"
-  ]);
+  const evaluationRatingKeys = new Set(["overall_satisfaction"]);
+  const evaluationTextKeys = new Set(["improvement_suggestion"]);
 
   const cardNode = document.querySelector("#question-card");
   const progressNode = document.querySelector("#progress");
@@ -68,14 +57,11 @@
   const privacyInput = document.querySelector("#privacy-acknowledged");
   const privacyConfirmationNode = document.querySelector(".privacy-confirmation");
   const publicEnrollmentMetaNode = document.querySelector('meta[name="advancy-public-enrollment"]');
-  const modeLandingNode = document.querySelector("#mode-landing");
   const assessmentExperienceNode = document.querySelector("#assessment-experience");
-  const modeLandingTitleNode = document.querySelector("#mode-landing-title");
   const questionCountMetricNode = document.querySelector("#question-count-metric");
   const quizTitleNode = document.querySelector("#quiz-title");
   const selectedModeLabelNode = document.querySelector("#selected-mode-label");
   const sectionLabelNode = document.querySelector("#section-label");
-  const changeModeNode = document.querySelector("#change-mode");
 
   const state = {
     inviteToken: "",
@@ -134,74 +120,19 @@
     parent.appendChild(document.createTextNode(String(value)));
   }
 
-  function modeDefinition(modeId) {
-    const definition = assessmentModes && assessmentModes[modeId];
-    return definition && typeof definition === "object" ? definition : {};
-  }
-
-  function modeLabel(modeId) {
-    const definition = modeDefinition(modeId);
-    const fallback = modeId === "advanced" ? "Advanced" : "Normal";
-    const label = definition.label || definition.name || definition.title || fallback;
-    return typeof label === "string" && label.trim() ? label.trim() : fallback;
-  }
-
   function updateSectionContext() {
-    if (!sectionLabelNode || !selectedAssessmentMode) return;
-    sectionLabelNode.textContent = state.currentIndex < 25
-      ? "Section 1 of 2 · AI Charter"
-      : "Section 2 of 2 · " + modeLabel(selectedAssessmentMode) + " module";
+    if (sectionLabelNode) sectionLabelNode.textContent = "AI Charter · Chat · Work · Codex";
   }
 
-  function renderModeLanding() {
-    const invite = captureInviteToken();
-    const handoffFragment = invite
-      ? "#invite=" + encodeURIComponent(invite)
-      : state.enrollmentToken ? "#enroll=" + encodeURIComponent(state.enrollmentToken) : "";
-    if (assessmentExperienceNode) assessmentExperienceNode.hidden = true;
-    if (modeLandingNode) modeLandingNode.hidden = false;
-    const normalTitle = document.querySelector("#mode-normal-title");
-    const advancedTitle = document.querySelector("#mode-advanced-title");
-    if (normalTitle) normalTitle.textContent = modeLabel("normal");
-    if (advancedTitle) advancedTitle.textContent = modeLabel("advanced");
-    const localHost = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-    const localApiBase = new URLSearchParams(window.location.search).get("apiBase") || "";
-    document.querySelectorAll("[data-mode]").forEach(function (link) {
-      const mode = link.getAttribute("data-mode");
-      const params = new URLSearchParams({ mode });
-      if (localHost && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(localApiBase)) {
-        params.set("apiBase", localApiBase);
-      }
-      link.setAttribute("href", "?" + params.toString() + handoffFragment);
-    });
-    document.title = "Choose assessment mode - Advancy";
-    window.requestAnimationFrame(function () {
-      if (modeLandingTitleNode) modeLandingTitleNode.focus();
-    });
-  }
-
-  function configureSelectedMode() {
-    if (modeLandingNode) modeLandingNode.hidden = true;
+  function configureAssessment() {
     if (assessmentExperienceNode) assessmentExperienceNode.hidden = false;
     if (questionCountMetricNode) questionCountMetricNode.textContent = String(questions.length);
     if (quizTitleNode) quizTitleNode.textContent = config.quizName || "Advancy AI Assessment";
     if (selectedModeLabelNode) {
-      selectedModeLabelNode.textContent = modeLabel(selectedAssessmentMode) + " mode · " + questions.length + " questions";
+      selectedModeLabelNode.textContent = questions.length + " mixed questions · one correct answer";
     }
-    document.title = config.quizName || (modeLabel(selectedAssessmentMode) + " Advancy AI Assessment");
+    document.title = config.quizName || "Advancy AI Assessment";
     updateSectionContext();
-  }
-
-  function changeAssessmentMode() {
-    const localHost = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-    const current = new URL(window.location.href);
-    const params = new URLSearchParams();
-    const localApiBase = current.searchParams.get("apiBase");
-    if (localHost && localApiBase && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(localApiBase)) {
-      params.set("apiBase", localApiBase);
-    }
-    const query = params.toString();
-    window.location.assign(current.pathname + (query ? "?" + query : ""));
   }
 
   function cleanApiBase(value) {
@@ -518,7 +449,7 @@
   function validPendingEvaluation(value) {
     if (value === null) return true;
     if (!isPlainObject(value)) return false;
-    const allowed = new Set([...evaluationRatingKeys, ...evaluationTextKeys, "recommend_training"]);
+    const allowed = new Set([...evaluationRatingKeys, ...evaluationTextKeys]);
     return Object.entries(value).every(function (entry) {
       const key = entry[0];
       const fieldValue = entry[1];
@@ -528,7 +459,7 @@
         return typeof fieldValue === "string" && fieldValue.length <= 2000 && fieldValue.trim() === fieldValue &&
           !/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(fieldValue);
       }
-      return typeof fieldValue === "boolean";
+      return false;
     });
   }
 
@@ -632,27 +563,6 @@
     if (!Number.isInteger(correct) || !Number.isInteger(total) || total !== questions.length || correct < 0 || correct > total ||
         !Number.isInteger(percent) || percent !== Math.round((correct / total) * 100) || typeof value.passed !== "boolean") {
       throw invalidContract();
-    }
-    if (selectedAssessmentMode && questions.length === 50) {
-      if (!Array.isArray(value.sections) || value.sections.length !== 2) throw invalidContract();
-      const expected = [
-        { id: "charter", name: "AI Charter" },
-        { id: selectedAssessmentMode, name: (selectedAssessmentMode === "advanced" ? "Advanced" : "Normal") + " module" }
-      ];
-      const sectionKeys = new Set(["id", "name", "correct", "total", "percent", "passed"]);
-      const sections = value.sections.map(function (section, index) {
-        if (!hasExactKeys(section, sectionKeys) || section.id !== expected[index].id || section.name !== expected[index].name ||
-            !Number.isInteger(section.correct) || section.correct < 0 || section.correct > 25 || section.total !== 25 ||
-            !Number.isInteger(section.percent) || section.percent !== Math.round((section.correct / 25) * 100) ||
-            typeof section.passed !== "boolean" || section.passed !== (section.correct >= 18)) {
-          throw invalidContract();
-        }
-        return { ...section };
-      });
-      if (correct !== sections[0].correct + sections[1].correct || value.passed !== sections.every(function (section) { return section.passed; })) {
-        throw invalidContract();
-      }
-      return { correct, total, percent, passed: value.passed, sections };
     }
     if (value.passed !== (correct >= Math.ceil(total * config.passThreshold))) throw invalidContract();
     return { correct, total, percent, passed: value.passed };
@@ -945,9 +855,7 @@
 
   function renderAccessGate() {
     if (!cardNode) return;
-    if (sectionLabelNode && selectedAssessmentMode) {
-      sectionLabelNode.textContent = modeLabel(selectedAssessmentMode) + " mode · Secure access";
-    }
+    if (sectionLabelNode) sectionLabelNode.textContent = "Secure access";
     cardNode.replaceChildren();
     const section = document.createElement("section");
     section.className = "access-gate";
@@ -980,7 +888,7 @@
     if (privacyConfirmationNode) privacyConfirmationNode.hidden = true;
     cardNode.replaceChildren();
     cardNode.setAttribute("aria-busy", state.enrollmentPending ? "true" : "false");
-    if (sectionLabelNode) sectionLabelNode.textContent = modeLabel(selectedAssessmentMode) + " mode · Shared registration";
+    if (sectionLabelNode) sectionLabelNode.textContent = "Shared registration";
     if (participantNameNode) participantNameNode.textContent = "Registration required";
     if (attemptStatusNode) attemptStatusNode.textContent = "Register with your Advancy work identity to continue.";
     setSessionStatus("Complete the registration form to verify your invitation.", "session-loading");
@@ -1149,7 +1057,7 @@
   }
 
   function renderCompletedGate() {
-    if (sectionLabelNode) sectionLabelNode.textContent = "Assessment recorded · " + modeLabel(selectedAssessmentMode) + " mode";
+    if (sectionLabelNode) sectionLabelNode.textContent = "Assessment recorded";
     cardNode.replaceChildren();
     const section = document.createElement("section");
     section.className = "access-gate completed-gate";
@@ -1285,16 +1193,9 @@
       const value = formData.get("evaluation-" + criterion.id);
       if (value !== null && value !== "") evaluation[criterion.id] = Number(value);
     });
-    evaluation.recommend_training = formData.get("recommend_training") === "yes";
-    [
-      "most_valuable_takeaway",
-      "improvement_suggestion",
-      "suggested_ai_automation_use_cases"
-    ].forEach(function (field) {
-      const value = String(formData.get(field) || "").trim();
-      if (value) evaluation[field] = value;
-    });
-    return Object.keys(evaluation).length > 1 || evaluation.recommend_training ? evaluation : null;
+    const comment = String(formData.get("improvement_suggestion") || "").trim();
+    if (comment) evaluation.improvement_suggestion = comment;
+    return Object.keys(evaluation).length ? evaluation : null;
   }
 
   function createTrainingEvaluation(statusNode) {
@@ -1305,9 +1206,9 @@
 
     const title = document.createElement("h3");
     title.id = "training-evaluation-title";
-    title.textContent = evaluation.title || "Optional training evaluation";
+    title.textContent = evaluation.title || "Feedback";
     const intro = document.createElement("p");
-    intro.textContent = "Feedback is optional and is not required to record your assessment result. Do not include client, confidential, personal, or market-sensitive information.";
+    intro.textContent = "Feedback is optional. Add a rating or comment, then submit the assessment. Do not include client, confidential, personal, or market-sensitive information.";
     const form = document.createElement("form");
     form.className = "evaluation-form";
     form.noValidate = true;
@@ -1340,9 +1241,7 @@
     });
 
     const fields = [
-      ["most_valuable_takeaway", "Most valuable takeaway (optional)", "What will you apply?"],
-      ["improvement_suggestion", "Improvement suggestion (optional)", "What should be improved?"],
-      ["suggested_ai_automation_use_cases", "Suggested AI automation use cases (optional)", "Describe workflow ideas."]
+      ["improvement_suggestion", "Comments or suggestions (optional)", "What should we keep or improve?"]
     ];
     fields.forEach(function (definition) {
       const label = document.createElement("label");
@@ -1358,37 +1257,19 @@
       form.append(label, textarea);
     });
 
-    const recommend = document.createElement("label");
-    recommend.className = "evaluation-checkbox";
-    const recommendInput = document.createElement("input");
-    recommendInput.type = "checkbox";
-    recommendInput.name = "recommend_training";
-    recommendInput.value = "yes";
-    recommend.appendChild(recommendInput);
-    appendText(recommend, " I would recommend this training.");
-    form.appendChild(recommend);
-
     const actions = document.createElement("div");
     actions.className = "question-actions";
-    const submitWithFeedback = document.createElement("button");
-    submitWithFeedback.type = "submit";
-    submitWithFeedback.className = "button button-primary";
-    submitWithFeedback.dataset.testid = "submit-with-feedback";
-    submitWithFeedback.textContent = "Submit result and optional feedback";
-    const submitWithoutFeedback = document.createElement("button");
-    submitWithoutFeedback.type = "button";
-    submitWithoutFeedback.className = "button button-neutral";
-    submitWithoutFeedback.dataset.testid = "submit-without-feedback";
-    submitWithoutFeedback.textContent = "Submit result without feedback";
-    actions.append(submitWithFeedback, submitWithoutFeedback);
+    const submitAssessmentButton = document.createElement("button");
+    submitAssessmentButton.type = "submit";
+    submitAssessmentButton.className = "button button-primary";
+    submitAssessmentButton.dataset.testid = "submit-assessment";
+    submitAssessmentButton.textContent = "Submit assessment";
+    actions.appendChild(submitAssessmentButton);
     form.appendChild(actions);
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
       submitAssessment(collectEvaluation(form), statusNode);
-    });
-    submitWithoutFeedback.addEventListener("click", function () {
-      submitAssessment(null, statusNode);
     });
     section.append(title, intro, form);
     return section;
@@ -1629,7 +1510,7 @@
 
     if (config.trainingEvaluation) {
       resultNode.appendChild(createTrainingEvaluation(status));
-      status.textContent = "You may add optional feedback or submit the result without feedback.";
+      status.textContent = "Add optional feedback, then submit your assessment.";
     } else {
       submitAssessment(null, status);
     }
@@ -1664,16 +1545,10 @@
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     if (params.has("invite") || params.has("enroll")) window.location.reload();
   });
-  if (changeModeNode) changeModeNode.addEventListener("click", changeAssessmentMode);
 
-  if (!selectedAssessmentMode) {
-    renderModeLanding();
-    return;
-  }
-
-  configureSelectedMode();
-  if (questions.length !== 50) {
-    state.accessError = "The selected 50-question assessment is not available. Contact the training organizer.";
+  configureAssessment();
+  if (questions.length !== 20) {
+    state.accessError = "The 20-question assessment is not available. Contact the training organizer.";
     setSessionStatus(state.accessError, "session-error");
     renderAccessGate();
     return;

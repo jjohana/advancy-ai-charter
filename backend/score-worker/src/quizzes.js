@@ -1,5 +1,7 @@
-export const QUIZ_VERSION = "2026-07-09";
+export const QUIZ_VERSION = "2026-07-29";
+export const LEGACY_QUIZ_VERSION = "2026-07-09";
 
+const UNIFIED_KEY = Object.freeze([2, 0, 4, 1, 3, 1, 4, 0, 2, 3, 0, 4, 1, 2, 3, 4, 2, 1, 0, 3]);
 const CHARTER_KEY = Object.freeze([0, 2, 4, 1, 3, 1, 3, 0, 2, 4, 2, 4, 1, 3, 0, 3, 0, 2, 4, 1, 4, 1, 3, 0, 2]);
 const USAGE_NORMAL_KEY = Object.freeze([0, 2, 4, 1, 3, 1, 3, 0, 2, 4, 2, 4, 1, 3, 0, 3, 0, 2, 4, 1, 4, 1, 3, 0, 2]);
 const COMBINED_NORMAL_KEY = Object.freeze(USAGE_NORMAL_KEY.map((_, index) => USAGE_NORMAL_KEY[(index + 1) % USAGE_NORMAL_KEY.length]));
@@ -8,8 +10,15 @@ const USAGE_ADVANCED_KEY = Object.freeze([3, 0, 4, 1, 2, 4, 1, 3, 0, 2, 1, 4, 2,
 const definitions = [
   {
     id: "advancy-ai-assessment-normal",
-    name: "Advancy AI Charter and Usage Assessment - Normal",
+    name: "Advancy AI Knowledge Assessment",
     version: QUIZ_VERSION,
+    passThreshold: 0.7,
+    answerKey: UNIFIED_KEY
+  },
+  {
+    id: "advancy-ai-assessment-normal",
+    name: "Advancy AI Charter and Usage Assessment - Normal",
+    version: LEGACY_QUIZ_VERSION,
     passThreshold: 0.7,
     answerKey: [...CHARTER_KEY, ...COMBINED_NORMAL_KEY],
     sections: [
@@ -20,7 +29,7 @@ const definitions = [
   {
     id: "advancy-ai-assessment-advanced",
     name: "Advancy AI Charter and Usage Assessment - Advanced",
-    version: QUIZ_VERSION,
+    version: LEGACY_QUIZ_VERSION,
     passThreshold: 0.7,
     answerKey: [...CHARTER_KEY, ...USAGE_ADVANCED_KEY],
     sections: [
@@ -31,21 +40,21 @@ const definitions = [
   {
     id: "advancy-ai-charter",
     name: "Advancy AI Charter Assessment",
-    version: QUIZ_VERSION,
+    version: LEGACY_QUIZ_VERSION,
     passThreshold: 0.7,
     answerKey: CHARTER_KEY
   },
   {
     id: "advancy-ai-usage",
     name: "Advancy AI Usage Training Assessment",
-    version: QUIZ_VERSION,
+    version: LEGACY_QUIZ_VERSION,
     passThreshold: 0.7,
     answerKey: USAGE_NORMAL_KEY
   },
   {
     id: "advancy-ai-usage-advanced",
     name: "Advancy AI Usage Advanced Assessment",
-    version: QUIZ_VERSION,
+    version: LEGACY_QUIZ_VERSION,
     passThreshold: 0.7,
     answerKey: USAGE_ADVANCED_KEY
   }
@@ -62,12 +71,11 @@ export const QUIZZES = new Map(definitions.map((quiz) => {
   });
   return [`${immutable.id}@${immutable.version}`, immutable];
 }));
-export const QUIZ_IDS = Object.freeze(definitions.map((quiz) => quiz.id));
-export const DEFAULT_QUIZ_IDS = Object.freeze([
-  "advancy-ai-assessment-normal",
-  "advancy-ai-assessment-advanced"
-]);
+export const QUIZ_IDS = Object.freeze([...new Set(definitions.map((quiz) => quiz.id))]);
+export const DEFAULT_QUIZ_IDS = Object.freeze(["advancy-ai-assessment-normal"]);
 export const LEGACY_QUIZ_IDS = Object.freeze([
+  "advancy-ai-assessment-normal",
+  "advancy-ai-assessment-advanced",
   "advancy-ai-charter",
   "advancy-ai-usage",
   "advancy-ai-usage-advanced"

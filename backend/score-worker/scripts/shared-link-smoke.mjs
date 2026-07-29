@@ -70,11 +70,10 @@ async function cleanup() {
 
 let primaryError = null;
 try {
-  for (const mode of ["normal", "advanced"]) {
-    const quizId = `advancy-ai-assessment-${mode}`;
+  for (const quizId of ["advancy-ai-assessment-normal"]) {
     const quiz = findQuiz(quizId, QUIZ_VERSION);
     for (let position = 0; position < 5; position += 1) {
-      const email = `codex-smoke-${runId}-${mode}-${position}@advancy.com`;
+      const email = `codex-smoke-${runId}-${position}@advancy.com`;
       const enrollmentIdempotencyKey = crypto.randomUUID();
       const enrollmentOptions = {
         method: "POST",
@@ -86,7 +85,7 @@ try {
         },
         body: JSON.stringify({
           first_name: "Synthetic",
-          last_name: `Smoke ${mode} ${position}`,
+          last_name: `Smoke ${position}`,
           email,
           quiz_id: quizId,
           privacy_notice_version: "2026-07-09",
@@ -160,6 +159,6 @@ console.log(JSON.stringify({
   submissions,
   enrollment_replays: enrollmentReplays,
   idempotent_replays: replays,
-  modes: 2,
-  constant_answer_positions_per_mode: 5
+  questionnaires: 1,
+  constant_answer_positions: 5
 }));

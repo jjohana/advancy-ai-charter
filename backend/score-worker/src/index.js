@@ -1,4 +1,11 @@
-import { DEFAULT_QUIZ_IDS, QUIZ_IDS, QUIZ_VERSION, findQuiz, scoreAnswers } from "./quizzes.js";
+import {
+  DEFAULT_QUIZ_IDS,
+  LEGACY_QUIZ_VERSION,
+  QUIZ_IDS,
+  QUIZ_VERSION,
+  findQuiz,
+  scoreAnswers
+} from "./quizzes.js";
 
 const API_VERSION = "2.1.0";
 const PUBLIC_HEADERS = new Set(["authorization", "content-type", "idempotency-key", "x-request-id"]);
@@ -946,7 +953,9 @@ async function handleAdminExport(request, env, requestId) {
   const testId = url.searchParams.get("test_id");
   if (testId && !QUIZ_IDS.includes(testId)) throw new HttpError(400, "INVALID_TEST_ID", "test_id is invalid.");
   const quizVersion = url.searchParams.get("quiz_version");
-  if (quizVersion && quizVersion !== QUIZ_VERSION) throw new HttpError(400, "INVALID_QUIZ_VERSION", "quiz_version is invalid.");
+  if (quizVersion && ![QUIZ_VERSION, LEGACY_QUIZ_VERSION].includes(quizVersion)) {
+    throw new HttpError(400, "INVALID_QUIZ_VERSION", "quiz_version is invalid.");
+  }
   const cohortId = url.searchParams.get("cohort_id");
   if (cohortId && !COHORT_RE.test(cohortId)) throw new HttpError(400, "INVALID_COHORT", "cohort_id is invalid.");
   const limitText = url.searchParams.get("limit") || "100";
@@ -1061,7 +1070,7 @@ async function legacySubmit(request, env, requestId) {
   }
   const payload = await readJson(request, 100_000);
   const testId = strictString(payload.test_id, "test_id", 80);
-  const quiz = findQuiz(testId, QUIZ_VERSION);
+  const quiz = findQuiz(testId, LEGACY_QUIZ_VERSION);
   if (!quiz) throw new HttpError(400, "INVALID_TEST_ID", "test_id is invalid.");
   const answersText = strictString(payload.answers, "answers", 300);
   const answers = answersText.split(/\s+/).map((letter) => "ABCDE".indexOf(letter.toUpperCase()));

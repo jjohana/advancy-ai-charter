@@ -10,8 +10,8 @@
   <meta name="referrer" content="no-referrer" />
   <meta name="advancy-public-enrollment" content="enabled" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://advancy-ai-score-api.advancy-ai-training.workers.dev; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
-  <title>Advancy AI Assessment</title>
-  <meta name="description" content="Advancy AI knowledge assessment with Normal and Advanced learning paths." />
+  <title>Advancy AI Knowledge Assessment</title>
+  <meta name="description" content="One 20-question assessment covering the Advancy AI Charter and practical AI usage." />
   <link rel="icon" href="assets/advancy-logo.png" />
   <link rel="stylesheet" href="styles.css?v=20260710-3" />
 </head>
@@ -22,46 +22,26 @@
       <div class="headline">
         <div class="eyebrow">AI usage assessment</div>
         <h1>Knowledge assessment</h1>
-        <p class="tagline">Choose a Normal or Advanced 50-question path. Both include the AI Charter section followed by the selected learning module.</p>
+        <p class="tagline">One concise assessment: 20 mixed questions on the AI Charter and practical use of Chat, Work and Codex.</p>
       </div>
     </div>
     <div class="orange-rule" aria-hidden="true"></div>
   </header>
 
   <main>
-    <section id="mode-landing" class="wrap mode-landing" aria-labelledby="mode-landing-title" hidden>
-      <div class="mode-landing-card">
-        <div class="eyebrow mode-eyebrow">Choose your path</div>
-        <h2 id="mode-landing-title" tabindex="-1">Select an assessment mode</h2>
-        <p>Each path contains 50 questions: 25 on the Advancy AI Charter, then 25 on the selected module.</p>
-        <ul class="mode-options" aria-label="Assessment modes">
-          <li><a class="mode-option" data-testid="mode-normal" data-mode="normal" href="?mode=normal">
-            <strong id="mode-normal-title">Normal</strong>
-            <span>AI Charter plus the Normal AI usage module.</span>
-            <span class="mode-option-action">Choose Normal</span>
-          </a></li>
-          <li><a class="mode-option" data-testid="mode-advanced" data-mode="advanced" href="?mode=advanced">
-            <strong id="mode-advanced-title">Advanced</strong>
-            <span>AI Charter plus the Advanced AI usage module.</span>
-            <span class="mode-option-action">Choose Advanced</span>
-          </a></li>
-        </ul>
-      </div>
-    </section>
-
-    <div id="assessment-experience" hidden>
+    <div id="assessment-experience">
       <div class="wrap assessment-grid">
       <aside class="side-panel" aria-labelledby="assessment-summary">
         <h2 id="assessment-summary">Assessment setup</h2>
-        <p>Submit one answer at a time. The correction explains why every option is right or wrong under the selected learning material.</p>
+        <p>Choose one answer per question. AI Charter and practical AI-usage topics are mixed throughout, with a short explanation after each answer.</p>
         <div class="metrics" aria-label="Assessment metrics">
-          <div class="metric"><strong id="question-count-metric">50</strong><span>Questions</span></div>
+          <div class="metric"><strong id="question-count-metric">20</strong><span>Questions</span></div>
           <div class="metric"><strong>A-E</strong><span>Five choices each</span></div>
           <div class="metric"><strong>1</strong><span>Correct answer</span></div>
-          <div class="metric"><strong>70%</strong><span>Required in each section</span></div>
+          <div class="metric"><strong>70%</strong><span>Pass threshold</span></div>
         </div>
         <div class="status-block">
-          <p id="progress">Question 1 / 50</p>
+          <p id="progress">Question 1 / 20</p>
           <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
         <div class="score-card" aria-live="polite">
@@ -87,11 +67,10 @@
         <div class="quiz-toolbar">
           <div>
             <strong id="quiz-title">Advancy AI Assessment</strong>
-            <span id="selected-mode-label" class="selected-mode-label"></span>
-            <span id="section-label" class="section-label" aria-live="polite"></span>
+            <span id="selected-mode-label" class="selected-mode-label">20 mixed questions · one correct answer</span>
+            <span id="section-label" class="section-label" aria-live="polite">AI Charter · Chat · Work · Codex</span>
           </div>
           <div class="toolbar-actions">
-            <button type="button" class="button button-secondary" id="change-mode" data-testid="change-mode">Change mode</button>
             <button type="button" class="button button-secondary" id="restart-top" disabled>Restart</button>
           </div>
         </div>
@@ -112,7 +91,7 @@
   </footer>
 
   <noscript><p class="noscript">JavaScript is required to verify the invitation and run this assessment.</p></noscript>
-  <script src="questions.js?v=20260710-2"></script>
-  <script src="app.js?v=20260710-6"></script>
+  <script src="questions.js?v=20260729-1"></script>
+  <script src="app.js?v=20260729-1"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # Production rollout runbook
 
-This runbook covers the canonical Advancy AI assessment site and its shared Cloudflare Worker/D1 service for a cohort of approximately 300 participants. One clean common URL opens public cohort registration and a landing page where each trainee chooses one of two 50-question modes: Charter + Usage Normal or Charter + Usage Advanced.
+This runbook covers the canonical Advancy AI assessment site and its shared Cloudflare Worker/D1 service for a cohort of approximately 300 participants. One clean common URL opens public cohort registration and one 20-question mixed assessment.
 
 ## 1. Approval gate
 
@@ -41,7 +41,7 @@ npm run db:migrate:local
 npx wrangler deploy --dry-run
 ```
 
-Validate the assembled 50-question Normal and Advanced banks in the canonical deployment artifact. Confirm the combined Normal module options implement the backend's one-position left rotation of the legacy Normal key at all 25 positions while the legacy ID remains unchanged. Confirm the canonical artifact's `app.js`, `styles.css`, `privacy.html`, and `robots.txt` hashes match the reviewed release manifest.
+Validate the assembled 20-question mixed bank in the canonical deployment artifact. Confirm that it contains exactly two routing questions grounded in the approved Chat/Work/Codex usage-credit framework, that every question has one correct option, and that A-E correct positions are balanced 4/4/4/4/4. Confirm the canonical artifact's `app.js`, `styles.css`, `privacy.html`, and `robots.txt` hashes match the reviewed release manifest.
 
 ## 4. Backward-compatible cutover
 
@@ -49,10 +49,10 @@ Validate the assembled 50-question Normal and Advanced banks in the canonical de
 2. Deploy the Worker with `/v2/enroll`, `/v2/session`, and `/v2/submit` only after both additive migrations are applied.
 3. Keep `LEGACY_SUBMISSIONS_ENABLED=false` unless a short, explicitly timed transition is unavoidable.
 4. Deploy the canonical site as a canary through the manual Pages workflow.
-5. Verify that the clean base URL opens registration in a fresh browser, registration is one-time per email, an ambiguous enrollment response replays the same participant invitation, and on-site Normal/Advanced selection works. Also verify that optional protected recovery fragments are scrubbed and survive the landing-to-mode handoff.
-6. Complete all 50 questions in each mode and verify optional feedback, server score, receipt, submission idempotency, admin count/export and participant deletion. Both combined IDs must advertise quiz/privacy version `2026-07-09`. Verify `score.sections` uses the confirmed Charter + Normal/Advanced order, and that 15/25 Charter plus 20/25 module fails despite a 70% aggregate.
-7. Deploy and test the two former questionnaire sites as compatibility redirects to the canonical mode chooser, including clean public registration and strict private-invitation fragment transfer.
-8. Confirm the three 25-question IDs remain accepted only for participants explicitly assigned during cutover, and confirm the unauthenticated legacy endpoint returns `410`.
+5. Verify that the clean base URL opens registration in a fresh browser, registration is one-time per email, and an ambiguous enrollment response replays the same participant invitation. Also verify that optional protected recovery fragments are scrubbed immediately.
+6. Complete all 20 questions and verify the single feedback step, server score, receipt, submission idempotency, admin count/export and participant deletion. The current ID must advertise quiz version `2026-07-29` and privacy version `2026-07-09`; confirm that 13/20 fails and 14/20 passes.
+7. Deploy and test the two former questionnaire sites as compatibility redirects to the canonical questionnaire.
+8. Confirm the five former IDs remain accepted only at version `2026-07-09` for participants explicitly assigned during cutover, and confirm the unauthenticated legacy endpoint returns `410`.
 
 If a temporary legacy window is used, enable it only after recording the owner and stop time. Disable it immediately after the last cached old client is no longer in use.
 
@@ -60,7 +60,7 @@ If a temporary legacy window is used, enable it only after recording the owner a
 
 Generate a distinct 256-bit `ENROLLMENT_TOKEN` and store it only as a Worker secret. Enable `PUBLIC_SELF_ENROLLMENT_ENABLED` only for the approved cohort window, then distribute the clean canonical URL. The Worker uses the secret to derive participant invitations; it is never placed in the website or participant link. Disable public registration and rotate the secret after the cohort closes.
 
-Pilot with 5-10 authorized users across both combined modes. Reconcile registrations, invitations, attempts and receipts before distributing the link to the full cohort. Shared-link registration is limited to the configured email domain and is one-time for each cohort/email.
+Pilot with 5-10 authorized users on the unified questionnaire. Reconcile registrations, invitations, attempts and receipts before distributing the link to the full cohort. Shared-link registration is limited to the configured email domain and is one-time for each cohort/email.
 
 Individual roster import remains the recovery path when a participant loses the browser-tab invitation or when a shared link is not appropriate. Use a UTF-8 CSV with exactly these headers:
 
@@ -71,7 +71,7 @@ FirstName,LastName,Email
 Alice,Example,alice@example.invalid
 ```
 
-Run the import script with an expected row count and cohort window. It sends batches of 50. The generated CSV contains one canonical `AssessmentInvite` per person; the participant chooses Normal or Advanced on that landing page. The file contains credentials and personal data: keep it in approved encrypted storage, distribute recovery links individually, and delete the working file after delivery.
+Run the import script with an expected row count and cohort window. It sends batches of 50. The generated CSV contains one canonical `AssessmentInvite` per person. The file contains credentials and personal data: keep it in approved encrypted storage, distribute recovery links individually, and delete the working file after delivery.
 
 ```powershell
 .\admin-import-participants.ps1 `
@@ -95,7 +95,7 @@ Freeze deployments during the main training window. Monitor:
 - imported, assigned, completed and failed counts by cohort;
 - the DB-aware `/health` check.
 
-At this scale, capacity is not the constraint: 300 people choosing one 50-question mode is approximately 300 primary submissions and 900 at the three-attempt ceiling. If everyone completes both modes, those figures are 600 and 1,800. Credential distribution and reconciliation are the main operational risks.
+At this scale, capacity is not the constraint: 300 people completing one 20-question assessment is approximately 300 primary submissions and 900 at the three-attempt ceiling. Credential distribution and reconciliation are the main operational risks.
 
 The Free Workers/D1 limits are technically ample for this cohort. For production, the Workers Paid plan (currently a USD 5 monthly account minimum) is recommended for the longer 30-day D1 Time Travel recovery window instead of 7 days on Free. Set an account budget alert and verify current pricing before launch.
 

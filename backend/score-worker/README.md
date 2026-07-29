@@ -1,11 +1,10 @@
 # Advancy AI assessment API v2
 
-Cloudflare Worker + D1 backend for the canonical Advancy assessment website. The site offers two selectable 50-question modes:
+Cloudflare Worker + D1 backend for the canonical Advancy assessment website. The site offers one 20-question mixed assessment:
 
-- `advancy-ai-assessment-normal`: Charter 25 + Usage Normal 25
-- `advancy-ai-assessment-advanced`: Charter 25 + Usage Advanced 25
+- `advancy-ai-assessment-normal` at version `2026-07-29`: AI Charter and practical AI usage, including two Chat/Work/Codex routing questions
 
-The three former 25-question quiz IDs remain accepted only for an explicitly assigned cutover cohort. This directory is deployment-ready but changes are **not deployed automatically**.
+The former Normal, Advanced, Charter-only and Usage-only quiz IDs remain accepted only at version `2026-07-09` for explicitly assigned cutover cohorts. This directory is deployment-ready but changes are **not deployed automatically**.
 
 ## Architecture and security boundary
 
@@ -13,12 +12,12 @@ The single canonical GitHub Pages site is a static client. D1 is bound only to t
 
 1. The organizer shares the clean canonical URL. It opens rate-limited public cohort registration without putting a bearer credential in the page or URL.
 2. `POST /v2/public-enroll` validates the allowed email domain and exchanges the registration once per cohort/email for a participant-specific 256-bit `inv_...` token. The Worker uses its private `ENROLLMENT_TOKEN` only as an HMAC key; raw tokens are not logged or stored in D1, and only the participant token's SHA-256 hash is persisted.
-3. By default, the participant token authorizes both combined modes; the participant chooses Normal or Advanced on the canonical landing page.
+3. By default, the participant token authorizes the single unified questionnaire.
 4. The participant token remains only in `sessionStorage`. Roster import and individual invitation links remain available as an administrator-controlled recovery path.
 5. The Worker derives identity from the token, validates the cohort and invitation window, computes the score from its versioned answer key, and inserts an append-only attempt.
 6. Admin reads require `ADMIN_TOKEN`; admin endpoints reject browser `Origin` requests.
 
-The answer-key version is `2026-07-09`. A submission is accepted only for a known `(test_id, quiz_version)` pair, preserving auditability after future question changes. New imports receive only the two combined IDs unless `quiz_ids` is supplied explicitly; the accepted legacy IDs are `advancy-ai-charter`, `advancy-ai-usage`, and `advancy-ai-usage-advanced`. To avoid duplicating the Charter answer pattern, the combined Normal module key is a one-position left rotation of the legacy Normal key; the legacy 25-question key itself is unchanged.
+The current answer-key version is `2026-07-29`. A submission is accepted only for a known `(test_id, quiz_version)` pair, preserving auditability after future question changes. New imports receive only the unified ID unless `quiz_ids` is supplied explicitly. The prior five quiz IDs and their `2026-07-09` keys remain available for cutover compatibility.
 
 ## Persisted data
 
@@ -55,7 +54,7 @@ Content-Type: application/json
 }
 ```
 
-The payload is exact: unknown fields, non-Advancy domains, stale privacy consent, and the three legacy quiz IDs are rejected. Both combined modes are assigned regardless of the selected `quiz_id`. Success returns exactly:
+The payload is exact: unknown fields, non-Advancy domains, stale privacy consent, and legacy quiz IDs are rejected. Success returns exactly:
 
 ```json
 {
@@ -73,7 +72,7 @@ Enrollment is one-time per cohort/email. The client must reuse the exact UUID an
 ### Resolve a quiz session
 
 ```http
-GET /v2/session?test_id=advancy-ai-assessment-normal&quiz_version=2026-07-09
+GET /v2/session?test_id=advancy-ai-assessment-normal&quiz_version=2026-07-29
 Authorization: Bearer <invitation-token>
 ```
 
@@ -90,11 +89,8 @@ Content-Type: application/json
 {
   "session_id": "...",
   "test_id": "advancy-ai-assessment-normal",
-  "quiz_version": "2026-07-09",
+  "quiz_version": "2026-07-29",
   "answers": [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   ],
@@ -107,24 +103,20 @@ Content-Type: application/json
 }
 ```
 
-For either combined mode, `answers` must contain exactly 50 indexes from 0 through 4. The three cutover IDs still require 25. Combined results pass only when the participant scores at least 18/25 (70%) in both the Charter section and the selected module; a 70% aggregate is not sufficient if either section fails. Authoritative submit and recovered-receipt responses add this ordered breakdown while legacy score objects remain unchanged:
+For the current questionnaire, `answers` must contain exactly 20 indexes from 0 through 4. The result passes at 14/20 (70%). Legacy IDs retain their prior 25- or 50-answer rules and versioned scoring contracts.
 
 ```json
 {
   "score": {
-    "correct": 40,
-    "total": 50,
+    "correct": 16,
+    "total": 20,
     "percent": 80,
-    "passed": true,
-    "sections": [
-      { "id": "charter", "name": "AI Charter", "correct": 20, "total": 25, "percent": 80, "passed": true },
-      { "id": "normal", "name": "Normal module", "correct": 20, "total": 25, "percent": 80, "passed": true }
-    ]
+    "passed": true
   }
 }
 ```
 
-The Advanced mode uses `{ "id": "advanced", "name": "Advanced module" }` for the second section. Evaluation is optional; supplied fields are range/length checked. A first insert returns `201`. Replaying the same idempotency key returns `200`, the same receipt/score, and `idempotent_replay: true`. A new key beyond the configured attempt limit returns `409`.
+Evaluation is optional; supplied fields are range/length checked. A first insert returns `201`. Replaying the same idempotency key returns `200`, the same receipt/score, and `idempotent_replay: true`. A new key beyond the configured attempt limit returns `409`.
 
 Errors use `{ok:false,error:{code,message,request_id,details?}}`. Every response has `X-Request-ID` and `Cache-Control: no-store`.
 
@@ -153,7 +145,7 @@ Import a CSV with `FirstName,LastName,Email` headers:
   -ExpiresAt 2026-10-31T23:59:59Z
 ```
 
-The script sends batches of 50 and creates a sensitive, one-time CSV containing one `AssessmentInvite` link per person. The token remains in the URL fragment and the participant selects Normal or Advanced after opening the canonical site. Do not place this file in shared storage; delete it after individual distribution. Re-importing keeps existing tokens by default. Use `-RotateExistingTokens` only when old links must be invalidated.
+The script sends batches of 50 and creates a sensitive, one-time CSV containing one `AssessmentInvite` link per person. The token remains in the URL fragment and opens the unified questionnaire. Do not place this file in shared storage; delete it after individual distribution. Re-importing keeps existing tokens by default. Use `-RotateExistingTokens` only when old links must be invalidated.
 
 Other operations:
 
@@ -204,14 +196,14 @@ npm run db:migrate:local
 npx wrangler deploy --dry-run
 ```
 
-With a local Worker running and the same local admin value in `LOCAL_ADMIN_TOKEN`, a synthetic contract/load check can exercise up to 300 invitations, 50 concurrent clients, both combined modes (600 first attempts or 1,800 attempts at the configured three-attempt ceiling), idempotent replays, and paginated reconciliation. It rejects non-loopback API URLs. Add `--include-legacy` only when explicitly testing all five accepted IDs:
+With a local Worker running and the same local admin value in `LOCAL_ADMIN_TOKEN`, a synthetic contract/load check can exercise up to 300 invitations, 50 concurrent clients, the unified questionnaire (300 first attempts or 900 attempts at the configured three-attempt ceiling), idempotent replays, and paginated reconciliation. It rejects non-loopback API URLs. Add `--include-legacy` only when explicitly testing the accepted cutover IDs:
 
 ```powershell
 $env:LOCAL_ADMIN_TOKEN = "local-test-admin-token-at-least-32-characters"
 npm run smoke:local -- --participants 300 --concurrency 50 --attempts-per-quiz 1
 ```
 
-`npm run smoke:shared-link` exercises the common-link exchange with ten synthetic participants: both modes crossed with all five constant answer positions. It checks enrollment recovery, authoritative section scores, and submission replay, then deletes every synthetic participant in `finally`. It reads `API_BASE`, `ENROLLMENT_TOKEN`, and `ADMIN_TOKEN` from the environment, never prints them or synthetic identity, and requires `SMOKE_CONFIRM=DELETE_SYNTHETIC_PARTICIPANTS` for a non-loopback API.
+`npm run smoke:shared-link` exercises the common-link exchange with five synthetic participants, one for each constant answer position. It checks enrollment recovery, authoritative scoring, and submission replay, then deletes every synthetic participant in `finally`. It reads `API_BASE`, `ENROLLMENT_TOKEN`, and `ADMIN_TOKEN` from the environment, never prints them or synthetic identity, and requires `SMOKE_CONFIRM=DELETE_SYNTHETIC_PARTICIPANTS` for a non-loopback API.
 
 Production sequence:
 
@@ -220,11 +212,11 @@ Production sequence:
 3. Set and verify the distinct `ADMIN_TOKEN` and `ENROLLMENT_TOKEN` secrets; verify the self-enrollment cohort expiry is still in the future.
 4. Deploy the Worker with `/v2/*`; do not enable the legacy flag unless an explicitly timed cutover window requires it.
 5. Deploy the canonical client pointing to `/v2/public-enroll`, `/v2/session`, and `/v2/submit`; retain `/v2/enroll` for protected recovery links and run synthetic smoke tests.
-6. Pilot the common link with a small synthetic group, verify both selectable combined modes and admin reconciliation, then share it with the approximately 300-person cohort.
+6. Pilot the common link with a small synthetic group, verify the unified questionnaire and admin reconciliation, then share it with the approximately 300-person cohort.
 7. Confirm `LEGACY_SUBMISSIONS_ENABLED=false`. If it was temporarily enabled, disable it immediately after client cutover and schedule deletion of the legacy handler.
 
 `LEGACY_SUBMISSIONS_ENABLED=true` restores an unauthenticated compatibility writer at `/submit`. It is intentionally off, is not suitable for participant use, and should exist only for a short, monitored deployment transition.
 
 ## Capacity and cost posture
 
-For roughly 300 participants choosing one combined mode, the expected first-attempt volume is 300 submissions and the configured three-attempt ceiling is 900. If everyone completes both assigned modes, those figures are 600 and 1,800. Each attempt stores 50 selected-answer indexes, but storage and request volume remain tiny for Workers/D1. The operational risks are public-registration abuse, identity denial through pre-registration, quota abuse, and recovery; database capacity is not the concern. Monitor Worker errors, D1 latency/write failures, `400/409/429` trends, and daily health; configure Cloudflare account budget alerts before sharing broadly.
+For roughly 300 participants completing the unified questionnaire, the expected first-attempt volume is 300 submissions and the configured three-attempt ceiling is 900. Each attempt stores 20 selected-answer indexes, so storage and request volume remain tiny for Workers/D1. The operational risks are public-registration abuse, identity denial through pre-registration, quota abuse, and recovery; database capacity is not the concern. Monitor Worker errors, D1 latency/write failures, `400/409/429` trends, and daily health; configure Cloudflare account budget alerts before sharing broadly.

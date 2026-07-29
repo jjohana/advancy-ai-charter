@@ -14,26 +14,36 @@ import {
   validatePublicEnrollmentConfiguration,
   validateSubmission
 } from "../src/index.js";
-import { DEFAULT_QUIZ_IDS, LEGACY_QUIZ_IDS, QUIZ_IDS, QUIZ_VERSION, findQuiz, scoreAnswers } from "../src/quizzes.js";
+import {
+  DEFAULT_QUIZ_IDS,
+  LEGACY_QUIZ_IDS,
+  LEGACY_QUIZ_VERSION,
+  QUIZ_IDS,
+  QUIZ_VERSION,
+  findQuiz,
+  scoreAnswers
+} from "../src/quizzes.js";
 
+const UNIFIED_KEY = [2, 0, 4, 1, 3, 1, 4, 0, 2, 3, 0, 4, 1, 2, 3, 4, 2, 1, 0, 3];
 const CHARTER_KEY = [0, 2, 4, 1, 3, 1, 3, 0, 2, 4, 2, 4, 1, 3, 0, 3, 0, 2, 4, 1, 4, 1, 3, 0, 2];
 const USAGE_NORMAL_KEY = [0, 2, 4, 1, 3, 1, 3, 0, 2, 4, 2, 4, 1, 3, 0, 3, 0, 2, 4, 1, 4, 1, 3, 0, 2];
 const COMBINED_NORMAL_KEY = USAGE_NORMAL_KEY.map((_, index) => USAGE_NORMAL_KEY[(index + 1) % USAGE_NORMAL_KEY.length]);
 const USAGE_ADVANCED_KEY = [3, 0, 4, 1, 2, 4, 1, 3, 0, 2, 1, 4, 2, 0, 3, 2, 3, 0, 4, 1, 0, 2, 1, 3, 4];
-const EXPECTED_KEYS = {
-  "advancy-ai-assessment-normal": [...CHARTER_KEY, ...COMBINED_NORMAL_KEY],
-  "advancy-ai-assessment-advanced": [...CHARTER_KEY, ...USAGE_ADVANCED_KEY],
-  "advancy-ai-charter": CHARTER_KEY,
-  "advancy-ai-usage": USAGE_NORMAL_KEY,
-  "advancy-ai-usage-advanced": USAGE_ADVANCED_KEY
-};
+const EXPECTED_DEFINITIONS = [
+  { id: "advancy-ai-assessment-normal", version: QUIZ_VERSION, key: UNIFIED_KEY },
+  { id: "advancy-ai-assessment-normal", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...COMBINED_NORMAL_KEY] },
+  { id: "advancy-ai-assessment-advanced", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...USAGE_ADVANCED_KEY] },
+  { id: "advancy-ai-charter", version: LEGACY_QUIZ_VERSION, key: CHARTER_KEY },
+  { id: "advancy-ai-usage", version: LEGACY_QUIZ_VERSION, key: USAGE_NORMAL_KEY },
+  { id: "advancy-ai-usage-advanced", version: LEGACY_QUIZ_VERSION, key: USAGE_ADVANCED_KEY }
+];
 
 function submission(overrides = {}) {
   return {
     session_id: "81e0b822-8250-4c2a-8451-bf48950fe7aa",
     test_id: "advancy-ai-assessment-normal",
     quiz_version: QUIZ_VERSION,
-    answers: [...EXPECTED_KEYS["advancy-ai-assessment-normal"]],
+    answers: [...UNIFIED_KEY],
     attempt_started_at: "2026-07-09T09:00:00.000Z",
     completed_at: "2026-07-09T09:15:00.000Z",
     duration_seconds: 900,
@@ -43,40 +53,57 @@ function submission(overrides = {}) {
   };
 }
 
-test("combined and cutover answer keys are exact with section-safe server scoring", () => {
-  assert.deepEqual(QUIZ_IDS, Object.keys(EXPECTED_KEYS));
-  assert.deepEqual(DEFAULT_QUIZ_IDS, ["advancy-ai-assessment-normal", "advancy-ai-assessment-advanced"]);
-  assert.deepEqual(LEGACY_QUIZ_IDS, ["advancy-ai-charter", "advancy-ai-usage", "advancy-ai-usage-advanced"]);
-  for (const [id, answerKey] of Object.entries(EXPECTED_KEYS)) {
-    const quiz = findQuiz(id, QUIZ_VERSION);
+test("unified and legacy answer keys are exact with server-side scoring", () => {
+  assert.deepEqual(QUIZ_IDS, [
+    "advancy-ai-assessment-normal",
+    "advancy-ai-assessment-advanced",
+    "advancy-ai-charter",
+    "advancy-ai-usage",
+    "advancy-ai-usage-advanced"
+  ]);
+  assert.deepEqual(DEFAULT_QUIZ_IDS, ["advancy-ai-assessment-normal"]);
+  assert.deepEqual(LEGACY_QUIZ_IDS, [
+    "advancy-ai-assessment-normal",
+    "advancy-ai-assessment-advanced",
+    "advancy-ai-charter",
+    "advancy-ai-usage",
+    "advancy-ai-usage-advanced"
+  ]);
+  for (const definition of EXPECTED_DEFINITIONS) {
+    const id = definition.id;
+    const answerKey = definition.key;
+    const quiz = findQuiz(id, definition.version);
     assert.deepEqual(quiz.answerKey, answerKey);
     const perfect = scoreAnswers(quiz, answerKey);
     assert.equal(perfect.correct, answerKey.length);
     assert.equal(perfect.total, answerKey.length);
     assert.equal(perfect.percent, 100);
     assert.equal(perfect.passed, true);
-    if (answerKey.length === 25) {
-      const seventeen = answerKey.map((answer, index) => index < 17 ? answer : (answer + 1) % 5);
-      const eighteen = answerKey.map((answer, index) => index < 18 ? answer : (answer + 1) % 5);
-      assert.equal(scoreAnswers(quiz, seventeen).passed, false);
-      assert.equal(scoreAnswers(quiz, eighteen).passed, true);
-      assert.equal("sections" in perfect, false);
-    } else {
+    if (answerKey.length === 50) {
       const passing = answerKey.map((answer, index) => (index < 18 || (index >= 25 && index < 43)) ? answer : (answer + 1) % 5);
       assert.equal(scoreAnswers(quiz, passing).passed, true);
       assert.equal(perfect.sections.length, 2);
+    } else {
+      const required = Math.ceil(answerKey.length * 0.7);
+      const below = answerKey.map((answer, index) => index < required - 1 ? answer : (answer + 1) % 5);
+      const passing = answerKey.map((answer, index) => index < required ? answer : (answer + 1) % 5);
+      assert.equal(scoreAnswers(quiz, below).passed, false);
+      assert.equal(scoreAnswers(quiz, passing).passed, true);
+      assert.equal("sections" in perfect, false);
     }
   }
 });
 
-test("combined assessments concatenate Charter with the selected Usage level", () => {
-  assert.deepEqual(findQuiz("advancy-ai-assessment-normal", QUIZ_VERSION).answerKey.slice(0, 25), CHARTER_KEY);
-  assert.deepEqual(findQuiz("advancy-ai-assessment-normal", QUIZ_VERSION).answerKey.slice(25), COMBINED_NORMAL_KEY);
-  assert.deepEqual(findQuiz("advancy-ai-assessment-advanced", QUIZ_VERSION).answerKey.slice(0, 25), CHARTER_KEY);
-  assert.deepEqual(findQuiz("advancy-ai-assessment-advanced", QUIZ_VERSION).answerKey.slice(25), USAGE_ADVANCED_KEY);
+test("the unified assessment has 20 balanced answer positions", () => {
+  const quiz = findQuiz("advancy-ai-assessment-normal", QUIZ_VERSION);
+  assert.equal(quiz.answerKey.length, 20);
+  assert.deepEqual(
+    [0, 1, 2, 3, 4].map((answer) => quiz.answerKey.filter((value) => value === answer).length),
+    [4, 4, 4, 4, 4]
+  );
 });
 
-test("combined Normal rotates every module answer position while retaining a balanced key", () => {
+test("legacy Normal keeps its rotated module answer positions", () => {
   assert.deepEqual(COMBINED_NORMAL_KEY, [...USAGE_NORMAL_KEY.slice(1), USAGE_NORMAL_KEY[0]]);
   assert.equal(COMBINED_NORMAL_KEY.every((answer, index) => answer !== USAGE_NORMAL_KEY[index]), true);
   assert.deepEqual(
@@ -85,8 +112,8 @@ test("combined Normal rotates every module answer position while retaining a bal
   );
 });
 
-test("combined scoring requires 70% in both sections and returns the exact section contract", () => {
-  const quiz = findQuiz("advancy-ai-assessment-normal", QUIZ_VERSION);
+test("legacy combined scoring retains its section-safe contract", () => {
+  const quiz = findQuiz("advancy-ai-assessment-normal", LEGACY_QUIZ_VERSION);
   const answers = quiz.answerKey.map((answer, index) => {
     const correct = index < 15 || (index >= 25 && index < 45);
     return correct ? answer : (answer + 1) % 5;
@@ -103,8 +130,11 @@ test("combined scoring requires 70% in both sections and returns the exact secti
   });
 
   const advanced = scoreAnswers(
-    findQuiz("advancy-ai-assessment-advanced", QUIZ_VERSION),
-    EXPECTED_KEYS["advancy-ai-assessment-advanced"]
+    findQuiz("advancy-ai-assessment-advanced", LEGACY_QUIZ_VERSION),
+    EXPECTED_DEFINITIONS.find((definition) =>
+      definition.id === "advancy-ai-assessment-advanced" &&
+      definition.version === LEGACY_QUIZ_VERSION
+    ).key
   );
   assert.deepEqual(advanced.sections.map(({ id, name }) => ({ id, name })), [
     { id: "charter", name: "AI Charter" },
@@ -132,7 +162,7 @@ test("submission validation rejects spoofed score fields, unknown versions and s
   assert.throws(() => validateSubmission(submission({ correct: 50 }), "2026-07-09"), { code: "UNKNOWN_FIELD" });
   assert.throws(() => validateSubmission(submission({ quiz_version: "old" }), "2026-07-09"), { code: "UNKNOWN_QUIZ_VERSION" });
   assert.throws(() => validateSubmission(submission({ privacy_notice_version: "old" }), "2026-07-09"), { code: "PRIVACY_NOTICE_REQUIRED" });
-  assert.throws(() => validateSubmission(submission({ answers: Array(50).fill(9) }), "2026-07-09"), { code: "INVALID_ANSWERS" });
+  assert.throws(() => validateSubmission(submission({ answers: Array(20).fill(9) }), "2026-07-09"), { code: "INVALID_ANSWERS" });
 });
 
 test("cohort imports enforce the privacy notice retention ceiling", () => {
@@ -174,7 +204,7 @@ test("legacy quiz ids remain explicitly assignable during cutover", () => {
   assert.deepEqual(validated.participants[0].quizIds, LEGACY_QUIZ_IDS);
 });
 
-test("shared-link enrollment accepts only the exact current combined-assessment contract", () => {
+test("shared-link enrollment accepts only the current unified assessment", () => {
   const env = { ALLOWED_EMAIL_DOMAINS: "advancy.com", PRIVACY_NOTICE_VERSION: "2026-07-09" };
   const payload = {
     first_name: "  Alice ",
@@ -191,10 +221,7 @@ test("shared-link enrollment accepts only the exact current combined-assessment 
     quizId: "advancy-ai-assessment-normal",
     privacyVersion: "2026-07-09"
   });
-  assert.equal(
-    validateEnrollmentPayload({ ...payload, quiz_id: "advancy-ai-assessment-advanced" }, env).quizId,
-    "advancy-ai-assessment-advanced"
-  );
+  assert.throws(() => validateEnrollmentPayload({ ...payload, quiz_id: "advancy-ai-assessment-advanced" }, env), { code: "INVALID_QUIZ_ID" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, quiz_id: "advancy-ai-charter" }, env), { code: "INVALID_QUIZ_ID" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, email: "alice@example.com" }, env), { code: "EMAIL_DOMAIN_NOT_ALLOWED" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, privacy_notice_version: "old" }, env), { code: "PRIVACY_NOTICE_REQUIRED" });
@@ -246,7 +273,7 @@ test("enrollment recovery derives stable tokens and normalized fingerprints with
   const fingerprint = await enrollmentFingerprint(input, cohortId);
   assert.match(fingerprint, /^[0-9a-f]{64}$/);
   assert.equal(fingerprint, await enrollmentFingerprint({ ...input }, cohortId));
-  assert.notEqual(fingerprint, await enrollmentFingerprint({ ...input, quizId: "advancy-ai-assessment-advanced" }, cohortId));
+  assert.notEqual(fingerprint, await enrollmentFingerprint({ ...input, quizId: "advancy-ai-charter" }, cohortId));
 });
 
 test("database timestamps are canonical ISO strings accepted by the browser contract", () => {

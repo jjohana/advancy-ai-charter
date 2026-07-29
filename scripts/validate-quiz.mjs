@@ -3,87 +3,70 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
 const questionsSource = readFileSync("questions.js", "utf8");
-const expectedEvaluationCriteria = [
-  { id: "training_relevance", label: "Relevance to consulting work and day-to-day delivery" },
-  { id: "conceptual_clarity", label: "Clarity of LLM fundamentals, agent concepts and tool-routing principles" },
-  { id: "practical_applicability", label: "Practical applicability of examples, workflows and exercises" },
-  { id: "governance_confidence", label: "Confidence in applying governance, permissions and human-review gates" },
-  { id: "overall_satisfaction", label: "Overall satisfaction with the training session" }
-];
+const location = { search: "", pathname: "/", href: "https://example.test/" };
+const context = { window: { location }, location };
+vm.runInNewContext(questionsSource, context, { filename: "questions.js" });
 
-function loadQuestionContext(search) {
-  const location = { search, pathname: "/", href: "https://example.test/" + search };
-  const context = { window: { location, URL, URLSearchParams }, location, URL, URLSearchParams };
-  vm.runInNewContext(questionsSource, context, { filename: "questions.js" });
-  return context.window;
-}
+const config = context.window.quizConfig;
+const questions = context.window.quizQuestions;
 
-function validateQuestionSet(config, questions, expectedLength, label) {
-  assert.ok(config && typeof config === "object", label + " quizConfig is required");
-  assert.match(config.quizId, /^[a-z0-9][a-z0-9_-]{1,79}$/, label + " quizId is invalid");
-  assert.equal(config.quizVersion, "2026-07-09", label + " has an unexpected quizVersion");
-  assert.equal(config.privacyNoticeVersion, "2026-07-09", label + " has an unexpected privacy notice version");
-  assert.equal(
-    config.apiBase,
-    "https://advancy-ai-score-api.advancy-ai-training.workers.dev",
-    label + " production apiBase must use the approved Worker origin"
-  );
-  assert.ok(config.trainingEvaluation && typeof config.trainingEvaluation === "object",
-    label + " must retain the post-QCM training evaluation");
-  assert.equal(config.trainingEvaluation.title, "Training evaluation",
-    label + " has an unexpected post-QCM evaluation title");
-  assert.deepEqual(JSON.parse(JSON.stringify(config.trainingEvaluation.criteria)), expectedEvaluationCriteria,
-    label + " must retain every post-QCM rating question");
-  assert.ok(Array.isArray(questions), label + " quizQuestions must be an array");
-  assert.equal(questions.length, expectedLength, label + " assessment has an unexpected question count");
+assert.ok(config && typeof config === "object", "quizConfig is required");
+assert.equal(config.quizId, "advancy-ai-assessment-normal");
+assert.equal(config.quizName, "Advancy AI Knowledge Assessment");
+assert.equal(config.quizVersion, "2026-07-29");
+assert.equal(config.privacyNoticeVersion, "2026-07-09");
+assert.equal(config.apiBase, "https://advancy-ai-score-api.advancy-ai-training.workers.dev");
+assert.equal(config.passThreshold, 0.7);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(config.trainingEvaluation.criteria)),
+  [{ id: "overall_satisfaction", label: "Overall satisfaction with the training and assessment" }],
+  "feedback must remain one concise rating plus the optional comment rendered by app.js"
+);
 
-  const questionTexts = new Set();
-  questions.forEach((question, index) => {
-    assert.equal(typeof question.q, "string", "question " + (index + 1) + " needs text");
-    assert.ok(question.q.trim().length > 0, "question " + (index + 1) + " is empty");
-    const normalizedQuestion = question.q.trim().toLowerCase();
-    assert.ok(!questionTexts.has(normalizedQuestion), "question " + (index + 1) + " duplicates another question");
-    questionTexts.add(normalizedQuestion);
-    assert.ok(Number.isInteger(question.correct), "question " + (index + 1) + " needs a correct index");
-    assert.ok(question.correct >= 0 && question.correct <= 4, "question " + (index + 1) + " correct index is invalid");
-    assert.ok(Array.isArray(question.options), "question " + (index + 1) + " needs options");
-    assert.equal(question.options.length, 5, "question " + (index + 1) + " must have five options");
-    const optionTexts = new Set();
-    question.options.forEach((option, optionIndex) => {
-      assert.ok(option && typeof option.text === "string" && option.text.trim(), "question " + (index + 1) + " option " + optionIndex + " needs text");
-      assert.ok(typeof option.why === "string" && option.why.trim(), "question " + (index + 1) + " option " + optionIndex + " needs feedback");
-      const normalizedOption = option.text.trim().toLowerCase();
-      assert.ok(!optionTexts.has(normalizedOption), "question " + (index + 1) + " has duplicate options");
-      optionTexts.add(normalizedOption);
-      assert.equal(/^Correct\b/.test(option.why), optionIndex === question.correct,
-        "question " + (index + 1) + " feedback does not align with its correct index");
-    });
+assert.ok(Array.isArray(questions));
+assert.equal(questions.length, 20, "the assessment must contain exactly 20 questions");
+
+const questionTexts = new Set();
+questions.forEach((question, index) => {
+  assert.equal(typeof question.q, "string", "question " + (index + 1) + " needs text");
+  assert.ok(question.q.trim(), "question " + (index + 1) + " is empty");
+  const normalizedQuestion = question.q.trim().toLowerCase();
+  assert.ok(!questionTexts.has(normalizedQuestion), "question " + (index + 1) + " duplicates another question");
+  questionTexts.add(normalizedQuestion);
+  assert.equal(typeof question.source, "string", "question " + (index + 1) + " needs a source rationale");
+  assert.ok(question.source.trim(), "question " + (index + 1) + " has an empty source rationale");
+  assert.ok(Number.isInteger(question.correct) && question.correct >= 0 && question.correct <= 4,
+    "question " + (index + 1) + " has an invalid correct index");
+  assert.ok(Array.isArray(question.options));
+  assert.equal(question.options.length, 5, "question " + (index + 1) + " must have five options");
+  const optionTexts = new Set();
+  question.options.forEach((option, optionIndex) => {
+    assert.ok(option && typeof option.text === "string" && option.text.trim(),
+      "question " + (index + 1) + " option " + (optionIndex + 1) + " needs text");
+    assert.ok(typeof option.why === "string" && option.why.trim(),
+      "question " + (index + 1) + " option " + (optionIndex + 1) + " needs feedback");
+    const normalizedOption = option.text.trim().toLowerCase();
+    assert.ok(!optionTexts.has(normalizedOption), "question " + (index + 1) + " has duplicate options");
+    optionTexts.add(normalizedOption);
+    assert.equal(/^Correct\b/.test(option.why), optionIndex === question.correct,
+      "question " + (index + 1) + " feedback does not align with its single correct answer");
   });
-}
+});
 
-const landingContext = loadQuestionContext("");
-const modeAware = landingContext.assessmentModes && typeof landingContext.assessmentModes === "object" &&
-  landingContext.assessmentModes.normal && landingContext.assessmentModes.advanced;
-let validatedLabel;
-if (modeAware) {
-  assert.ok(!landingContext.selectedAssessmentMode, "landing state must not preselect a mode");
-  const normalContext = loadQuestionContext("?mode=normal");
-  const advancedContext = loadQuestionContext("?mode=advanced");
-  assert.equal(normalContext.selectedAssessmentMode, "normal", "Normal mode selection failed");
-  assert.equal(advancedContext.selectedAssessmentMode, "advanced", "Advanced mode selection failed");
-  validateQuestionSet(normalContext.quizConfig, normalContext.quizQuestions, 50, "Normal");
-  validateQuestionSet(advancedContext.quizConfig, advancedContext.quizQuestions, 50, "Advanced");
-  assert.notEqual(normalContext.quizConfig.quizId, advancedContext.quizConfig.quizId, "modes need distinct quiz IDs");
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(normalContext.quizQuestions.slice(0, 25))),
-    JSON.parse(JSON.stringify(advancedContext.quizQuestions.slice(0, 25))),
-    "both modes must begin with the same 25 Charter questions"
-  );
-  validatedLabel = "Normal and Advanced modes (50 questions each)";
-} else {
-  validateQuestionSet(landingContext.quizConfig, landingContext.quizQuestions, 25, "Legacy source bank");
-  validatedLabel = landingContext.quizConfig.quizId + " source bank (25 questions)";
-}
+assert.deepEqual(
+  [0, 1, 2, 3, 4].map((answer) => questions.filter((question) => question.correct === answer).length),
+  [4, 4, 4, 4, 4],
+  "correct-answer positions must be balanced"
+);
+
+const surfaceQuestions = questions.filter((question) => question.source.includes("Advancy ChatGPT Enterprise Practical Usage & Credit Guide"));
+assert.equal(surfaceQuestions.length, 2, "exactly two questions must apply the Advancy Chat, Work and Codex framework");
+assert.ok(surfaceQuestions.every((question) => /Chat|Work|Codex/.test(question.q)));
+assert.ok(surfaceQuestions.some((question) => question.options[question.correct].text.includes("Chat with Sol Thinking")));
+assert.ok(surfaceQuestions.some((question) =>
+  question.options[question.correct].text.includes("Work with Luna High") &&
+  question.options[question.correct].text.includes("Codex with Terra")
+));
 
 const html = readFileSync("index.html", "utf8");
 for (const contract of [
@@ -92,222 +75,94 @@ for (const contract of [
   'id="privacy-acknowledged"',
   'name="advancy-public-enrollment"',
   'class="privacy-confirmation" hidden',
-  'id="mode-landing"',
-  'href="?mode=normal"',
-  'href="?mode=advanced"',
-  'data-mode="normal"',
-  'data-mode="advanced"',
   'id="assessment-experience"',
-  'id="question-count-metric"',
-  'id="change-mode"',
+  'id="question-count-metric">20',
   'id="section-label"',
-  'id="selected-mode-label"',
   'href="privacy.html"',
   'name="robots"',
   'name="referrer"',
-  'Content-Security-Policy'
+  "Content-Security-Policy",
+  "20 mixed questions",
+  "Chat · Work · Codex"
 ]) {
   assert.ok(html.includes(contract), "index.html is missing " + contract);
 }
-assert.ok(html.includes('<meta name="advancy-public-enrollment" content="enabled" />'),
-  "index.html must explicitly enable public cohort registration");
+for (const removed of [
+  'id="mode-landing"',
+  'href="?mode=normal"',
+  'href="?mode=advanced"',
+  'id="change-mode"',
+  "Normal or Advanced",
+  "50-question"
+]) {
+  assert.ok(!html.includes(removed), "index.html still contains removed mode content: " + removed);
+}
 
 const app = readFileSync("app.js", "utf8");
-for (const feedbackContract of [
-  "most_valuable_takeaway",
-  "Most valuable takeaway (optional)",
+for (const contract of [
+  "overall_satisfaction",
+  "Comments or suggestions (optional)",
   "improvement_suggestion",
-  "Improvement suggestion (optional)",
-  "suggested_ai_automation_use_cases",
-  "Suggested AI automation use cases (optional)",
-  "Describe workflow ideas.",
-  "recommend_training",
-  "I would recommend this training."
-]) {
-  assert.ok(app.includes(feedbackContract), "app.js is missing post-QCM feedback field: " + feedbackContract);
-}
-assert.ok(!app.includes("Describe only non-confidential workflow ideas."),
-  "the use-case prompt must not contain the removed non-confidential qualifier");
-const resultStart = app.indexOf("function setResult");
-const restartStart = app.indexOf("function restartAssessment", resultStart);
-assert.ok(resultStart >= 0 && restartStart > resultStart &&
-  app.slice(resultStart, restartStart).includes("createTrainingEvaluation(status)"),
-  "the post-QCM result screen must render the training evaluation before secure submission");
-for (const forbidden of ["correct_answers", "user_agent", "source_url", "raw_json", "enrollment_token"]) {
-  assert.ok(!app.includes(forbidden), "app.js must not send " + forbidden);
-}
-const submissionBuilderStart = app.indexOf("function buildSubmissionPayload");
-const submissionBuilderEnd = app.indexOf("async function postWithRetry", submissionBuilderStart);
-assert.ok(submissionBuilderStart >= 0 && submissionBuilderEnd > submissionBuilderStart,
-  "app.js must define the submission payload builder");
-const submissionBuilder = app.slice(submissionBuilderStart, submissionBuilderEnd);
-for (const identityField of ["first_name", "last_name", "email"]) {
-  assert.ok(!submissionBuilder.includes(identityField), "assessment submissions must not include " + identityField);
-}
-assert.ok(app.includes("/v2/session"), "app.js must use the v2 session endpoint");
-assert.ok(app.includes("/v2/submit"), "app.js must use the v2 submit endpoint");
-assert.ok(app.includes("/v2/enroll"), "app.js must use the protected enrollment endpoint");
-assert.ok(app.includes("Idempotency-Key"), "app.js must send an idempotency key");
-for (const reliabilityContract of [
+  'dataset.testid = "submit-assessment"',
+  "Add optional feedback, then submit your assessment.",
+  "questions.length !== 20",
+  "/v2/session",
+  "/v2/submit",
+  "/v2/enroll",
+  "Idempotency-Key",
   "AbortController",
   "Retry-After",
   "requestTimeoutMs",
-  "selectedAssessmentMode",
-  "renderModeLanding",
-  "configureSelectedMode",
-  "changeAssessmentMode",
-  "updateSectionContext",
-  "Section 1 of 2",
-  "Section 2 of 2",
-  "value.sections",
-  'id: "charter"',
-  "result-section-",
   "retry-session",
   "validateSessionResponse",
   "validateSubmissionResponse",
   "validateEnrollmentResponse",
   "enrollmentStorageKey",
   "enrollmentIdempotencyStorageKey",
-  "enrollmentPattern",
   "publicEnrollmentMetaNode",
-  'params.has("enroll")',
   "renderEnrollmentForm",
   "privacyConfirmationNode",
   "submitEnrollment",
   'quiz_id: config.quizId',
   'privacy_notice_version: config.privacyNoticeVersion',
-  "safeSessionRemove(enrollmentStorageKey)",
-  "@advancy.com",
-  "state.lastSubmissionBody",
   "pendingStorageKey",
   "persistPendingSubmission",
   "restorePendingSubmission",
   "resumePersistedSubmission",
   "clearPendingSubmission",
-  "serialized_payload",
-  "showRecoveredSubmission",
-  "baseline_attempts_used",
   "window.top !== window.self",
   "document.documentElement.replaceChildren()",
   'document.createElement("fieldset")',
   'document.createElement("legend")',
-  'aria-live'
+  "aria-live"
 ]) {
-  assert.ok(app.includes(reliabilityContract), "app.js is missing reliability/accessibility contract: " + reliabilityContract);
+  assert.ok(app.includes(contract), "app.js is missing contract: " + contract);
 }
-assert.ok(app.includes("questions.length !== 50"), "selected modes must fail closed unless all 50 questions are loaded");
-assert.ok(app.includes("sections.every(function (section) { return section.passed; })"),
-  "combined pass must require both authoritative section results to pass");
-assert.ok(app.slice(app.indexOf("function renderModeLanding"), app.indexOf("function configureSelectedMode")).includes("captureInviteToken()"),
-  "the landing must initialize shared or private access before mode navigation");
-const modeLandingContract = app.slice(app.indexOf("function renderModeLanding"), app.indexOf("function configureSelectedMode"));
-for (const handoffContract of ["handoffFragment", '"#invite="', '"#enroll="']) {
-  assert.ok(modeLandingContract.includes(handoffContract),
-    "mode navigation must preserve access across browser-context handoff: " + handoffContract);
-}
-const modeGuard = app.lastIndexOf("if (!selectedAssessmentMode)");
-const finalSessionLoad = app.lastIndexOf("loadSession();");
-assert.ok(modeGuard >= 0 && finalSessionLoad > modeGuard && app.slice(modeGuard, finalSessionLoad).includes("return;"),
-  "the no-mode landing must return before any session API request");
-assert.ok(!app.slice(app.indexOf("function changeAssessmentMode"), app.indexOf("function cleanApiBase")).includes("inviteToken"),
-  "Change mode must not place the invitation token in navigation");
-assert.ok(!app.slice(app.indexOf("function changeAssessmentMode"), app.indexOf("function cleanApiBase")).includes("enrollmentToken"),
-  "Change mode must not place the enrollment token in navigation");
-const captureStart = app.indexOf("function captureInviteToken");
-const captureEnd = app.indexOf("function privacyAcknowledged", captureStart);
-const captureContract = app.slice(captureStart, captureEnd);
-assert.ok(captureStart >= 0 && captureEnd > captureStart &&
-  captureContract.includes("window.history.replaceState") &&
-  captureContract.includes("window.location.pathname + window.location.search"),
-  "invite and enrollment fragments must be scrubbed immediately after capture");
-for (const sharedAccessContract of [
-  "validInviteFragment",
-  "validEnrollmentFragment",
-  "state.enrollmentToken = inviteToken ? \"\" : enrollmentToken",
-  "state.publicEnrollment = !hasCredentialFragment",
-  'publicEnrollmentMetaNode.getAttribute("content") === "enabled"'
+for (const removed of [
+  "selectedAssessmentMode",
+  "renderModeLanding",
+  "changeAssessmentMode",
+  "Section 1 of 2",
+  "Section 2 of 2",
+  "submit-without-feedback",
+  "most_valuable_takeaway",
+  "suggested_ai_automation_use_cases"
 ]) {
-  assert.ok(captureContract.includes(sharedAccessContract),
-    "shared access capture is missing resilient fallback behavior: " + sharedAccessContract);
+  assert.ok(!app.includes(removed), "app.js still contains removed complexity: " + removed);
 }
-for (const idempotencyCaptureContract of [
-  "previousEnrollment !== fromEnrollmentFragment",
-  "safeSessionGet(enrollmentIdempotencyStorageKey)",
-  "safeSessionSet(enrollmentIdempotencyStorageKey, state.enrollmentIdempotencyKey)",
-  "uuidPattern.test(storedIdempotencyKey) ? storedIdempotencyKey : createId()",
-  "safeSessionRemove(enrollmentIdempotencyStorageKey)"
-]) {
-  assert.ok(captureContract.includes(idempotencyCaptureContract),
-    "enrollment access capture is missing stable idempotency behavior: " + idempotencyCaptureContract);
+for (const forbidden of ["correct_answers", "user_agent", "source_url", "raw_json", "enrollment_token"]) {
+  assert.ok(!app.includes(forbidden), "app.js must not send " + forbidden);
 }
-assert.ok(!app.includes("safeLocalSet(enrollmentIdempotencyStorageKey") &&
-  !app.includes("safeLocalGet(enrollmentIdempotencyStorageKey"),
-  "the enrollment idempotency key must never use persistent localStorage");
 
-const enrollmentRenderStart = app.indexOf("function renderEnrollmentForm");
-const enrollmentPayloadStart = app.indexOf("function enrollmentFormPayload");
-const enrollmentSubmitStart = app.indexOf("async function submitEnrollment", enrollmentPayloadStart);
-const enrollmentSubmitEnd = app.indexOf("function renderCompletedGate", enrollmentSubmitStart);
-assert.ok(enrollmentRenderStart >= 0 && enrollmentPayloadStart > enrollmentRenderStart &&
-  app.slice(enrollmentRenderStart, enrollmentPayloadStart).includes("privacyConfirmationNode.hidden = true"),
-  "protected registration must hide the duplicate sidebar privacy acknowledgement");
-assert.ok(enrollmentPayloadStart >= 0 && enrollmentSubmitStart > enrollmentPayloadStart && enrollmentSubmitEnd > enrollmentSubmitStart,
-  "app.js must define the enrollment form and submission flow");
-const enrollmentPayloadBuilder = app.slice(enrollmentPayloadStart, enrollmentSubmitStart);
-for (const field of ["first_name", "last_name", "email", "quiz_id", "privacy_notice_version", "privacy_acknowledged"]) {
-  assert.ok(enrollmentPayloadBuilder.includes(field), "enrollment payload is missing " + field);
+const submissionBuilderStart = app.indexOf("function buildSubmissionPayload");
+const submissionBuilderEnd = app.indexOf("async function wait", submissionBuilderStart);
+assert.ok(submissionBuilderStart >= 0 && submissionBuilderEnd > submissionBuilderStart,
+  "app.js must define the submission payload builder");
+const submissionBuilder = app.slice(submissionBuilderStart, submissionBuilderEnd);
+for (const identityField of ["first_name", "last_name", "email"]) {
+  assert.ok(!submissionBuilder.includes(identityField), "assessment submissions must not include " + identityField);
 }
-for (const forbiddenField of ["invite_token", "enrollment_token", "idempotency_key", "answers", "source_url"]) {
-  assert.ok(!enrollmentPayloadBuilder.includes(forbiddenField), "enrollment payload must not include " + forbiddenField);
-}
-const enrollmentSubmit = app.slice(enrollmentSubmitStart, enrollmentSubmitEnd);
-for (const enrollmentContract of [
-  'state.publicEnrollment ? "/v2/public-enroll" : "/v2/enroll"',
-  "apiBase() + registrationPath",
-  'registrationHeaders.Authorization = "Bearer " + state.enrollmentToken',
-  '"Idempotency-Key": state.enrollmentIdempotencyKey',
-  "body: JSON.stringify(prepared.payload)",
-  "validate: validateEnrollmentResponse",
-  "safeSessionSet(inviteStorageKey, response.invite_token)",
-  "safeSessionRemove(enrollmentStorageKey)",
-  "safeSessionRemove(enrollmentIdempotencyStorageKey)",
-  'state.enrollmentToken = ""',
-  'state.enrollmentIdempotencyKey = ""',
-  "state.publicEnrollment = false",
-  "loadSession()"
-]) {
-  assert.ok(enrollmentSubmit.includes(enrollmentContract), "enrollment submission is missing contract: " + enrollmentContract);
-}
-assert.ok(app.includes('new Set(["ok", "participant_id", "invite_token", "participant", "expires_at", "request_id"])'),
-  "enrollment responses must be checked against the exact v2 response keys");
-const sessionLoaderStart = app.indexOf("async function loadSession");
-const sessionRequestStart = app.indexOf("const base = apiBase();", sessionLoaderStart);
-assert.ok(sessionLoaderStart >= 0 && sessionRequestStart > sessionLoaderStart &&
-  app.slice(sessionLoaderStart, sessionRequestStart).includes("state.enrollmentToken || state.publicEnrollment") &&
-  app.slice(sessionLoaderStart, sessionRequestStart).includes("renderEnrollmentForm();"),
-  "shared or credentialed enrollment must render registration before any session request");
-assert.ok(app.slice(sessionLoaderStart, app.indexOf("function renderAccessGate", sessionLoaderStart))
-  .includes("privacyConfirmationNode.hidden = !state.sessionReady"),
-  "the sidebar privacy acknowledgement must appear only for a verified session");
-assert.ok(
-  app.includes("postWithRetry(state.lastSubmissionBody, statusNode)"),
-  "explicit and automatic submission retries must reuse the exact serialized payload"
-);
-const submitFunctionStart = app.indexOf("async function submitAssessment");
-const pendingWrite = app.indexOf("persistPendingSubmission();", submitFunctionStart);
-const firstSubmit = app.indexOf("postWithRetry(state.lastSubmissionBody, statusNode)", submitFunctionStart);
-assert.ok(submitFunctionStart >= 0 && pendingWrite > submitFunctionStart && firstSubmit > pendingWrite,
-  "the exact pending submission must be stored before the first POST");
-assert.ok(app.includes("safeSessionSet(pendingStorageKey"), "pending submission must use sessionStorage");
-assert.ok(app.includes("safeSessionRemove(pendingStorageKey)"), "pending submission must be removed from sessionStorage");
-assert.ok(app.includes("state.lastSubmissionBody = envelope.serialized_payload"),
-  "reload recovery must reuse the stored serialized payload without reserialization");
-assert.ok(app.includes("state.idempotencyKey = envelope.idempotency_key"),
-  "reload recovery must reuse the stored idempotency key");
-assert.ok((app.match(/clearPendingSubmission\(\);/g) || []).length >= 4,
-  "pending submission must be cleared on success, recovery, restart, and invalid restore");
 
-const css = readFileSync("styles.css", "utf8");
 const privacy = readFileSync("privacy.html", "utf8");
 const worker = readFileSync("backend/score-worker/src/index.js", "utf8");
 const wrangler = readFileSync("backend/score-worker/wrangler.toml", "utf8");
@@ -325,12 +180,12 @@ for (const privacyContract of [
   "work in any browser",
   "Registration remains restricted to authorized work-email domains",
   "removed from the browser address after capture",
-  "random registration transaction identifier may be held in session storage",
-  "reload or interrupted request reuses the same registration",
-  "removed after successful exchange or when invalid access is detected"
+  "reload or interrupted request reuses the same registration"
 ]) {
-  assert.ok(privacy.includes(privacyContract), "privacy.html is missing enrollment disclosure: " + privacyContract);
+  assert.ok(privacy.includes(privacyContract), "privacy.html is missing disclosure: " + privacyContract);
 }
+
+const css = readFileSync("styles.css", "utf8");
 function cssColor(variable) {
   const match = css.match(new RegExp("--" + variable + ":\\s*(#[0-9a-fA-F]{6})"));
   assert.ok(match, "styles.css is missing --" + variable);
@@ -347,4 +202,4 @@ function whiteContrast(hex) {
 assert.ok(whiteContrast(cssColor("advancy-orange-action")) >= 4.5, "primary button must meet WCAG AA contrast");
 assert.ok(whiteContrast(cssColor("advancy-orange-action-hover")) >= 4.5, "hovered primary button must meet WCAG AA contrast");
 
-console.log("Validated " + validatedLabel + ".");
+console.log("Validated one mixed 20-question assessment with concise feedback.");

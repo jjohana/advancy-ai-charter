@@ -205,7 +205,7 @@ test("legacy quiz ids remain explicitly assignable during cutover", () => {
 });
 
 test("shared-link enrollment accepts only the current unified assessment", () => {
-  const env = { ALLOWED_EMAIL_DOMAINS: "advancy.com", PRIVACY_NOTICE_VERSION: "2026-07-09" };
+  const env = { ALLOWED_EMAIL_DOMAINS: "advancy.com,cn.advancy.com", PRIVACY_NOTICE_VERSION: "2026-07-09" };
   const payload = {
     first_name: "  Alice ",
     last_name: " Example  ",
@@ -221,6 +221,10 @@ test("shared-link enrollment accepts only the current unified assessment", () =>
     quizId: "advancy-ai-assessment-normal",
     privacyVersion: "2026-07-09"
   });
+  assert.equal(
+    validateEnrollmentPayload({ ...payload, email: "L.YE@CN.ADVANCY.COM" }, env).email,
+    "l.ye@cn.advancy.com"
+  );
   assert.throws(() => validateEnrollmentPayload({ ...payload, quiz_id: "advancy-ai-assessment-advanced" }, env), { code: "INVALID_QUIZ_ID" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, quiz_id: "advancy-ai-charter" }, env), { code: "INVALID_QUIZ_ID" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, email: "alice@example.com" }, env), { code: "EMAIL_DOMAIN_NOT_ALLOWED" });

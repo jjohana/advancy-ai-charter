@@ -172,7 +172,7 @@ Committed production defaults are in `wrangler.toml`:
 
 - exact origin: `https://jjohana.github.io`
 - EU-jurisdiction D1 binding: `advancy-ai-results-eu`
-- allowed import domain: `advancy.com` (empty in local tests means unrestricted)
+- allowed registration/import domains: `advancy.com` and `cn.advancy.com` (empty in local tests means unrestricted)
 - invitation lifetime: 90 days, capped by cohort expiry
 - maximum attempts: 3 unless a participant override is imported
 - default retention: 365 days, copied into each cohort

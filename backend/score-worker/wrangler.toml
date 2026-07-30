@@ -6,7 +6,7 @@ preview_urls = false
 
 [vars]
 ALLOWED_ORIGINS = "https://jjohana.github.io"
-ALLOWED_EMAIL_DOMAINS = "advancy.com"
+ALLOWED_EMAIL_DOMAINS = "advancy.com,cn.advancy.com"
 INVITATION_TTL_DAYS = "90"
 MAX_ATTEMPTS_PER_QUIZ = "3"
 PRIVACY_NOTICE_VERSION = "2026-07-09"

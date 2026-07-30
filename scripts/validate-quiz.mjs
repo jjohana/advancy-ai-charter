@@ -153,6 +153,7 @@ for (const removed of [
 for (const forbidden of ["correct_answers", "user_agent", "source_url", "raw_json", "enrollment_token"]) {
   assert.ok(!app.includes(forbidden), "app.js must not send " + forbidden);
 }
+assert.ok(app.includes("cn\\.advancy\\.com"), "app.js must accept the China-office work-email domain");
 
 const submissionBuilderStart = app.indexOf("function buildSubmissionPayload");
 const submissionBuilderEnd = app.indexOf("async function wait", submissionBuilderStart);
@@ -166,6 +167,10 @@ for (const identityField of ["first_name", "last_name", "email"]) {
 const privacy = readFileSync("privacy.html", "utf8");
 const worker = readFileSync("backend/score-worker/src/index.js", "utf8");
 const wrangler = readFileSync("backend/score-worker/wrangler.toml", "utf8");
+assert.ok(
+  wrangler.includes('ALLOWED_EMAIL_DOMAINS = "advancy.com,cn.advancy.com"'),
+  "Worker configuration must accept the standard and China-office work-email domains"
+);
 for (const publicEnrollmentContract of [
   'path === "/v2/public-enroll"',
   "validatePublicEnrollmentConfiguration",

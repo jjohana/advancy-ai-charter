@@ -31,6 +31,7 @@
   const pendingSubmissionTtlMs = 24 * 60 * 60 * 1000;
   const requestTimeoutMs = 12000;
   const retryDelaysMs = [0, 600, 1800];
+  const advancyEmailPattern = /^[^\s@]{1,64}@(advancy\.com|cn\.advancy\.com)$/i;
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const invitePattern = /^inv_[A-Za-z0-9_-]{43}$/;
   const enrollmentPattern = /^enr_[A-Za-z0-9_-]{43}$/;
@@ -766,7 +767,7 @@
       public_enrollment_disabled: "Registration is closed. Contact the training organizer.",
       self_enrollment_disabled: "Registration is closed. Contact the training organizer.",
       self_enrollment_not_configured: "Registration is temporarily unavailable. Contact the training organizer.",
-      email_domain_not_allowed: "Use your @advancy.com work email to register.",
+      email_domain_not_allowed: "Use your Advancy work email (@advancy.com or @cn.advancy.com) to register.",
       identity_conflict: "These registration details could not be verified. Contact the training organizer.",
       idempotency_key_reused: "Use the same details as your first registration attempt or contact the training organizer.",
       participant_revoked: "Your assessment access has been revoked. Contact the training organizer.",
@@ -901,7 +902,7 @@
     title.tabIndex = -1;
     title.textContent = "Register for the assessment";
     const intro = document.createElement("p");
-    intro.textContent = "Use your @advancy.com work email. This shared cohort access will be exchanged for a private participant invitation.";
+    intro.textContent = "Use your Advancy work email (@advancy.com or @cn.advancy.com). This shared cohort access will be exchanged for a private participant invitation.";
     const form = document.createElement("form");
     form.className = "enrollment-form";
     form.dataset.testid = "enrollment-form";
@@ -978,8 +979,8 @@
     if (!lastName || lastName.length > 120 || invalidControl.test(lastName)) {
       return { error: "Enter a valid last name.", focus: form.elements.last_name };
     }
-    if (!/^[^\s@]{1,64}@advancy\.com$/i.test(email) || email.length > 254) {
-      return { error: "Enter your @advancy.com work email.", focus: form.elements.email };
+    if (!advancyEmailPattern.test(email) || email.length > 254) {
+      return { error: "Enter your Advancy work email (@advancy.com or @cn.advancy.com).", focus: form.elements.email };
     }
     if (!form.elements.privacy_acknowledged.checked) {
       return { error: "Acknowledge the privacy notice to register.", focus: form.elements.privacy_acknowledged };

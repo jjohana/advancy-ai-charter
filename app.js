@@ -44,7 +44,7 @@
     "idempotency_key", "serialized_payload", "created_at", "expires_at"
   ]);
   const evaluationRatingKeys = new Set(["overall_satisfaction"]);
-  const evaluationTextKeys = new Set(["improvement_suggestion"]);
+  const evaluationTextKeys = new Set(["improvement_suggestion", "suggested_ai_automation_use_cases"]);
 
   const cardNode = document.querySelector("#question-card");
   const progressNode = document.querySelector("#progress");
@@ -1194,8 +1194,10 @@
       const value = formData.get("evaluation-" + criterion.id);
       if (value !== null && value !== "") evaluation[criterion.id] = Number(value);
     });
-    const comment = String(formData.get("improvement_suggestion") || "").trim();
-    if (comment) evaluation.improvement_suggestion = comment;
+    evaluationTextKeys.forEach(function (field) {
+      const value = String(formData.get(field) || "").trim();
+      if (value) evaluation[field] = value;
+    });
     return Object.keys(evaluation).length ? evaluation : null;
   }
 
@@ -1209,7 +1211,7 @@
     title.id = "training-evaluation-title";
     title.textContent = evaluation.title || "Feedback";
     const intro = document.createElement("p");
-    intro.textContent = "Feedback is optional. Add a rating or comment, then submit the assessment. Do not include client, confidential, personal, or market-sensitive information.";
+    intro.textContent = "Feedback and use cases are optional. Add a rating, comment or AI use case, then submit the assessment. Do not include client, confidential, personal, or market-sensitive information.";
     const form = document.createElement("form");
     form.className = "evaluation-form";
     form.noValidate = true;
@@ -1242,7 +1244,8 @@
     });
 
     const fields = [
-      ["improvement_suggestion", "Comments or suggestions (optional)", "What should we keep or improve?"]
+      ["improvement_suggestion", "Comments or suggestions (optional)", "What should we keep or improve?"],
+      ["suggested_ai_automation_use_cases", "Suggested AI automation use cases (optional)", "Describe workflow ideas."]
     ];
     fields.forEach(function (definition) {
       const label = document.createElement("label");

@@ -103,6 +103,9 @@ for (const contract of [
   "overall_satisfaction",
   "Comments or suggestions (optional)",
   "improvement_suggestion",
+  "Suggested AI automation use cases (optional)",
+  "suggested_ai_automation_use_cases",
+  "Describe workflow ideas.",
   'dataset.testid = "submit-assessment"',
   "Add optional feedback, then submit your assessment.",
   "questions.length !== 20",
@@ -145,8 +148,7 @@ for (const removed of [
   "Section 1 of 2",
   "Section 2 of 2",
   "submit-without-feedback",
-  "most_valuable_takeaway",
-  "suggested_ai_automation_use_cases"
+  "most_valuable_takeaway"
 ]) {
   assert.ok(!app.includes(removed), "app.js still contains removed complexity: " + removed);
 }
@@ -207,4 +209,4 @@ function whiteContrast(hex) {
 assert.ok(whiteContrast(cssColor("advancy-orange-action")) >= 4.5, "primary button must meet WCAG AA contrast");
 assert.ok(whiteContrast(cssColor("advancy-orange-action-hover")) >= 4.5, "hovered primary button must meet WCAG AA contrast");
 
-console.log("Validated one mixed 20-question assessment with concise feedback.");
+console.log("Validated one mixed 20-question assessment with concise feedback and use-case capture.");

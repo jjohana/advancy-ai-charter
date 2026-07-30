@@ -6,7 +6,7 @@ One canonical website serves one concise assessment:
 - 20 mixed multiple-choice questions
 - one correct answer per question
 - AI Charter, practical AI usage, and two Chat/Work/Codex routing questions
-- one short optional feedback form after the QCM
+- one short optional feedback and AI use-case form after the QCM
 
 The former `advancy-ai-usage` and `advancy-ai-usage-advanced` Pages sites remain compatibility redirects to the canonical questionnaire.
 

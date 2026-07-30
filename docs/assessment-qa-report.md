@@ -8,7 +8,7 @@ The questionnaire has been simplified to one participant journey:
 
 1. secure registration;
 2. one mixed 20-question QCM;
-3. one concise feedback form;
+3. one concise feedback and AI use-case form;
 4. authoritative score and receipt.
 
 The Normal/Advanced choice and the two 50-question paths have been removed from the participant-facing website.
@@ -29,13 +29,14 @@ Two questions apply the approved `Advancy ChatGPT Enterprise Practical Usage & C
 
 ## Feedback
 
-The previous multi-field training evaluation has been reduced to:
+The participant-facing evaluation contains:
 
 - one optional 1-5 overall rating;
 - one optional comments or suggestions field;
+- one optional field dedicated to suggested AI automation use cases, restored with its original wording;
 - one `Submit assessment` action.
 
-The participant may leave both feedback fields blank. The form repeats the warning not to enter client, confidential, personal or market-sensitive information.
+The participant may leave all feedback fields blank. The form repeats the warning not to enter client, confidential, personal or market-sensitive information.
 
 ## Technical and browser QA
 
@@ -49,7 +50,7 @@ Passed:
 - Cloudflare Worker production dry-run;
 - local browser registration with a synthetic `@advancy.com` identity;
 - all 20 answer/correction/next-question transitions;
-- the final feedback form with one rating, one comment and one submit button;
+- the final feedback form with one rating, one comment, one dedicated AI use-case field and one submit button;
 - authoritative 20/20 result, receipt creation and attempt-count update;
 - no browser console errors and no horizontal page overflow at the tested desktop viewport.
 

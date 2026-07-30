@@ -151,11 +151,16 @@ test("submission validation accepts a minimal payload and optional validated eva
       training_relevance: 5,
       overall_satisfaction: 4,
       recommend_training: true,
-      improvement_suggestion: "More worked examples"
+      improvement_suggestion: "More worked examples",
+      suggested_ai_automation_use_cases: "Analyze a large product portfolio and produce a structured SKU mapping."
     }
   }), "2026-07-09");
   assert.equal(evaluated.evaluation.training_relevance, 5);
   assert.equal(evaluated.evaluation.recommend_training, 1);
+  assert.equal(
+    evaluated.evaluation.suggested_ai_automation_use_cases,
+    "Analyze a large product portfolio and produce a structured SKU mapping."
+  );
 });
 
 test("submission validation rejects spoofed score fields, unknown versions and stale privacy consent", () => {

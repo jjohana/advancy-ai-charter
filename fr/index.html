@@ -47,18 +47,17 @@
             <span>Score actuel</span>
             <strong id="score">0 / 0</strong>
           </div>
-          <div class="participant-card secure-access-card" data-testid="secure-access">
-            <h3>Accès ADMIN sécurisé</h3>
-            <strong id="participant-name">Invitation ADMIN requise</strong>
-            <p id="session-status" class="session-status" data-testid="session-status" role="status" aria-live="polite">Vérification de votre invitation ADMIN…</p>
-            <p id="attempt-status"></p>
-            <div class="privacy-confirmation" hidden>
-              <label for="privacy-acknowledged">
-                <input id="privacy-acknowledged" data-testid="privacy-acknowledged" type="checkbox" disabled />
-                <span>J’ai lu la <a href="privacy.html" target="_blank" rel="noopener noreferrer">notice de confidentialité du questionnaire</a>.</span>
-              </label>
-              <p>N’indiquez aucune information client, financière, RH, confidentielle, personnelle ou sensible dans les commentaires facultatifs.</p>
-            </div>
+          <div data-testid="secure-access" hidden>
+            <span id="participant-name">Invitation ADMIN requise</span>
+            <span id="session-status" class="session-status" data-testid="session-status" role="status" aria-live="polite">Vérification de votre invitation ADMIN…</span>
+            <span id="attempt-status"></span>
+          </div>
+          <div class="participant-card privacy-confirmation" hidden>
+            <label for="privacy-acknowledged">
+              <input id="privacy-acknowledged" data-testid="privacy-acknowledged" type="checkbox" disabled />
+              <span>J’ai lu la <a href="privacy.html" target="_blank" rel="noopener noreferrer">notice de confidentialité du questionnaire</a>.</span>
+            </label>
+            <p>N’indiquez aucune information client, financière, RH, confidentielle, personnelle ou sensible dans les commentaires facultatifs.</p>
           </div>
         </aside>
 

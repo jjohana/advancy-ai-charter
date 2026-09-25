@@ -708,6 +708,19 @@ main {
   line-height: 1.2;
 }
 
+.question-title-block {
+  display: grid;
+  gap: 7px;
+}
+
+.question-meta {
+  color: var(--advancy-orange-action);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .answers {
   display: grid;
   gap: 10px;

@@ -1,4 +1,5 @@
 import {
+  ADMIN_FRENCH_QUIZ_VERSION,
   DEFAULT_QUIZ_IDS,
   LEGACY_QUIZ_VERSION,
   QUIZ_IDS,
@@ -33,7 +34,11 @@ const participantCount = integerFlag("--participants", 10, 1, 300);
 const concurrency = integerFlag("--concurrency", 10, 1, 50);
 const attemptsPerQuiz = integerFlag("--attempts-per-quiz", 1, 1, 3);
 const quizIds = process.argv.includes("--include-legacy") ? QUIZ_IDS : DEFAULT_QUIZ_IDS;
-const quizVersion = (quizId) => quizId === "advancy-ai-assessment-normal" ? QUIZ_VERSION : LEGACY_QUIZ_VERSION;
+const quizVersion = (quizId) => {
+  if (quizId === "advancy-ai-assessment-normal") return QUIZ_VERSION;
+  if (quizId === "advancy-ai-admin-fr") return ADMIN_FRENCH_QUIZ_VERSION;
+  return LEGACY_QUIZ_VERSION;
+};
 const expectedAttempts = participantCount * quizIds.length * attemptsPerQuiz;
 const runId = crypto.randomUUID().slice(0, 8);
 const cohortId = `load-${runId}`;

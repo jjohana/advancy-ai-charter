@@ -13,6 +13,7 @@ param(
   [int]$RetentionDays = 365,
   [ValidateRange(0, 20)]
   [int]$MaxAttempts = 0,
+  [string[]]$QuizIds = @("advancy-ai-assessment-normal"),
   [switch]$RotateExistingTokens,
   [string]$OutputPath = "",
   [string]$CanonicalSiteUrl = "https://jjohana.github.io/advancy-ai-charter/",
@@ -49,6 +50,19 @@ foreach ($row in $source) {
   }
 }
 
+$allowedQuizIds = @(
+  "advancy-ai-assessment-normal",
+  "advancy-ai-assessment-advanced",
+  "advancy-ai-charter",
+  "advancy-ai-usage",
+  "advancy-ai-usage-advanced",
+  "advancy-ai-admin-fr"
+)
+$QuizIds = @($QuizIds | ForEach-Object { $_.Trim() } | Where-Object { $_ } | Select-Object -Unique)
+if ($QuizIds.Count -eq 0 -or @($QuizIds | Where-Object { $_ -cnotin $allowedQuizIds }).Count -gt 0) {
+  throw "QuizIds must contain one or more supported questionnaire ids. No network request was made."
+}
+
 if (-not $OutputPath) {
   $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
   $OutputPath = Join-Path $PSScriptRoot "invite-links-$CohortId-$stamp.csv"
@@ -72,6 +86,7 @@ for ($offset = 0; $offset -lt $source.Count; $offset += 50) {
       email = $_.Email.Trim().ToLowerInvariant()
     }
     if ($MaxAttempts -gt 0) { $item.max_attempts = $MaxAttempts }
+    $item.quiz_ids = @($QuizIds)
     $item
   })
   $payload = [ordered]@{

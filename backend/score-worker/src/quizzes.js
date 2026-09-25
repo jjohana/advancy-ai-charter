@@ -1,7 +1,9 @@
 export const QUIZ_VERSION = "2026-07-29";
+export const ADMIN_FRENCH_QUIZ_VERSION = "2026-09-25-admin-fr";
 export const LEGACY_QUIZ_VERSION = "2026-07-09";
 
 const UNIFIED_KEY = Object.freeze([2, 0, 4, 1, 3, 1, 4, 0, 2, 3, 0, 4, 1, 2, 3, 4, 2, 1, 0, 3]);
+const ADMIN_FRENCH_KEY = Object.freeze([2, 4, 1, 3, 0, 1, 3, 0, 4, 2, 3, 1, 4, 0, 2, 4, 0, 2, 1, 3]);
 const CHARTER_KEY = Object.freeze([0, 2, 4, 1, 3, 1, 3, 0, 2, 4, 2, 4, 1, 3, 0, 3, 0, 2, 4, 1, 4, 1, 3, 0, 2]);
 const USAGE_NORMAL_KEY = Object.freeze([0, 2, 4, 1, 3, 1, 3, 0, 2, 4, 2, 4, 1, 3, 0, 3, 0, 2, 4, 1, 4, 1, 3, 0, 2]);
 const COMBINED_NORMAL_KEY = Object.freeze(USAGE_NORMAL_KEY.map((_, index) => USAGE_NORMAL_KEY[(index + 1) % USAGE_NORMAL_KEY.length]));
@@ -14,6 +16,13 @@ const definitions = [
     version: QUIZ_VERSION,
     passThreshold: 0.7,
     answerKey: UNIFIED_KEY
+  },
+  {
+    id: "advancy-ai-admin-fr",
+    name: "Évaluation IA générative — ADMIN",
+    version: ADMIN_FRENCH_QUIZ_VERSION,
+    passThreshold: 0.7,
+    answerKey: ADMIN_FRENCH_KEY
   },
   {
     id: "advancy-ai-assessment-normal",

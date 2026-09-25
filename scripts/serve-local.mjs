@@ -13,10 +13,15 @@ const contentTypes = new Map([
   [".png", "image/png"],
   [".txt", "text/plain; charset=utf-8"]
 ]);
-const rootFiles = new Set(["index.html", "app.js", "questions.js", "redirect.js", "styles.css", "privacy.html", "robots.txt"]);
+const rootFiles = new Set([
+  "index.html", "app.js", "questions.js", "redirect.js", "styles.css", "privacy.html", "robots.txt",
+  "fr/index.html", "fr/questions.js", "fr/privacy.html"
+]);
 
 function safePath(pathname) {
-  const relative = pathname === "/" ? "index.html" : decodeURIComponent(pathname.slice(1));
+  const relative = pathname === "/"
+    ? "index.html"
+    : pathname === "/fr/" ? "fr/index.html" : decodeURIComponent(pathname.slice(1));
   if (!rootFiles.has(relative) && !relative.startsWith("assets/")) return null;
   const absolute = resolve(root, relative);
   if (absolute !== root && !absolute.startsWith(root + sep)) return null;

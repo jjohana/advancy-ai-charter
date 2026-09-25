@@ -16,6 +16,7 @@ import {
 } from "../src/index.js";
 import {
   DEFAULT_QUIZ_IDS,
+  ADMIN_FRENCH_QUIZ_VERSION,
   LEGACY_QUIZ_IDS,
   LEGACY_QUIZ_VERSION,
   QUIZ_IDS,
@@ -25,12 +26,14 @@ import {
 } from "../src/quizzes.js";
 
 const UNIFIED_KEY = [2, 0, 4, 1, 3, 1, 4, 0, 2, 3, 0, 4, 1, 2, 3, 4, 2, 1, 0, 3];
+const ADMIN_FRENCH_KEY = [2, 4, 1, 3, 0, 1, 3, 0, 4, 2, 3, 1, 4, 0, 2, 4, 0, 2, 1, 3];
 const CHARTER_KEY = [0, 2, 4, 1, 3, 1, 3, 0, 2, 4, 2, 4, 1, 3, 0, 3, 0, 2, 4, 1, 4, 1, 3, 0, 2];
 const USAGE_NORMAL_KEY = [0, 2, 4, 1, 3, 1, 3, 0, 2, 4, 2, 4, 1, 3, 0, 3, 0, 2, 4, 1, 4, 1, 3, 0, 2];
 const COMBINED_NORMAL_KEY = USAGE_NORMAL_KEY.map((_, index) => USAGE_NORMAL_KEY[(index + 1) % USAGE_NORMAL_KEY.length]);
 const USAGE_ADVANCED_KEY = [3, 0, 4, 1, 2, 4, 1, 3, 0, 2, 1, 4, 2, 0, 3, 2, 3, 0, 4, 1, 0, 2, 1, 3, 4];
 const EXPECTED_DEFINITIONS = [
   { id: "advancy-ai-assessment-normal", version: QUIZ_VERSION, key: UNIFIED_KEY },
+  { id: "advancy-ai-admin-fr", version: ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
   { id: "advancy-ai-assessment-normal", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...COMBINED_NORMAL_KEY] },
   { id: "advancy-ai-assessment-advanced", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...USAGE_ADVANCED_KEY] },
   { id: "advancy-ai-charter", version: LEGACY_QUIZ_VERSION, key: CHARTER_KEY },
@@ -53,9 +56,10 @@ function submission(overrides = {}) {
   };
 }
 
-test("unified and legacy answer keys are exact with server-side scoring", () => {
+test("current and legacy answer keys are exact with server-side scoring", () => {
   assert.deepEqual(QUIZ_IDS, [
     "advancy-ai-assessment-normal",
+    "advancy-ai-admin-fr",
     "advancy-ai-assessment-advanced",
     "advancy-ai-charter",
     "advancy-ai-usage",
@@ -209,6 +213,26 @@ test("legacy quiz ids remain explicitly assignable during cutover", () => {
   assert.deepEqual(validated.participants[0].quizIds, LEGACY_QUIZ_IDS);
 });
 
+test("French ADMIN quiz is available only through explicit assignment", () => {
+  const now = Date.now();
+  const input = {
+    cohort: {
+      id: "admin-fr-2026",
+      name: "French ADMIN training",
+      starts_at: new Date(now - 86_400_000).toISOString(),
+      expires_at: new Date(now + 86_400_000).toISOString()
+    },
+    participants: [{
+      first_name: "Admin",
+      last_name: "Participant",
+      email: "admin@advancy.com",
+      quiz_ids: ["advancy-ai-admin-fr"]
+    }]
+  };
+  const validated = validateImport(input, { RETENTION_DAYS: "365", INVITATION_TTL_DAYS: "1", ALLOWED_EMAIL_DOMAINS: "advancy.com" });
+  assert.deepEqual(validated.participants[0].quizIds, ["advancy-ai-admin-fr"]);
+});
+
 test("shared-link enrollment accepts only the current unified assessment", () => {
   const env = { ALLOWED_EMAIL_DOMAINS: "advancy.com,cn.advancy.com", PRIVACY_NOTICE_VERSION: "2026-07-09" };
   const payload = {
@@ -232,6 +256,7 @@ test("shared-link enrollment accepts only the current unified assessment", () =>
   );
   assert.throws(() => validateEnrollmentPayload({ ...payload, quiz_id: "advancy-ai-assessment-advanced" }, env), { code: "INVALID_QUIZ_ID" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, quiz_id: "advancy-ai-charter" }, env), { code: "INVALID_QUIZ_ID" });
+  assert.throws(() => validateEnrollmentPayload({ ...payload, quiz_id: "advancy-ai-admin-fr" }, env), { code: "INVALID_QUIZ_ID" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, email: "alice@example.com" }, env), { code: "EMAIL_DOMAIN_NOT_ALLOWED" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, privacy_notice_version: "old" }, env), { code: "PRIVACY_NOTICE_REQUIRED" });
   assert.throws(() => validateEnrollmentPayload({ ...payload, extra: true }, env), { code: "UNKNOWN_FIELD" });

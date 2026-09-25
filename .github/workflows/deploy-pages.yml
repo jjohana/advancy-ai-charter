@@ -26,6 +26,7 @@ jobs:
       - run: node scripts/build-unified-questions.mjs --check
       - run: node --check app.js
       - run: node scripts/validate-quiz.mjs
+      - run: node scripts/validate-french-quiz.mjs
       - run: node scripts/validate-full-contract.mjs
       - name: Build minimal static artifact
         shell: bash
@@ -33,6 +34,7 @@ jobs:
           mkdir _site
           cp .nojekyll index.html app.js questions.js styles.css privacy.html robots.txt _site/
           cp -R assets _site/assets
+          cp -R fr _site/fr
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

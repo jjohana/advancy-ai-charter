@@ -1,0 +1,40 @@
+.admin-assessment .masthead { grid-template-columns: 180px 1fr; gap: 24px; padding: 24px 0; }
+.admin-assessment .logo { width: 180px; }
+.admin-assessment h1 { font-size: clamp(1.7rem, 3vw, 2.5rem); line-height: 1.15; }
+.admin-assessment .headline { text-align: left; justify-items: start; }
+.admin-assessment .question-heading h2 { font-size: clamp(1.15rem, 2vw, 1.45rem); line-height: 1.4; }
+.admin-assessment .answer { line-height: 1.55; }
+.admin-assessment .answer:has(input:focus-visible) { outline: 3px solid var(--advancy-blue-2); outline-offset: 2px; }
+.admin-assessment .button { min-height: 44px; }
+.admin-assessment .restart-confirmation { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; border: 2px solid var(--advancy-orange-action); background: #fff8f4; }
+.admin-assessment .restart-confirmation h3 { width: 100%; margin: 0; font-size: 1rem; color: var(--advancy-blue); }
+.admin-assessment .feedback-details summary { padding: 12px 0; color: var(--advancy-blue); font-weight: 700; cursor: pointer; }
+.admin-assessment .feedback-details .option-feedback { margin-bottom: 8px; }
+.admin-assessment .feedback-source { margin: 4px 0 0; color: #565d65; font-size: .85rem; }
+.admin-assessment .question-card { scroll-margin-top: 20px; }
+.admin-assessment .skip-link { position: absolute; top: -100px; left: 20px; z-index: 10; padding: 12px; background: white; color: var(--advancy-blue); }
+.admin-assessment .skip-link:focus { top: 10px; }
+@media (max-width: 900px) {
+  .admin-assessment .side-panel { gap: 10px; padding: 16px; }
+  .admin-assessment .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .admin-assessment .metric { display: block; padding: 8px; }
+  .admin-assessment .metric strong, .admin-assessment .metric span { display: block; }
+  .admin-assessment .metric strong { font-size: 1.2rem; }
+  .admin-assessment .score-card { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; }
+  .admin-assessment .privacy-confirmation { padding: 9px; }
+  .admin-assessment .privacy-confirmation p { font-size: .8rem; }
+  .admin-assessment main { padding-top: 20px; }
+}
+@media (max-width: 660px) {
+  .admin-assessment .masthead { grid-template-columns: 1fr; gap: 14px; padding: 18px 0; }
+  .admin-assessment .logo { width: 140px; padding: 7px; }
+  .admin-assessment .eyebrow { font-size: .7rem; letter-spacing: .08em; }
+  .admin-assessment .tagline { font-size: .9rem; }
+  .admin-assessment .quiz-toolbar { padding: 12px 14px; }
+  .admin-assessment .toolbar-actions { display: flex; justify-content: flex-end; }
+  .admin-assessment .toolbar-actions .button { width: auto; padding: 8px 12px; }
+  .admin-assessment .question-heading { grid-template-columns: 34px 1fr; gap: 10px; }
+  .admin-assessment .qid { min-height: 34px; }
+  .admin-assessment .metric span { font-size: .75rem; }
+  .admin-assessment .answer { gap: 8px; padding: 12px 10px; }
+}

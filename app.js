@@ -964,7 +964,7 @@
     title.textContent = letters[optionIndex] + ". " +
       (optionIndex === correctIndex ? uiText("correct") : uiText("incorrect"));
     const why = document.createElement("span");
-    why.textContent = option.why;
+    why.textContent = config.focusedFeedback ? option.why.replace(/^(?:Correct|Incorrect)\.\s*/, "") : option.why;
     feedback.append(title, why);
     return feedback;
   }
@@ -1257,9 +1257,33 @@
     correctionTitle.textContent = config.correctionTitle;
     correction.setAttribute("aria-labelledby", correctionTitle.id);
     correction.appendChild(correctionTitle);
-    item.options.forEach(function (option, optionIndex) {
-      correction.appendChild(createFeedback(option, optionIndex, item.correct));
-    });
+    if (config.focusedFeedback) {
+      if (state.selectedIndex !== null && state.selectedIndex !== item.correct) {
+        const selectedFeedback = createFeedback(item.options[state.selectedIndex], state.selectedIndex, item.correct);
+        selectedFeedback.querySelector("strong").textContent += " · " + uiText("selectedAnswer");
+        correction.appendChild(selectedFeedback);
+      }
+      correction.appendChild(createFeedback(item.options[item.correct], item.correct, item.correct));
+      const details = document.createElement("details");
+      details.className = "feedback-details";
+      const summary = document.createElement("summary");
+      summary.textContent = uiText("otherExplanations");
+      details.appendChild(summary);
+      item.options.forEach(function (option, optionIndex) {
+        if (optionIndex !== item.correct && optionIndex !== state.selectedIndex) {
+          details.appendChild(createFeedback(option, optionIndex, item.correct));
+        }
+      });
+      correction.appendChild(details);
+      const source = document.createElement("p");
+      source.className = "feedback-source";
+      source.textContent = uiText("sourceLabel") + " — " + item.source;
+      correction.appendChild(source);
+    } else {
+      item.options.forEach(function (option, optionIndex) {
+        correction.appendChild(createFeedback(option, optionIndex, item.correct));
+      });
+    }
 
     const actions = document.createElement("div");
     actions.className = "question-actions";
@@ -1296,7 +1320,7 @@
         clearResult();
         saveProgress();
         renderQuestion("question");
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (!config.focusedFeedback) window.scrollTo({ top: 0, behavior: "smooth" });
       });
       actions.appendChild(next);
     }
@@ -1307,9 +1331,16 @@
     restart.textContent = uiText("restartAttempt");
     restart.dataset.testid = "restart-assessment";
     restart.addEventListener("click", restartAssessment);
-    actions.appendChild(restart);
+    if (!config.focusedFeedback) actions.appendChild(restart);
 
     cardNode.append(heading, answersNode, correction, actions);
+    if (config.focusedFeedback && privacyInput && !privacyInput.checked && !state.submitted) {
+      const privacyHint = document.createElement("p");
+      privacyHint.className = "feedback-source";
+      privacyHint.setAttribute("role", "status");
+      privacyHint.textContent = uiText("privacyBeforeAnswer");
+      answersNode.before(privacyHint);
+    }
     updateProgress();
     if (focusTarget === "correction") {
       window.requestAnimationFrame(function () { correctionTitle.focus(); });
@@ -1658,9 +1689,36 @@
     window.requestAnimationFrame(function () { title.focus(); });
   }
 
-  function restartAssessment() {
+  function restartAssessment(confirmed) {
     if (state.submissionPending) return;
     if (state.session && state.session.can_submit === false) return;
+    if (config.confirmRestart && confirmed !== true && !state.resultSubmitted && !state.recoveredSubmission &&
+        (state.selectedIndex !== null || state.answers.some(function (answer) { return answer !== null; }))) {
+      if (cardNode.querySelector(".restart-confirmation")) return;
+      const confirmation = document.createElement("section");
+      confirmation.className = "restart-confirmation";
+      confirmation.setAttribute("aria-labelledby", "restart-confirmation-title");
+      const message = document.createElement("h3");
+      message.id = "restart-confirmation-title";
+      message.textContent = uiText("restartConfirmation");
+      const cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.className = "button button-neutral";
+      cancel.textContent = uiText("keepAttempt");
+      cancel.addEventListener("click", function () {
+        confirmation.remove();
+        if (restartTopNode) restartTopNode.focus();
+      });
+      const confirm = document.createElement("button");
+      confirm.type = "button";
+      confirm.className = "button button-primary";
+      confirm.textContent = uiText("confirmRestartAction");
+      confirm.addEventListener("click", function () { restartAssessment(true); });
+      confirmation.append(message, cancel, confirm);
+      cardNode.prepend(confirmation);
+      cancel.focus();
+      return;
+    }
     state.recoveredSubmission = null;
     state.accessError = "";
     state.currentIndex = 0;

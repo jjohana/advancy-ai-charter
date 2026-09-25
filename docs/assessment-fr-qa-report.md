@@ -56,6 +56,32 @@ L’accès public est désactivé. Le questionnaire exige une invitation individ
 - Les corrections expliquent la règle en jeu sans seulement répéter « vrai » ou « faux ».
 - Les informations susceptibles d’évoluer, notamment les crédits et les modèles, sont explicitement rattachées au support de septembre 2026.
 
-## Validation automatisée
+## Relecture pédagogique et parcours — 25 septembre 2026
+
+Les 20 questions ont été relues. Les positions des bonnes réponses restent identiques à la clé du serveur.
+
+Corrections principales :
+
+- Q3 : existence du glossaire et absence de pertinence des autres sections rendues explicites.
+- Q5 : statut non confirmé de l’outil précisé.
+- Q6 : besoin ponctuel explicite ; suppression du nom de la bonne solution dans le thème.
+- Q7 : titre neutre et distracteur Codex recentré sur l’absence de validation des correspondances, plutôt que sur une exclusion générale de l’outil.
+- Q9 : comparaison factuelle sans estimation ni classement provisoire explicitement demandée.
+- Q12 : assistant destiné à traiter de nouvelles demandes, pour distinguer correction d’exemples et correction de la méthode.
+- Q13 : échantillonnage rattaché à une règle interne hypothétique du scénario, sans le présenter comme une règle universelle de contrôle financier.
+- Q15 et Q17 : retrait des noms de solutions dans les titres affichés avant réponse.
+- Q20 : dépendance entre les horaires et les livrables explicite ; réponse attendue fondée sur un agenda de référence et des contrôles à chaque changement.
+
+Parcours observé dans le navigateur local :
+
+1. Entrée : en-tête et panneau compacts ; consigne de choix contextualisée ; durée indicative. Capture avant : `output/admin-review/01-before.png`.
+2. Réponse et correction : bonne réponse et erreur testées ; votre choix puis réponse attendue ; explications restantes dépliables ; référence à la formation visible. Capture : `output/admin-review/02-correction.png`.
+3. Mobile à 390 px : pas de débordement horizontal (largeur de contenu 375 px), contrôles et textes lisibles. Capture : `output/admin-review/03-mobile.png`.
+4. Ordinateur à 1280 px : parcours des 20 questions, score local 20/20 ; reprise à la question 13 après actualisation ; annulation du redémarrage sans perte. Capture : `output/admin-review/04-desktop.png`.
+5. Fin : formulaire facultatif de satisfaction, commentaires et idées d’agents accessible. Capture : `output/admin-review/05-final.png`.
+
+Le contrôle suit le guide Product Design Audit pour la capture du parcours et les vérifications visuelles. Les captures de cette revue sont locales et ne sont pas des preuves de mise en production. Le formulaire final n’a pas été envoyé à la base de production. Aucun audit complet avec lecteur d’écran ni validation psychométrique auprès d’ADMIN réels n’a été réalisé. Les tests automatiques vérifient la structure et la notation ; la qualité pédagogique repose sur la relecture décrite ci-dessus.
+
+### Contrôles automatiques
 
 Le script `scripts/validate-french-quiz.mjs` vérifie la structure, l’unicité, un niveau minimal de contexte pour chaque arbitrage, l’absence de codes couleur, les explications, les huit activités ADMIN, l’accès sur invitation, la couverture des slides, l’équilibre A-E et l’identité de la clé de correction entre le navigateur et le serveur.

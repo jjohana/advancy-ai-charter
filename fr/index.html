@@ -13,14 +13,16 @@
   <meta name="description" content="Questionnaire français réservé aux équipes ADMIN, fondé sur la présentation Advancy Generative AI de septembre 2026." />
   <link rel="icon" href="../assets/advancy-logo.png" />
   <link rel="stylesheet" href="../styles.css?v=20260925-1" />
+  <link rel="stylesheet" href="assessment.css?v=20260925-2" />
 </head>
-<body>
+<body class="admin-assessment">
+  <a class="skip-link" href="#question-card">Aller au questionnaire</a>
   <header class="topline">
     <div class="wrap masthead">
       <img class="logo" src="../assets/advancy-logo.png" alt="Advancy - Driving strategy to results" />
       <div class="headline">
         <div class="eyebrow">Formation à l’IA générative · ADMIN</div>
-        <h1>Évaluation des connaissances ADMIN</h1>
+        <h1>L’IA dans votre quotidien ADMIN</h1>
         <p class="tagline">20 questions sur la communication, les e-mails, la traduction, Excel, le support, la finance, les RH et l’agenda.</p>
       </div>
     </div>
@@ -32,10 +34,10 @@
       <div class="wrap assessment-grid">
         <aside class="side-panel" aria-labelledby="assessment-summary">
           <h2 id="assessment-summary">Réservé aux équipes ADMIN</h2>
-          <p>Accès par invitation individuelle. Choisissez une réponse par question ; chaque option est ensuite expliquée.</p>
+          <p>Choisissez la réponse la plus adaptée aux contraintes du cas. Plusieurs approches peuvent sembler utiles : cherchez celle qui répond à l’ensemble du besoin.</p>
           <div class="metrics" aria-label="Caractéristiques du questionnaire">
             <div class="metric"><strong id="question-count-metric">20</strong><span>Questions</span></div>
-            <div class="metric"><strong>A-E</strong><span>Cinq choix</span></div>
+            <div class="metric"><strong>20–30</strong><span>Minutes environ</span></div>
             <div class="metric"><strong>1</strong><span>Bonne réponse</span></div>
             <div class="metric"><strong>70 %</strong><span>Seuil de réussite</span></div>
           </div>
@@ -66,13 +68,13 @@
             <div>
               <strong id="quiz-title">Évaluation IA générative — ADMIN</strong>
               <span id="selected-mode-label" class="selected-mode-label">20 questions ADMIN · une seule bonne réponse</span>
-              <span id="section-label" class="section-label" aria-live="polite">Communication · Excel · Support · RH</span>
+              <span id="section-label" class="section-label" aria-live="polite">Réfléchir · Choisir · Vérifier</span>
             </div>
             <div class="toolbar-actions">
               <button type="button" class="button button-secondary" id="restart-top" disabled>Recommencer</button>
             </div>
           </div>
-          <div id="question-card" class="question-card"></div>
+          <div id="question-card" class="question-card" tabindex="-1"></div>
         </section>
       </div>
       <div class="wrap">
@@ -89,7 +91,7 @@
   </footer>
 
   <noscript><p class="noscript">JavaScript est nécessaire pour vérifier l’invitation et lancer le questionnaire.</p></noscript>
-  <script src="questions.js?v=20260925-1"></script>
-  <script src="../app.js?v=20260925-1"></script>
+  <script src="questions.js?v=20260925-2"></script>
+  <script src="../app.js?v=20260925-2"></script>
 </body>
 </html>

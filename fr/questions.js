@@ -48,7 +48,7 @@
       question(
         "scenario",
         "Traduction · Minimisation",
-        "Vous devez traduire deux paragraphes non sensibles d’une procédure interne de douze pages. Quel apport à l’IA est proportionné ?",
+        "Vous devez traduire deux paragraphes autorisés d’une procédure de douze pages. Ils emploient des termes définis ailleurs dans un glossaire approuvé ; les autres sections ne concernent pas la traduction. Quelles informations fournir à l’IA ?",
         "Présentation septembre 2026, slide 2 : n’utiliser que le minimum nécessaire et traiter la limite de dix pages comme un plafond, non comme une permission.",
         1,
         [
@@ -76,7 +76,7 @@
       question(
         "qcm",
         "Support · Outil approuvé",
-        "Un collègue propose un outil externe plus rapide pour reformuler un message non sensible, en activant l’option « ne pas conserver mes données ». Quel critère reste décisif ?",
+        "Un collègue propose un outil externe dont l’approbation par Advancy n’est pas confirmée pour reformuler un message non sensible. Il active l’option « ne pas conserver mes données ». Quel critère reste décisif ?",
         "Présentation septembre 2026, slide 2 : utiliser exclusivement un outil approuvé avec l’accès professionnel autorisé.",
         0,
         [
@@ -89,8 +89,8 @@
       ),
       question(
         "scenario",
-        "Mail · Choix de Chat",
-        "Vous devez reformuler un rappel interne non sensible sur la réservation des salles et comparer trois tons possibles. Quel workflow est le plus adapté ?",
+        "Mail · Choix de méthode",
+        "Pour un besoin ponctuel, vous devez reformuler un rappel interne autorisé sur la réservation des salles et comparer trois tons. Aucun fichier ni automatisation récurrente n’est demandé. Quelle méthode est la plus proportionnée ?",
         "Présentation septembre 2026, slides 4 à 7 : Chat convient aux demandes ponctuelles, ciblées et conversationnelles.",
         1,
         [
@@ -103,13 +103,13 @@
       ),
       question(
         "scenario",
-        "Excel · Choix de Work",
+        "Excel · Consolidation de fichiers",
         "Vous souhaitez utiliser l’IA pour consolider quatre fichiers autorisés de suivi logistique. Les colonnes diffèrent selon les bureaux et le livrable attendu est un Excel contrôlé ; la méthode n’est pas encore stabilisée. Quel environnement choisir ?",
         "Présentation septembre 2026, slides 5 à 7 : Work est adapté aux fichiers, aux outils et aux livrables multiétapes.",
         3,
         [
           ["Demander à Chat des règles génériques de nettoyage, puis appliquer manuellement ces règles dans chaque fichier.", "Incorrect. Cette approche peut aider à réfléchir, mais elle ne traite pas efficacement la consolidation ni la traçabilité du livrable."],
-          ["Développer immédiatement avec Codex un script permanent couvrant toutes les variantes de colonnes observées.", "Incorrect. Un script réutilisable est prématuré tant que les variantes et les contrôles ne sont pas stabilisés."],
+          ["Faire coder un script permanent qui déduit les correspondances de colonnes, puis l’exécuter sans faire valider ces correspondances.", "Incorrect. Codex pourrait aider à construire la solution, mais les correspondances doivent être validées avant de réutiliser le script."],
           ["Créer un assistant no-code qui apprend les correspondances au fil des fichiers et corrige ses erreurs en production.", "Incorrect. Les règles de correspondance doivent être explicites et testées avant d’être réutilisées."],
           ["Work, avec les seuls fichiers nécessaires, un brief précis, les permissions minimales et une revue du classeur produit.", "Correct. Work correspond à une exécution multiétape sur fichiers avec livrable fini et contrôles explicites."],
           ["Créer un Chat Project pour conserver les quatre fichiers et demander ensuite un tableau récapitulatif dans la conversation.", "Incorrect. Le Project organise le contexte, mais n’est pas le meilleur choix pour produire et contrôler un fichier Excel multiétape."]
@@ -132,7 +132,7 @@
       question(
         "scenario",
         "Finance · Qualité du brief",
-        "Vous demandez à Work de comparer quatre offres fournisseurs autorisées. Deux offres omettent certains frais et le choix final reste au responsable achats. Quel brief donne la base d’analyse la plus fiable ?",
+        "Vous demandez à Work une comparaison factuelle de quatre offres autorisées, sans estimation ni classement provisoire. Deux offres omettent certains frais ; le choix reste au responsable achats. Quel brief permet de préparer sa décision ?",
         "Présentation septembre 2026, slide 8 : préciser objectif, contexte, sources, exclusions, format de sortie et contrôles.",
         4,
         [
@@ -174,7 +174,7 @@
       question(
         "scenario",
         "RH · Choix du workflow",
-        "Une FAQ d’onboarding répond correctement à 14 questions sur 20. Les six échecs concernent tous des règles décrites dans une annexe autorisée mais absente des sources fournies. Quelle amélioration tester d’abord ?",
+        "Un assistant de FAQ RH répond correctement à 14 questions de test sur 20. Il devra traiter de nouvelles demandes. Les six échecs portent sur une annexe autorisée absente des sources. Quelle amélioration tester d’abord ?",
         "Présentation septembre 2026, slides 5, 8, 10 et 12 : diagnostiquer le défaut, améliorer brief et sources, puis ajuster le modèle si nécessaire.",
         1,
         [
@@ -187,15 +187,15 @@
       ),
       question(
         "scenario",
-        "Excel · Revue de l’évidence",
-        "Work extrait 240 factures autorisées dans un Excel de pré-validation mensuelle. Le fichier servira à préparer, mais pas à déclencher, les paiements. Quel plan de contrôle offre le meilleur équilibre entre fiabilité et efficacité ?",
+        "Excel · Fiabilité des résultats",
+        "Work extrait 240 factures autorisées dans un Excel de pré-validation, sans déclencher de paiements. La procédure interne permet un échantillonnage sur les lignes courantes et impose un contrôle de toutes les exceptions. Quel plan appliquer ?",
         "Présentation septembre 2026, slide 12 : vérifier l’évidence, la couverture, les calculs et les incohérences avant usage.",
         4,
         [
           ["Rapprocher le total global avec la comptabilité et vérifier une facture choisie au hasard par fournisseur.", "Incorrect. Ce contrôle peut manquer des erreurs concentrées sur certains formats, montants ou champs manquants."],
           ["Contrôler toutes les factures au-dessus d’un seuil élevé et accepter automatiquement les autres.", "Incorrect. Le montant est un facteur de risque, mais les petits montants peuvent aussi présenter des erreurs systématiques."],
           ["Relancer la même extraction et considérer comme fiables les lignes identiques dans les deux résultats.", "Incorrect. Deux exécutions peuvent reproduire la même erreur et ne valident pas les formules du classeur."],
-          ["Effectuer une double saisie manuelle complète des 240 factures dans un second fichier, puis comparer les deux versions.", "Incorrect. La méthode serait robuste mais disproportionnée pour une pré-validation et supprimerait l’essentiel du gain attendu."],
+          ["Effectuer une double saisie manuelle complète des 240 factures dans un second fichier, puis comparer les deux versions.", "Incorrect. Cette méthode peut être justifiée dans un autre contexte, mais dépasse le contrôle demandé ici et ne vérifie pas à elle seule les formules du classeur."],
           ["Rapprocher les totaux, contrôler les formules, vérifier toutes les exceptions et lignes à risque, échantillonner le reste et étendre le contrôle si des erreurs apparaissent.", "Correct. Le plan combine contrôles exhaustifs ciblés, échantillonnage et règle d’escalade proportionnée au risque."]
         ]
       ),
@@ -215,7 +215,7 @@
       ),
       question(
         "qcm",
-        "Agenda · Chat Projects",
+        "Agenda · Continuité du travail",
         "Pendant quatre mois, vous organisez chaque semaine le même comité : mêmes modèles, documents de référence et suivi de décisions. Les invitations restent gérées dans l’agenda officiel. Quel usage apporte le plus de continuité sans automatisation excessive ?",
         "Présentation septembre 2026, slide 13 : regrouper conversations, fichiers et instructions pour un travail récurrent et contextualisé.",
         2,
@@ -243,7 +243,7 @@
       ),
       question(
         "scenario",
-        "Excel · Skill Codex",
+        "Excel · Automatisation répétable",
         "Chaque mois, 120 fichiers non sensibles doivent être contrôlés, renommés selon une règle stable et recensés dans un Excel. Les doublons doivent être signalés mais jamais supprimés automatiquement. Quel usage de Codex est pertinent ?",
         "Présentation septembre 2026, slide 15 : créer une skill pour une séquence technique répétable, bornée et testable.",
         0,
@@ -286,14 +286,14 @@
       question(
         "scenario",
         "Agenda · Cas intégré ADMIN",
-        "Vous organisez un séminaire interne : agenda évolutif, invitation bilingue, suivi Excel des inscriptions et FAQ logistique. Les sources sont autorisées, mais chaque communication externe doit être approuvée. Quel plan de travail est le plus solide ?",
+        "Vous organisez un séminaire : agenda évolutif, invitation bilingue, suivi Excel et FAQ. Chaque changement d’horaire doit être répercuté partout et vérifié avant diffusion. Les sources sont autorisées et les envois soumis à approbation. Quel plan est le plus solide ?",
         "Présentation septembre 2026, synthèse des slides 2, 5, 7, 8, 12 et 16.",
         3,
         [
           ["Utiliser Work pour produire tous les livrables en une seule exécution, puis effectuer une revue globale juste avant les envois.", "Incorrect. Une revue uniquement finale risque de laisser se propager une erreur d’agenda dans la traduction, le suivi et la FAQ."],
           ["Traiter chaque livrable dans un Chat séparé avec un extrait adapté, puis consolider manuellement les versions approuvées.", "Incorrect. La minimisation est bonne, mais la fragmentation rend difficile la cohérence entre l’agenda, l’invitation, l’Excel et la FAQ."],
           ["Créer un assistant dédié au séminaire après un premier brouillon satisfaisant et lui confier les mises à jour jusqu’au jour J.", "Incorrect. Un premier résultat ne suffit pas à stabiliser les règles, les exceptions et les validations d’un processus évolutif."],
-          ["Vérifier que chaque source est autorisée et sans donnée exclue, définir brief et permissions, choisir Chat ou Work, contrôler les livrables, puis faire valider les envois.", "Correct. L’enchaînement couvre autorisation, choix d’outil, qualité, preuve et responsabilité humaine."],
+          ["Fixer un agenda de référence, borner les sources et accès, choisir Chat ou Work par tâche, vérifier la cohérence après chaque changement et faire valider les envois.", "Correct. Une référence commune et des contrôles à chaque changement évitent de diffuser des horaires contradictoires dans des livrables pourtant corrects isolément."],
           ["Utiliser Work avec des accès en lecture aux dossiers du séminaire, automatiser les mises à jour et demander une validation uniquement pour les e-mails externes.", "Incorrect. Les permissions sont raisonnables, mais les mises à jour de l’agenda et du suivi doivent aussi être contrôlées car elles alimentent les communications."]
         ]
       )
@@ -314,13 +314,21 @@
     quizName: "Évaluation IA générative — ADMIN",
     quizVersion: "2026-09-25-admin-fr",
     storageNamespace: "admin-fr",
+    focusedFeedback: true,
+    confirmRestart: true,
     privacyNoticeVersion: "2026-07-09",
     apiBase: "https://advancy-ai-score-api.advancy-ai-training.workers.dev",
     passThreshold: 0.7,
     correctionTitle: "Correction et explications",
     trainingEvaluation: source.evaluation,
     ui: {
-      sectionContext: "ADMIN · Communication · Excel · Support",
+      sectionContext: "Réfléchir · Choisir · Vérifier",
+      otherExplanations: "Comprendre les autres choix",
+      selectedAnswer: "Votre choix",
+      sourceLabel: "Repère dans la formation",
+      restartConfirmation: "Recommencer effacera les réponses de cette tentative sur cet appareil. Voulez-vous continuer ?",
+      keepAttempt: "Conserver mes réponses",
+      confirmRestartAction: "Effacer et recommencer",
       assessmentFallbackName: "Évaluation IA — ADMIN",
       mixedQuestionsLabel: "{count} questions ADMIN · une seule bonne réponse",
       secureServiceInvalid: "Le service sécurisé a renvoyé une réponse invalide.",
@@ -370,7 +378,8 @@
       assessmentAlreadyRecorded: "Questionnaire ADMIN déjà enregistré",
       latestResult: "Votre dernier résultat et son reçu figurent ci-dessous.",
       startAnotherAttempt: "Commencer une nouvelle tentative",
-      chooseAnswer: "Choisissez une réponse.",
+      chooseAnswer: "Choisissez la réponse la plus adaptée aux contraintes de cette situation.",
+      privacyBeforeAnswer: "Pour répondre, cochez la confirmation de lecture de la notice de confidentialité dans le panneau du questionnaire.",
       submitAnswer: "Valider la réponse",
       finalizeAssessment: "Terminer le questionnaire",
       nextQuestion: "Question suivante",

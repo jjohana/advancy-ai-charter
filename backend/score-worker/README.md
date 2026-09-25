@@ -1,8 +1,9 @@
 # Advancy AI assessment API v2
 
-Cloudflare Worker + D1 backend for the canonical Advancy assessment website. The site offers one 20-question mixed assessment:
+Cloudflare Worker + D1 backend for the Advancy assessment websites. It serves two current 20-question assessments:
 
 - `advancy-ai-assessment-normal` at version `2026-07-29`: AI Charter and practical AI usage, including two Chat/Work/Codex routing questions
+- `advancy-ai-admin-fr` at version `2026-09-25-admin-fr`: invite-only French assessment for ADMIN workflows
 
 The former Normal, Advanced, Charter-only and Usage-only quiz IDs remain accepted only at version `2026-07-09` for explicitly assigned cutover cohorts. This directory is deployment-ready but changes are **not deployed automatically**.
 
@@ -12,12 +13,12 @@ The single canonical GitHub Pages site is a static client. D1 is bound only to t
 
 1. The organizer shares the clean canonical URL. It opens rate-limited public cohort registration without putting a bearer credential in the page or URL.
 2. `POST /v2/public-enroll` validates the allowed email domain and exchanges the registration once per cohort/email for a participant-specific 256-bit `inv_...` token. The Worker uses its private `ENROLLMENT_TOKEN` only as an HMAC key; raw tokens are not logged or stored in D1, and only the participant token's SHA-256 hash is persisted.
-3. By default, the participant token authorizes the single unified questionnaire.
+3. By default, public registration authorizes only the unified English questionnaire. The French ADMIN quiz must be assigned explicitly through a protected cohort import or an individual invitation.
 4. The participant token remains only in `sessionStorage`. Roster import and individual invitation links remain available as an administrator-controlled recovery path.
 5. The Worker derives identity from the token, validates the cohort and invitation window, computes the score from its versioned answer key, and inserts an append-only attempt.
 6. Admin reads require `ADMIN_TOKEN`; admin endpoints reject browser `Origin` requests.
 
-The current answer-key version is `2026-07-29`. A submission is accepted only for a known `(test_id, quiz_version)` pair, preserving auditability after future question changes. New imports receive only the unified ID unless `quiz_ids` is supplied explicitly. The prior five quiz IDs and their `2026-07-09` keys remain available for cutover compatibility.
+The current English answer-key version is `2026-07-29`; the French ADMIN version is `2026-09-25-admin-fr`. A submission is accepted only for a known `(test_id, quiz_version)` pair, preserving auditability after future question changes. New imports receive only the unified English ID unless `quiz_ids` is supplied explicitly. The prior five quiz IDs and their `2026-07-09` keys remain available for cutover compatibility.
 
 ## Persisted data
 
@@ -145,7 +146,19 @@ Import a CSV with `FirstName,LastName,Email` headers:
   -ExpiresAt 2026-10-31T23:59:59Z
 ```
 
-The script sends batches of 50 and creates a sensitive, one-time CSV containing one `AssessmentInvite` link per person. The token remains in the URL fragment and opens the unified questionnaire. Do not place this file in shared storage; delete it after individual distribution. Re-importing keeps existing tokens by default. Use `-RotateExistingTokens` only when old links must be invalidated.
+For the invite-only French ADMIN questionnaire, explicitly assign its quiz ID and generate links to the French path:
+
+```powershell
+.\admin-import-participants.ps1 `
+  -CsvPath .\participants-admin.csv `
+  -CohortId ai-training-admin-fr-2026-09 `
+  -CohortName "Formation IA ADMIN - septembre 2026" `
+  -QuizIds advancy-ai-admin-fr `
+  -CanonicalSiteUrl https://jjohana.github.io/advancy-ai-charter/fr/ `
+  -ExpiresAt 2026-10-31T23:59:59Z
+```
+
+The script sends batches of 50 and creates a sensitive, one-time CSV containing one `AssessmentInvite` link per person. The token remains in the URL fragment and opens the explicitly assigned questionnaire. Do not place this file in shared storage; delete it after individual distribution. Re-importing keeps existing tokens by default. Use `-RotateExistingTokens` only when old links must be invalidated.
 
 Other operations:
 

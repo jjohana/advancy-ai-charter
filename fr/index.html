@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://advancy-ai-score-api.advancy-ai-training.workers.dev; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'" />
+  <title>Évaluation IA générative — ADMIN</title>
+  <meta name="description" content="Questionnaire français réservé aux équipes ADMIN, fondé sur la présentation Advancy Generative AI de septembre 2026." />
+  <link rel="icon" href="../assets/advancy-logo.png" />
+  <link rel="stylesheet" href="../styles.css?v=20260925-1" />
+</head>
+<body>
+  <header class="topline">
+    <div class="wrap masthead">
+      <img class="logo" src="../assets/advancy-logo.png" alt="Advancy - Driving strategy to results" />
+      <div class="headline">
+        <div class="eyebrow">Formation à l’IA générative · ADMIN</div>
+        <h1>Évaluation des connaissances ADMIN</h1>
+        <p class="tagline">20 questions sur la communication, les e-mails, la traduction, Excel, le support, la finance, les RH et l’agenda.</p>
+      </div>
+    </div>
+    <div class="orange-rule" aria-hidden="true"></div>
+  </header>
+
+  <main>
+    <div id="assessment-experience">
+      <div class="wrap assessment-grid">
+        <aside class="side-panel" aria-labelledby="assessment-summary">
+          <h2 id="assessment-summary">Réservé aux équipes ADMIN</h2>
+          <p>Accès par invitation individuelle. Choisissez une réponse par question ; chaque option est ensuite expliquée.</p>
+          <div class="metrics" aria-label="Caractéristiques du questionnaire">
+            <div class="metric"><strong id="question-count-metric">20</strong><span>Questions</span></div>
+            <div class="metric"><strong>A-E</strong><span>Cinq choix</span></div>
+            <div class="metric"><strong>1</strong><span>Bonne réponse</span></div>
+            <div class="metric"><strong>70 %</strong><span>Seuil de réussite</span></div>
+          </div>
+          <div class="status-block">
+            <p id="progress">Question 1 / 20</p>
+            <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+          </div>
+          <div class="score-card" aria-live="polite">
+            <span>Score actuel</span>
+            <strong id="score">0 / 0</strong>
+          </div>
+          <div class="participant-card secure-access-card" data-testid="secure-access">
+            <h3>Accès ADMIN sécurisé</h3>
+            <strong id="participant-name">Invitation ADMIN requise</strong>
+            <p id="session-status" class="session-status" data-testid="session-status" role="status" aria-live="polite">Vérification de votre invitation ADMIN…</p>
+            <p id="attempt-status"></p>
+            <div class="privacy-confirmation" hidden>
+              <label for="privacy-acknowledged">
+                <input id="privacy-acknowledged" data-testid="privacy-acknowledged" type="checkbox" disabled />
+                <span>J’ai lu la <a href="privacy.html" target="_blank" rel="noopener noreferrer">notice de confidentialité du questionnaire</a>.</span>
+              </label>
+              <p>N’indiquez aucune information client, financière, RH, confidentielle, personnelle ou sensible dans les commentaires facultatifs.</p>
+            </div>
+          </div>
+        </aside>
+
+        <section class="quiz-shell" aria-labelledby="quiz-title">
+          <div class="quiz-toolbar">
+            <div>
+              <strong id="quiz-title">Évaluation IA générative — ADMIN</strong>
+              <span id="selected-mode-label" class="selected-mode-label">20 questions ADMIN · une seule bonne réponse</span>
+              <span id="section-label" class="section-label" aria-live="polite">Communication · Excel · Support · RH</span>
+            </div>
+            <div class="toolbar-actions">
+              <button type="button" class="button button-secondary" id="restart-top" disabled>Recommencer</button>
+            </div>
+          </div>
+          <div id="question-card" class="question-card"></div>
+        </section>
+      </div>
+      <div class="wrap">
+        <section id="result" aria-live="polite" aria-atomic="false"></section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>Évaluation IA générative — ADMIN</span>
+      <span><a href="privacy.html">Confidentialité</a> · <a href="../">English version</a> · <a href="https://www.advancy.com/">advancy.com</a></span>
+    </div>
+  </footer>
+
+  <noscript><p class="noscript">JavaScript est nécessaire pour vérifier l’invitation et lancer le questionnaire.</p></noscript>
+  <script src="questions.js?v=20260925-1"></script>
+  <script src="../app.js?v=20260925-1"></script>
+</body>
+</html>

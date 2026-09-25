@@ -19,13 +19,103 @@
     privacyNoticeVersion: "2026-07-09",
     apiBase: "",
     scoreEndpoint: "",
+    storageNamespace: "",
     trainingEvaluation: null,
     ...window.quizConfig
   };
+  const ui = {
+    sectionContext: "AI Charter · Chat · Work · Codex",
+    assessmentFallbackName: "Advancy AI Assessment",
+    mixedQuestionsLabel: "{count} mixed questions · one correct answer",
+    secureServiceInvalid: "The secure service returned an invalid response.",
+    secureServiceTimeout: "The secure service took too long to respond.",
+    secureServiceUnavailable: "The secure service could not be reached.",
+    requestFailed: "The request failed.",
+    authorizedParticipant: "Authorized participant",
+    attemptsUsed: "Attempts used: {used} of {maximum}.",
+    invitationVerified: "Invitation verified.",
+    attemptBlocked: "This invitation cannot start another attempt for this assessment.",
+    secureInvitationVerified: "Secure invitation verified.",
+    openInvitation: "Open the unique invitation link supplied by the training organizer.",
+    serviceNotConfigured: "The secure assessment service is not configured.",
+    verifyingInvitation: "Verifying your secure invitation...",
+    retryInvitationStatus: "Connection interrupted. Retrying invitation verification ({attempt} of {maximum}) in {seconds} seconds...",
+    invitationVerificationFailed: "The invitation could not be verified. Contact the training organizer.",
+    progress: "Question {current} / {total}",
+    correct: "Correct",
+    incorrect: "Incorrect",
+    secureAccess: "Secure access",
+    secureAccessRequired: "Secure access required",
+    verifyingSecureAccess: "Verifying secure access",
+    waitInvitation: "Please wait while your invitation is verified.",
+    retryInvitation: "Retry invitation verification",
+    sharedRegistration: "Shared registration",
+    registrationRequired: "Registration required",
+    registerIdentity: "Register with your Advancy work identity to continue.",
+    completeRegistration: "Complete the registration form to verify your invitation.",
+    registerTitle: "Register for the assessment",
+    registerIntro: "Use your Advancy work email (@advancy.com or @cn.advancy.com). This shared cohort access will be exchanged for a private participant invitation.",
+    firstName: "First name",
+    lastName: "Last name",
+    workEmail: "Advancy work email",
+    privacyPrefix: "I have read the ",
+    privacyLink: "assessment privacy notice",
+    registerContinue: "Register and continue",
+    invalidFirstName: "Enter a valid first name.",
+    invalidLastName: "Enter a valid last name.",
+    invalidWorkEmail: "Enter your Advancy work email (@advancy.com or @cn.advancy.com).",
+    acknowledgePrivacyRegister: "Acknowledge the privacy notice to register.",
+    registrationSessionInvalid: "The registration session could not be initialized. Reopen the assessment link.",
+    registering: "Registering securely...",
+    retryRegistrationStatus: "Connection interrupted. Retrying registration ({attempt} of {maximum}) in {seconds} seconds...",
+    registrationVerified: "Registration verified. Loading your assessment...",
+    registrationFailed: "Registration could not be completed.",
+    assessmentRecorded: "Assessment recorded",
+    assessmentAlreadyRecorded: "Assessment already recorded",
+    latestResult: "Your latest recorded result and receipt are shown below.",
+    startAnotherAttempt: "Start another attempt",
+    chooseAnswer: "Choose one answer.",
+    submitAnswer: "Submit answer",
+    finalizeAssessment: "Finalize assessment",
+    nextQuestion: "Next question",
+    restartAttempt: "Restart this attempt",
+    scenarioLabel: "Scenario",
+    qcmLabel: "Knowledge check",
+    feedback: "Feedback",
+    feedbackIntro: "Feedback and use cases are optional. Add a rating, comment or AI use case, then submit the assessment. Do not include client, confidential, personal, or market-sensitive information.",
+    feedbackScale: "Optional scale: 1 = insufficient, 5 = excellent.",
+    optionalSuffix: " (optional)",
+    commentsLabel: "Comments or suggestions (optional)",
+    commentsPlaceholder: "What should we keep or improve?",
+    useCasesLabel: "Suggested AI automation use cases (optional)",
+    useCasesPlaceholder: "Describe workflow ideas.",
+    submitAssessment: "Submit assessment",
+    retrySubmissionStatus: "Connection interrupted. Retrying secure submission ({attempt} of {maximum}) in {seconds} seconds...",
+    passed: "Passed",
+    notPassed: "Not passed",
+    recoveredResult: "Your previously recorded assessment result was recovered securely.",
+    recordedResult: "Your assessment was recorded securely.",
+    receipt: "Receipt: {receipt}",
+    sectionResults: "Section results",
+    submissionFailed: "Submission failed. Your answers remain on this device so you can retry.",
+    retrySubmission: "Retry secure submission",
+    retryingSubmission: "Retrying the same secure submission...",
+    resumingSubmission: "Resuming secure submission",
+    resumingSubmissionCopy: "The exact pending response from this tab is being retried safely.",
+    acknowledgePrivacySubmit: "Acknowledge the privacy notice before submitting.",
+    submitting: "Submitting securely...",
+    readyForSubmission: "Assessment complete - ready for secure submission",
+    authoritativeResult: "The secure service will calculate and record the authoritative result.",
+    addFeedback: "Add optional feedback, then submit your assessment.",
+    unavailableAssessment: "The 20-question assessment is not available. Contact the training organizer.",
+    registrationInvalidResponse: "The registration service returned an invalid response.",
+    ...(config.ui || {})
+  };
   const letters = ["A", "B", "C", "D", "E"];
-  const inviteStorageKey = "advancy-assessment-invite-v2";
-  const enrollmentStorageKey = "advancy-assessment-enrollment-v2";
-  const enrollmentIdempotencyStorageKey = "advancy-assessment-enrollment-idempotency-v2";
+  const storageSuffix = config.storageNamespace ? ":" + config.storageNamespace : "";
+  const inviteStorageKey = "advancy-assessment-invite-v2" + storageSuffix;
+  const enrollmentStorageKey = "advancy-assessment-enrollment-v2" + storageSuffix;
+  const enrollmentIdempotencyStorageKey = "advancy-assessment-enrollment-idempotency-v2" + storageSuffix;
   const pendingStorageKey = ["advancy-assessment-pending-v2", config.quizId, config.quizVersion].join(":");
   const progressTtlMs = 7 * 24 * 60 * 60 * 1000;
   const pendingSubmissionTtlMs = 24 * 60 * 60 * 1000;
@@ -121,18 +211,26 @@
     parent.appendChild(document.createTextNode(String(value)));
   }
 
+  function uiText(key, replacements) {
+    let value = String(ui[key] || "");
+    Object.entries(replacements || {}).forEach(function (entry) {
+      value = value.replaceAll("{" + entry[0] + "}", String(entry[1]));
+    });
+    return value;
+  }
+
   function updateSectionContext() {
-    if (sectionLabelNode) sectionLabelNode.textContent = "AI Charter · Chat · Work · Codex";
+    if (sectionLabelNode) sectionLabelNode.textContent = uiText("sectionContext");
   }
 
   function configureAssessment() {
     if (assessmentExperienceNode) assessmentExperienceNode.hidden = false;
     if (questionCountMetricNode) questionCountMetricNode.textContent = String(questions.length);
-    if (quizTitleNode) quizTitleNode.textContent = config.quizName || "Advancy AI Assessment";
+    if (quizTitleNode) quizTitleNode.textContent = config.quizName || uiText("assessmentFallbackName");
     if (selectedModeLabelNode) {
-      selectedModeLabelNode.textContent = questions.length + " mixed questions · one correct answer";
+      selectedModeLabelNode.textContent = uiText("mixedQuestionsLabel", { count: questions.length });
     }
-    document.title = config.quizName || "Advancy AI Assessment";
+    document.title = config.quizName || uiText("assessmentFallbackName");
     updateSectionContext();
   }
 
@@ -206,7 +304,7 @@
           });
         }
         if (!isPlainObject(payload)) {
-          throw new RequestError("The secure service returned an invalid response.", { retryable: true });
+          throw new RequestError(uiText("secureServiceInvalid"), { retryable: true });
         }
         return validate ? validate(payload) : payload;
       } catch (error) {
@@ -215,8 +313,8 @@
           ? error
           : new RequestError(
             error && error.name === "AbortError"
-              ? "The secure service took too long to respond."
-              : "The secure service could not be reached.",
+              ? uiText("secureServiceTimeout")
+              : uiText("secureServiceUnavailable"),
             { retryable: true }
           );
         lastError = normalized;
@@ -228,7 +326,7 @@
         window.clearTimeout(timeout);
       }
     }
-    throw lastError || new RequestError("The request failed.", { retryable: true });
+    throw lastError || new RequestError(uiText("requestFailed"), { retryable: true });
   }
 
   function safeSessionGet(key) {
@@ -553,7 +651,7 @@
   }
 
   function invalidContract(message) {
-    return new RequestError(message || "The secure service returned an invalid response.", { retryable: true });
+    return new RequestError(message || uiText("secureServiceInvalid"), { retryable: true });
   }
 
   function validateScoreResult(value) {
@@ -628,7 +726,7 @@
         payload.participant.display_name !== payload.participant.display_name.trim() ||
         !validIsoTimestamp(payload.expires_at) || Date.parse(payload.expires_at) <= Date.now() - 60000 ||
         !uuidPattern.test(String(payload.request_id || ""))) {
-      throw invalidContract("The registration service returned an invalid response.");
+      throw invalidContract(uiText("registrationInvalidResponse"));
     }
     return {
       ...payload,
@@ -645,21 +743,21 @@
   function displaySession(session) {
     const participant = session.participant || {};
     if (participantNameNode) {
-      participantNameNode.textContent = participant.display_name || "Authorized participant";
+      participantNameNode.textContent = participant.display_name || uiText("authorizedParticipant");
     }
     const used = Number(session.attempts_used || 0);
     const maximum = Number(session.max_attempts || 0);
     if (attemptStatusNode) {
       attemptStatusNode.textContent = maximum > 0
-        ? "Attempts used: " + used + " of " + maximum + "."
-        : "Invitation verified.";
+        ? uiText("attemptsUsed", { used, maximum })
+        : uiText("invitationVerified");
     }
     if (restartTopNode) restartTopNode.disabled = session.can_submit === false;
     if (sessionBlocked(session)) {
-      state.accessError = "This invitation cannot start another attempt for this assessment.";
+      state.accessError = uiText("attemptBlocked");
       setSessionStatus(state.accessError, "session-error");
     } else {
-      setSessionStatus("Secure invitation verified.", "session-ok");
+      setSessionStatus(uiText("secureInvitationVerified"), "session-ok");
     }
   }
 
@@ -679,7 +777,7 @@
         renderEnrollmentForm();
         return;
       }
-      state.accessError = "Open the unique invitation link supplied by the training organizer.";
+      state.accessError = uiText("openInvitation");
       setSessionStatus(state.accessError, "session-error");
       state.sessionLoading = false;
       if (cardNode) cardNode.setAttribute("aria-busy", "false");
@@ -688,7 +786,7 @@
     }
     const base = apiBase();
     if (!base) {
-      state.accessError = "The secure assessment service is not configured.";
+      state.accessError = uiText("serviceNotConfigured");
       setSessionStatus(state.accessError, "session-error");
       state.sessionLoading = false;
       if (cardNode) cardNode.setAttribute("aria-busy", "false");
@@ -696,7 +794,7 @@
       return;
     }
 
-    setSessionStatus("Verifying your secure invitation...", "session-loading");
+    setSessionStatus(uiText("verifyingInvitation"), "session-loading");
     try {
       const url = base + "/v2/session?test_id=" + encodeURIComponent(config.quizId) +
         "&quiz_version=" + encodeURIComponent(config.quizVersion);
@@ -711,7 +809,11 @@
         },
         validate: validateSessionResponse
       }, function (attempt, maximum, delay) {
-        setSessionStatus("Connection interrupted. Retrying invitation verification (" + attempt + " of " + maximum + ") in " + Math.ceil(delay / 1000) + " seconds...", "session-loading");
+        setSessionStatus(uiText("retryInvitationStatus", {
+          attempt,
+          maximum,
+          seconds: Math.ceil(delay / 1000)
+        }), "session-loading");
       });
       state.session = payload;
       state.sessionReady = !sessionBlocked(payload);
@@ -737,7 +839,7 @@
     } catch (error) {
       state.accessError = error && error.message
         ? error.message
-        : "The invitation could not be verified. Contact the training organizer.";
+        : uiText("invitationVerificationFailed");
       state.sessionRetryable = Boolean(error && error.retryable);
       setSessionStatus(state.accessError, "session-error");
     } finally {
@@ -780,20 +882,32 @@
       privacy_acknowledgement_required: "Please acknowledge the privacy notice before submitting.",
       privacy_notice_required: "Please acknowledge the current privacy notice before submitting.",
       session_mismatch: "This invitation does not authorize the current assessment session.",
-      unknown_quiz_version: "This assessment version is no longer available. Reload the page or contact the organizer."
+      unknown_quiz_version: "This assessment version is no longer available. Reload the page or contact the organizer.",
+      ...(config.errorMessages || {})
     };
     if (messages[code]) return messages[code];
-    if (status === 401 || status === 403) return "The invitation could not be authorized.";
-    if (status === 429) return "The service is temporarily limiting requests. Please retry shortly.";
-    if (status >= 500) return "The secure assessment service is temporarily unavailable.";
-    return "The request could not be completed. Please check the invitation and try again.";
+    if (status === 401 || status === 403) {
+      return config.errorMessages?.unauthorizedFallback || "The invitation could not be authorized.";
+    }
+    if (status === 429) {
+      return config.errorMessages?.rateLimitedFallback || "The service is temporarily limiting requests. Please retry shortly.";
+    }
+    if (status >= 500) {
+      return config.errorMessages?.serverFallback || "The secure assessment service is temporarily unavailable.";
+    }
+    return config.errorMessages?.defaultFallback || "The request could not be completed. Please check the invitation and try again.";
   }
 
   function updateProgress() {
     const answered = answeredCount();
     const total = questions.length;
     const progressValue = Math.round(((state.submitted ? state.currentIndex + 1 : state.currentIndex) / total) * 100);
-    if (progressNode) progressNode.textContent = "Question " + Math.min(state.currentIndex + 1, total) + " / " + total;
+    if (progressNode) {
+      progressNode.textContent = uiText("progress", {
+        current: Math.min(state.currentIndex + 1, total),
+        total
+      });
+    }
     if (progressFillNode) progressFillNode.style.width = progressValue + "%";
     if (scoreNode) scoreNode.textContent = score() + " / " + answered;
   }
@@ -847,7 +961,8 @@
     const feedback = document.createElement("div");
     feedback.className = "option-feedback " + (optionIndex === correctIndex ? "correct" : "incorrect");
     const title = document.createElement("strong");
-    title.textContent = letters[optionIndex] + ". " + (optionIndex === correctIndex ? "Correct" : "Incorrect");
+    title.textContent = letters[optionIndex] + ". " +
+      (optionIndex === correctIndex ? uiText("correct") : uiText("incorrect"));
     const why = document.createElement("span");
     why.textContent = option.why;
     feedback.append(title, why);
@@ -856,22 +971,22 @@
 
   function renderAccessGate() {
     if (!cardNode) return;
-    if (sectionLabelNode) sectionLabelNode.textContent = "Secure access";
+    if (sectionLabelNode) sectionLabelNode.textContent = uiText("secureAccess");
     cardNode.replaceChildren();
     const section = document.createElement("section");
     section.className = "access-gate";
     section.dataset.testid = "access-gate";
     const title = document.createElement("h2");
-    title.textContent = state.accessError ? "Secure access required" : "Verifying secure access";
+    title.textContent = state.accessError ? uiText("secureAccessRequired") : uiText("verifyingSecureAccess");
     const copy = document.createElement("p");
-    copy.textContent = state.accessError || "Please wait while your invitation is verified.";
+    copy.textContent = state.accessError || uiText("waitInvitation");
     section.append(title, copy);
     if (state.accessError && state.sessionRetryable) {
       const retry = document.createElement("button");
       retry.type = "button";
       retry.className = "button button-primary";
       retry.dataset.testid = "retry-session";
-      retry.textContent = "Retry invitation verification";
+      retry.textContent = uiText("retryInvitation");
       retry.addEventListener("click", function () {
         state.accessError = "";
         state.sessionRetryable = false;
@@ -889,10 +1004,10 @@
     if (privacyConfirmationNode) privacyConfirmationNode.hidden = true;
     cardNode.replaceChildren();
     cardNode.setAttribute("aria-busy", state.enrollmentPending ? "true" : "false");
-    if (sectionLabelNode) sectionLabelNode.textContent = "Shared registration";
-    if (participantNameNode) participantNameNode.textContent = "Registration required";
-    if (attemptStatusNode) attemptStatusNode.textContent = "Register with your Advancy work identity to continue.";
-    setSessionStatus("Complete the registration form to verify your invitation.", "session-loading");
+    if (sectionLabelNode) sectionLabelNode.textContent = uiText("sharedRegistration");
+    if (participantNameNode) participantNameNode.textContent = uiText("registrationRequired");
+    if (attemptStatusNode) attemptStatusNode.textContent = uiText("registerIdentity");
+    setSessionStatus(uiText("completeRegistration"), "session-loading");
 
     const section = document.createElement("section");
     section.className = "enrollment-card";
@@ -900,18 +1015,18 @@
     const title = document.createElement("h2");
     title.id = "enrollment-title";
     title.tabIndex = -1;
-    title.textContent = "Register for the assessment";
+    title.textContent = uiText("registerTitle");
     const intro = document.createElement("p");
-    intro.textContent = "Use your Advancy work email (@advancy.com or @cn.advancy.com). This shared cohort access will be exchanged for a private participant invitation.";
+    intro.textContent = uiText("registerIntro");
     const form = document.createElement("form");
     form.className = "enrollment-form";
     form.dataset.testid = "enrollment-form";
     form.noValidate = true;
 
     const fields = [
-      { id: "enrollment-first-name", name: "first_name", label: "First name", type: "text", autocomplete: "given-name", maxLength: 120 },
-      { id: "enrollment-last-name", name: "last_name", label: "Last name", type: "text", autocomplete: "family-name", maxLength: 120 },
-      { id: "enrollment-email", name: "email", label: "Advancy work email", type: "email", autocomplete: "email", maxLength: 254 }
+      { id: "enrollment-first-name", name: "first_name", label: uiText("firstName"), type: "text", autocomplete: "given-name", maxLength: 120 },
+      { id: "enrollment-last-name", name: "last_name", label: uiText("lastName"), type: "text", autocomplete: "family-name", maxLength: 120 },
+      { id: "enrollment-email", name: "email", label: uiText("workEmail"), type: "email", autocomplete: "email", maxLength: 254 }
     ];
     fields.forEach(function (field) {
       const label = document.createElement("label");
@@ -936,12 +1051,12 @@
     privacy.required = true;
     privacy.dataset.testid = "enrollment-privacy";
     const privacyText = document.createElement("span");
-    appendText(privacyText, "I have read the ");
+    appendText(privacyText, uiText("privacyPrefix"));
     const privacyLink = document.createElement("a");
     privacyLink.href = "privacy.html";
     privacyLink.target = "_blank";
     privacyLink.rel = "noopener noreferrer";
-    privacyLink.textContent = "assessment privacy notice";
+    privacyLink.textContent = uiText("privacyLink");
     privacyText.append(privacyLink, document.createTextNode("."));
     privacyLabel.append(privacy, privacyText);
     form.appendChild(privacyLabel);
@@ -955,7 +1070,7 @@
     submit.type = "submit";
     submit.className = "button button-primary";
     submit.dataset.testid = "submit-enrollment";
-    submit.textContent = "Register and continue";
+    submit.textContent = uiText("registerContinue");
     form.append(status, submit);
     form.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -974,16 +1089,16 @@
     const email = String(data.get("email") || "").trim().toLowerCase();
     const invalidControl = /[\u0000-\u001f]/;
     if (!firstName || firstName.length > 120 || invalidControl.test(firstName)) {
-      return { error: "Enter a valid first name.", focus: form.elements.first_name };
+      return { error: uiText("invalidFirstName"), focus: form.elements.first_name };
     }
     if (!lastName || lastName.length > 120 || invalidControl.test(lastName)) {
-      return { error: "Enter a valid last name.", focus: form.elements.last_name };
+      return { error: uiText("invalidLastName"), focus: form.elements.last_name };
     }
     if (!advancyEmailPattern.test(email) || email.length > 254) {
-      return { error: "Enter your Advancy work email (@advancy.com or @cn.advancy.com).", focus: form.elements.email };
+      return { error: uiText("invalidWorkEmail"), focus: form.elements.email };
     }
     if (!form.elements.privacy_acknowledged.checked) {
-      return { error: "Acknowledge the privacy notice to register.", focus: form.elements.privacy_acknowledged };
+      return { error: uiText("acknowledgePrivacyRegister"), focus: form.elements.privacy_acknowledged };
     }
     return {
       payload: {
@@ -1000,7 +1115,7 @@
   async function submitEnrollment(form, statusNode) {
     if (state.enrollmentPending || (!state.enrollmentToken && !state.publicEnrollment)) return;
     if (!uuidPattern.test(state.enrollmentIdempotencyKey)) {
-      statusNode.textContent = "The registration session could not be initialized. Reopen the assessment link.";
+      statusNode.textContent = uiText("registrationSessionInvalid");
       statusNode.className = "enrollment-status save-error";
       return;
     }
@@ -1014,7 +1129,7 @@
     state.enrollmentPending = true;
     cardNode.setAttribute("aria-busy", "true");
     Array.from(form.elements).forEach(function (control) { control.disabled = true; });
-    statusNode.textContent = "Registering securely...";
+    statusNode.textContent = uiText("registering");
     statusNode.className = "enrollment-status";
     try {
       const registrationHeaders = {
@@ -1033,7 +1148,11 @@
         body: JSON.stringify(prepared.payload),
         validate: validateEnrollmentResponse
       }, function (attempt, maximum, delay) {
-        statusNode.textContent = "Connection interrupted. Retrying registration (" + attempt + " of " + maximum + ") in " + Math.ceil(delay / 1000) + " seconds...";
+        statusNode.textContent = uiText("retryRegistrationStatus", {
+          attempt,
+          maximum,
+          seconds: Math.ceil(delay / 1000)
+        });
       });
       safeSessionSet(inviteStorageKey, response.invite_token);
       safeSessionRemove(enrollmentStorageKey);
@@ -1045,35 +1164,35 @@
       state.enrollmentPending = false;
       if (privacyInput) privacyInput.checked = true;
       if (participantNameNode) participantNameNode.textContent = response.participant.display_name;
-      setSessionStatus("Registration verified. Loading your assessment...", "session-ok");
+      setSessionStatus(uiText("registrationVerified"), "session-ok");
       cardNode.setAttribute("aria-busy", "false");
       loadSession();
     } catch (error) {
       state.enrollmentPending = false;
       cardNode.setAttribute("aria-busy", "false");
       Array.from(form.elements).forEach(function (control) { control.disabled = false; });
-      statusNode.textContent = error && error.message ? error.message : "Registration could not be completed.";
+      statusNode.textContent = error && error.message ? error.message : uiText("registrationFailed");
       statusNode.className = "enrollment-status save-error";
     }
   }
 
   function renderCompletedGate() {
-    if (sectionLabelNode) sectionLabelNode.textContent = "Assessment recorded";
+    if (sectionLabelNode) sectionLabelNode.textContent = uiText("assessmentRecorded");
     cardNode.replaceChildren();
     const section = document.createElement("section");
     section.className = "access-gate completed-gate";
     section.dataset.testid = "recorded-attempt";
     const title = document.createElement("h2");
-    title.textContent = "Assessment already recorded";
+    title.textContent = uiText("assessmentAlreadyRecorded");
     const copy = document.createElement("p");
-    copy.textContent = "Your latest recorded result and receipt are shown below.";
+    copy.textContent = uiText("latestResult");
     section.append(title, copy);
     if (state.session && state.session.can_submit) {
       const another = document.createElement("button");
       another.type = "button";
       another.className = "button button-primary";
       another.dataset.testid = "start-another-attempt";
-      another.textContent = "Start another attempt";
+      another.textContent = uiText("startAnotherAttempt");
       another.addEventListener("click", restartAssessment);
       section.appendChild(another);
     }
@@ -1099,19 +1218,29 @@
     const id = document.createElement("div");
     id.className = "qid";
     id.textContent = String(state.currentIndex + 1).padStart(2, "0");
+    const titleBlock = document.createElement("div");
+    titleBlock.className = "question-title-block";
+    if (item.kind || item.theme) {
+      const meta = document.createElement("div");
+      meta.className = "question-meta";
+      const kind = item.kind === "scenario" ? uiText("scenarioLabel") : uiText("qcmLabel");
+      meta.textContent = item.theme ? kind + " · " + item.theme : kind;
+      titleBlock.appendChild(meta);
+    }
     const title = document.createElement("h2");
     title.id = "current-question-title";
     title.tabIndex = -1;
     if (sectionLabelNode) title.setAttribute("aria-describedby", sectionLabelNode.id);
     title.textContent = item.q;
-    heading.append(id, title);
+    titleBlock.appendChild(title);
+    heading.append(id, titleBlock);
 
     const answersNode = document.createElement("fieldset");
     answersNode.className = "answers";
     answersNode.setAttribute("aria-labelledby", title.id);
     const legend = document.createElement("legend");
     legend.className = "visually-hidden";
-    legend.textContent = "Choose one answer.";
+    legend.textContent = uiText("chooseAnswer");
     answersNode.appendChild(legend);
     item.options.forEach(function (option, optionIndex) {
       answersNode.appendChild(createOption(item, option, optionIndex));
@@ -1138,7 +1267,7 @@
       const submit = document.createElement("button");
       submit.type = "button";
       submit.className = "button button-primary";
-      submit.textContent = "Submit answer";
+      submit.textContent = uiText("submitAnswer");
       submit.dataset.testid = "submit-answer";
       submit.disabled = state.selectedIndex === null || !canStart();
       submit.addEventListener("click", function () {
@@ -1153,7 +1282,9 @@
       next.type = "button";
       next.className = "button button-primary";
       next.dataset.testid = state.currentIndex === questions.length - 1 ? "finalize-assessment" : "next-question";
-      next.textContent = state.currentIndex === questions.length - 1 ? "Finalize assessment" : "Next question";
+      next.textContent = state.currentIndex === questions.length - 1
+        ? uiText("finalizeAssessment")
+        : uiText("nextQuestion");
       next.addEventListener("click", function () {
         if (state.currentIndex === questions.length - 1) {
           setResult();
@@ -1173,7 +1304,7 @@
     const restart = document.createElement("button");
     restart.type = "button";
     restart.className = "button button-neutral";
-    restart.textContent = "Restart this attempt";
+    restart.textContent = uiText("restartAttempt");
     restart.dataset.testid = "restart-assessment";
     restart.addEventListener("click", restartAssessment);
     actions.appendChild(restart);
@@ -1209,23 +1340,23 @@
 
     const title = document.createElement("h3");
     title.id = "training-evaluation-title";
-    title.textContent = evaluation.title || "Feedback";
+    title.textContent = evaluation.title || uiText("feedback");
     const intro = document.createElement("p");
-    intro.textContent = "Feedback and use cases are optional. Add a rating, comment or AI use case, then submit the assessment. Do not include client, confidential, personal, or market-sensitive information.";
+    intro.textContent = evaluation.intro || uiText("feedbackIntro");
     const form = document.createElement("form");
     form.className = "evaluation-form";
     form.noValidate = true;
 
     const scale = document.createElement("div");
     scale.className = "evaluation-scale";
-    scale.textContent = evaluation.scaleLabel || "Optional scale: 1 = insufficient, 5 = excellent.";
+    scale.textContent = evaluation.scaleLabel || uiText("feedbackScale");
     form.appendChild(scale);
 
     (evaluation.criteria || []).forEach(function (criterion) {
       const field = document.createElement("fieldset");
       field.className = "evaluation-criterion";
       const legend = document.createElement("legend");
-      legend.textContent = criterion.label + " (optional)";
+      legend.textContent = criterion.label + uiText("optionalSuffix");
       field.appendChild(legend);
       const group = document.createElement("div");
       group.className = "rating-group";
@@ -1244,8 +1375,8 @@
     });
 
     const fields = [
-      ["improvement_suggestion", "Comments or suggestions (optional)", "What should we keep or improve?"],
-      ["suggested_ai_automation_use_cases", "Suggested AI automation use cases (optional)", "Describe workflow ideas."]
+      ["improvement_suggestion", uiText("commentsLabel"), uiText("commentsPlaceholder")],
+      ["suggested_ai_automation_use_cases", uiText("useCasesLabel"), uiText("useCasesPlaceholder")]
     ];
     fields.forEach(function (definition) {
       const label = document.createElement("label");
@@ -1267,7 +1398,7 @@
     submitAssessmentButton.type = "submit";
     submitAssessmentButton.className = "button button-primary";
     submitAssessmentButton.dataset.testid = "submit-assessment";
-    submitAssessmentButton.textContent = "Submit assessment";
+    submitAssessmentButton.textContent = uiText("submitAssessment");
     actions.appendChild(submitAssessmentButton);
     form.appendChild(actions);
 
@@ -1318,7 +1449,11 @@
       body: serializedPayload,
       validate: validateSubmissionResponse
     }, function (attempt, maximum, delay) {
-      statusNode.textContent = "Connection interrupted. Retrying secure submission (" + attempt + " of " + maximum + ") in " + Math.ceil(delay / 1000) + " seconds...";
+      statusNode.textContent = uiText("retrySubmissionStatus", {
+        attempt,
+        maximum,
+        seconds: Math.ceil(delay / 1000)
+      });
     });
   }
 
@@ -1336,22 +1471,23 @@
     const title = document.createElement("h2");
     title.className = "result-title";
     title.tabIndex = -1;
-    title.textContent = (passed ? "Passed" : "Not passed") + " - " + correct + "/" + total + " (" + percent + "%)";
+    title.textContent = (passed ? uiText("passed") : uiText("notPassed")) +
+      " - " + correct + "/" + total + " (" + percent + "%)";
     const copy = document.createElement("p");
     copy.className = "result-copy save-status save-ok";
     copy.setAttribute("role", "status");
     copy.textContent = recovered
-      ? "Your previously recorded assessment result was recovered securely."
-      : "Your assessment was recorded securely.";
+      ? uiText("recoveredResult")
+      : uiText("recordedResult");
     const receipt = document.createElement("p");
     receipt.className = "receipt";
     receipt.dataset.testid = "submission-receipt";
-    receipt.textContent = "Receipt: " + response.receipt_id;
+    receipt.textContent = uiText("receipt", { receipt: response.receipt_id });
     resultNode.append(title, copy);
     if (Array.isArray(scoreResult.sections)) {
       const sectionTitle = document.createElement("h3");
       sectionTitle.className = "result-sections-title";
-      sectionTitle.textContent = "Section results";
+      sectionTitle.textContent = uiText("sectionResults");
       const sectionList = document.createElement("ul");
       sectionList.className = "result-sections";
       scoreResult.sections.forEach(function (section) {
@@ -1363,7 +1499,7 @@
         detail.textContent = section.correct + "/" + section.total + " (" + section.percent + "%)";
         const status = document.createElement("span");
         status.className = "section-result-status " + (section.passed ? "section-pass" : "section-fail");
-        status.textContent = section.passed ? "Passed" : "Not passed";
+        status.textContent = section.passed ? uiText("passed") : uiText("notPassed");
         item.append(name, detail, status);
         sectionList.appendChild(item);
       });
@@ -1405,7 +1541,7 @@
     resultNode.setAttribute("aria-busy", "false");
     statusNode.textContent = error && error.message
       ? error.message
-      : "Submission failed. Your answers remain on this device so you can retry.";
+      : uiText("submissionFailed");
     statusNode.className = "result-copy save-status save-error";
     const existing = resultNode.querySelector("[data-testid='retry-submit']");
     if (existing) existing.remove();
@@ -1414,7 +1550,7 @@
     retry.type = "button";
     retry.className = "button button-primary";
     retry.dataset.testid = "retry-submit";
-    retry.textContent = "Retry secure submission";
+    retry.textContent = uiText("retrySubmission");
     retry.addEventListener("click", function () {
       retrySubmission(statusNode);
     });
@@ -1431,7 +1567,7 @@
     if (state.submissionPending || state.resultSubmitted || !state.lastSubmissionBody) return;
     state.submissionPending = true;
     resultNode.setAttribute("aria-busy", "true");
-    statusNode.textContent = "Retrying the same secure submission...";
+    statusNode.textContent = uiText("retryingSubmission");
     statusNode.className = "result-copy save-status";
     const retry = resultNode.querySelector("[data-testid='retry-submit']");
     if (retry) retry.remove();
@@ -1452,10 +1588,10 @@
     title.className = "result-title";
     title.tabIndex = -1;
     title.dataset.testid = "resuming-submission";
-    title.textContent = "Resuming secure submission";
+    title.textContent = uiText("resumingSubmission");
     const copy = document.createElement("p");
     copy.className = "result-copy";
-    copy.textContent = "The exact pending response from this tab is being retried safely.";
+    copy.textContent = uiText("resumingSubmissionCopy");
     const status = document.createElement("p");
     status.className = "result-copy save-status";
     status.setAttribute("role", "status");
@@ -1473,7 +1609,7 @@
       return;
     }
     if (!privacyAcknowledged()) {
-      statusNode.textContent = "Acknowledge the privacy notice before submitting.";
+      statusNode.textContent = uiText("acknowledgePrivacySubmit");
       return;
     }
     state.submissionPending = true;
@@ -1483,7 +1619,7 @@
     state.lastSubmissionBody = JSON.stringify(state.lastSubmissionPayload);
     persistPendingSubmission();
     lockEvaluationControls();
-    statusNode.textContent = "Submitting securely...";
+    statusNode.textContent = uiText("submitting");
     statusNode.className = "result-copy save-status";
     try {
       const response = await postWithRetry(state.lastSubmissionBody, statusNode);
@@ -1502,10 +1638,10 @@
     const title = document.createElement("h2");
     title.className = "result-title";
     title.tabIndex = -1;
-    title.textContent = "Assessment complete - ready for secure submission";
+    title.textContent = uiText("readyForSubmission");
     const copy = document.createElement("p");
     copy.className = "result-copy";
-    copy.textContent = "The secure service will calculate and record the authoritative result.";
+    copy.textContent = uiText("authoritativeResult");
     const status = document.createElement("p");
     status.className = "result-copy save-status";
     status.setAttribute("role", "status");
@@ -1514,7 +1650,7 @@
 
     if (config.trainingEvaluation) {
       resultNode.appendChild(createTrainingEvaluation(status));
-      status.textContent = "Add optional feedback, then submit your assessment.";
+      status.textContent = uiText("addFeedback");
     } else {
       submitAssessment(null, status);
     }
@@ -1552,7 +1688,7 @@
 
   configureAssessment();
   if (questions.length !== 20) {
-    state.accessError = "The 20-question assessment is not available. Contact the training organizer.";
+    state.accessError = uiText("unavailableAssessment");
     setSessionStatus(state.accessError, "session-error");
     renderAccessGate();
     return;

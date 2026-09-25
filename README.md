@@ -1,11 +1,12 @@
 # Advancy AI assessment
 
-One canonical website serves one concise assessment:
+The project serves the original English assessment and a separate French assessment:
 
 - [Advancy AI Knowledge Assessment](https://jjohana.github.io/advancy-ai-charter/)
-- 20 mixed multiple-choice questions
+- [Évaluation IA générative — ADMIN](https://jjohana.github.io/advancy-ai-charter/fr/)
+- 20 mixed multiple-choice questions in each version
 - one correct answer per question
-- AI Charter, practical AI usage, and two Chat/Work/Codex routing questions
+- the French version is invite-only, follows the September 2026 Generative AI overview, and covers ADMIN work: communication, email, translation, Excel, support, finance, HR, and calendar management
 - one short optional feedback and AI use-case form after the QCM
 
 The former `advancy-ai-usage` and `advancy-ai-usage-advanced` Pages sites remain compatibility redirects to the canonical questionnaire.
@@ -21,7 +22,7 @@ Participant browser
   -> private Cloudflare D1 database
 ```
 
-A clean common URL opens rate-limited public cohort registration. The Worker validates the participant's Advancy identity and a retry-safe idempotency key, then uses its server-side enrollment secret to derive a participant-specific invitation. Raw enrollment and invitation credentials are never stored in D1. The private invitation remains only in the browser-tab session and authorizes the unified questionnaire. Protected enrollment fragments and individual administrator-issued invitations remain available as recovery paths.
+A clean common URL opens rate-limited public cohort registration for the English assessment. The French ADMIN assessment does not expose public enrollment: it requires an individual invitation or a protected enrollment link assigned to the ADMIN campaign. The Worker validates the participant's Advancy identity and a retry-safe idempotency key, then uses its server-side enrollment secret to derive a participant-specific invitation. Raw enrollment and invitation credentials are never stored in D1. The private invitation remains only in the browser-tab session and authorizes its assigned questionnaire.
 
 The Worker resolves identity, enforces one-time registration, cohort windows and attempt limits, and computes the authoritative score. The unified result passes at 14/20 (70%). Public cohort registration validates an allowed email format rather than mailbox ownership, so use Advancy SSO for consequential certification or employment decisions.
 
@@ -34,6 +35,8 @@ Reviewed source banks are stored in:
 - `question-banks/advanced.json`
 
 `scripts/build-unified-questions.mjs` selects and interleaves the 20 deployable questions, adds the two current Chat/Work/Codex routing questions, balances the A-E answer positions, and deterministically generates `questions.js`.
+
+The reviewed French ADMIN question set is stored in `fr/questions.js`. `scripts/validate-french-quiz.mjs` checks its structure, the eight requested ADMIN domains, invite-only access, source coverage, scenario mix, balanced A-E answer positions, option-by-option feedback, and client/server answer-key alignment. The review record is in `docs/assessment-fr-qa-report.md`.
 
 ## Data and privacy
 
@@ -50,6 +53,7 @@ node scripts/build-unified-questions.mjs --check
 node --check questions.js
 node --check app.js
 node scripts/validate-quiz.mjs
+node scripts/validate-french-quiz.mjs
 
 Set-Location backend/score-worker
 npm ci

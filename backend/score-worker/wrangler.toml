@@ -5,7 +5,7 @@ workers_dev = true
 preview_urls = false
 
 [vars]
-ALLOWED_ORIGINS = "https://jjohana.github.io"
+ALLOWED_ORIGINS = "https://jjohana.github.io,https://advancy-ai-admin-fr.pages.dev"
 ALLOWED_EMAIL_DOMAINS = "advancy.com,cn.advancy.com"
 INVITATION_TTL_DAYS = "90"
 MAX_ATTEMPTS_PER_QUIZ = "3"

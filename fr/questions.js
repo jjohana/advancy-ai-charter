@@ -20,29 +20,29 @@
       question(
         "scenario",
         "Communication · Charte IA",
-        "Vous préparez une communication interne à partir de notes classées Orange. Les noms et situations individuelles sont hors périmètre. Quelle méthode respecte la Charte IA ?",
-        "Présentation septembre 2026, slide 2 : couleur de la mission, outil approuvé, minimum d’information, revue humaine et escalade.",
+        "Vous préparez une communication interne à partir de notes de réunion. Le responsable autorise l’IA uniquement pour les décisions générales ; les noms et situations individuelles sont explicitement exclus. Quelle méthode respecte la Charte IA ?",
+        "Présentation septembre 2026, slide 2 : vérifier l’autorisation des informations, utiliser un outil approuvé, limiter les entrées et prévoir une revue humaine.",
         2,
         [
-          ["Déposer toutes les notes dans l’outil approuvé, puis demander au modèle d’anonymiser le résultat.", "Incorrect. Un outil approuvé ne rend pas autorisées des informations exclues du périmètre, même si la sortie est ensuite anonymisée."],
-          ["Utiliser un compte personnel pour séparer le brouillon des systèmes Advancy.", "Incorrect. Les comptes personnels et outils non approuvés font partie des interdits absolus."],
-          ["Retirer les éléments individuels, ne transmettre que l’extrait nécessaire et faire relire la communication avant diffusion.", "Correct. La méthode respecte le périmètre Orange, la minimisation des données et la responsabilité humaine."],
-          ["Envoyer les notes complètes si elles représentent moins de dix pages.", "Incorrect. Dix pages constituent un plafond pour un extrait nécessaire, pas une autorisation générale."],
-          ["Demander au modèle de décider seul quelles informations sont sensibles.", "Incorrect. La classification et l’autorisation relèvent de l’équipe et du responsable, pas du modèle."]
+          ["Déposer toutes les notes dans l’outil approuvé, demander une anonymisation automatique, puis contrôler le brouillon.", "Incorrect. Le contrôle de la sortie intervient trop tard : les informations individuelles exclues auraient déjà été transmises à l’outil."],
+          ["Faire anonymiser l’ensemble des notes par un collègue, puis les déposer intégralement pour conserver le contexte.", "Incorrect. L’anonymisation réduit un risque mais ne justifie pas de transmettre des éléments sans rapport avec les décisions générales demandées."],
+          ["Retirer les éléments individuels, ne transmettre que l’extrait nécessaire et faire relire la communication avant diffusion.", "Correct. La méthode respecte l’autorisation donnée, la minimisation des informations et la responsabilité humaine."],
+          ["Créer un extrait des décisions mais conserver le nom des responsables de chaque action afin de rendre le message opérationnel.", "Incorrect. Les noms sont explicitement exclus ; il faut traiter leur réintégration séparément lors de la revue humaine, si elle est autorisée."],
+          ["Utiliser toutes les notes dans un outil approuvé configuré sans conservation, puis supprimer la conversation.", "Incorrect. Les réglages de conservation et la suppression ultérieure ne remplacent pas l’autorisation sur les informations transmises."]
         ]
       ),
       question(
         "scenario",
         "Finance · Données interdites",
-        "Pour préparer un suivi de paiements, on vous transmet un fichier contenant des coordonnées bancaires de fournisseurs et des commentaires confidentiels. Que faites-vous avant toute utilisation d’IA ?",
+        "Un fichier de 800 paiements contient des coordonnées bancaires et des commentaires confidentiels. Vous avez seulement besoin des montants mensuels par statut. Quelle préparation est la plus pertinente avant d’utiliser l’IA ?",
         "Présentation septembre 2026, slide 2 : interdits absolus, données sensibles et obligation d’escalade en cas de doute.",
         4,
         [
-          ["Importer le fichier dans Work, puisque la finalité est interne.", "Incorrect. Une finalité interne ne lève pas les restrictions liées aux données sensibles ou confidentielles."],
-          ["Masquer seulement le nom du fichier avant de le déposer.", "Incorrect. Renommer un fichier ne modifie pas son contenu ni son niveau de sensibilité."],
-          ["Copier les colonnes dans le prompt plutôt que de joindre le fichier.", "Incorrect. Copier le contenu revient toujours à le transmettre à l’outil."],
-          ["Utiliser le modèle le plus puissant afin de réduire le risque d’erreur.", "Incorrect. Le choix du modèle ne remplace ni l’autorisation ni la protection des données."],
-          ["Ne rien transmettre, demander un extrait autorisé et assaini, ou escalader vers le responsable si le besoin reste ambigu.", "Correct. Les données sensibles restent hors périmètre tant qu’une version autorisée et minimale n’a pas été définie."]
+          ["Masquer les colonnes bancaires dans Excel et transmettre le fichier, car les colonnes masquées ne seront pas affichées au modèle.", "Incorrect. Une colonne masquée reste présente dans le fichier et peut être lue par l’outil."],
+          ["Exporter les 800 lignes avec seulement le montant et le statut, afin de préserver la possibilité de refaire tous les calculs.", "Incorrect. Les données ligne à ligne dépassent le besoin annoncé, qui porte uniquement sur des agrégats mensuels."],
+          ["Donner un accès en lecture seule au fichier complet et supprimer la conversation dès que le tableau est produit.", "Incorrect. Le mode lecture seule protège le fichier source, mais pas les informations transmises à l’outil."],
+          ["Remplacer les coordonnées bancaires par des identifiants fictifs tout en conservant les commentaires pour expliquer les anomalies.", "Incorrect. Les commentaires confidentiels restent inutiles pour calculer les montants par statut."],
+          ["Produire localement un extrait agrégé et autorisé, vérifier qu’il ne contient ni colonne cachée ni commentaire, puis transmettre seulement ces totaux.", "Correct. La solution sépare le calcul nécessaire des données sensibles et réduit l’entrée au strict besoin."]
         ]
       ),
       question(
@@ -52,39 +52,39 @@
         "Présentation septembre 2026, slide 2 : n’utiliser que le minimum nécessaire et traiter la limite de dix pages comme un plafond, non comme une permission.",
         1,
         [
-          ["Déposer les douze pages afin de préserver tout le contexte.", "Incorrect. Le document complet dépasse le besoin de traduction défini."],
-          ["Transmettre uniquement les deux paragraphes nécessaires, après vérification de leur caractère autorisé.", "Correct. L’entrée est limitée au contenu utile et reste dans le périmètre permis."],
-          ["Transmettre dix pages, puisque le support mentionne ce maximum.", "Incorrect. Le maximum n’est ni une cible ni une autorisation automatique."],
-          ["Envoyer le document vers une messagerie personnelle avant de le traduire.", "Incorrect. Un compte personnel est interdit et ne réduit pas la sensibilité du contenu."],
-          ["Faire traduire l’intégralité du document, puis supprimer les pages inutiles de la réponse.", "Incorrect. La minimisation doit intervenir avant la transmission à l’outil."]
+          ["Déposer la procédure complète, car la cohérence terminologique prime sur le volume transmis.", "Incorrect. Le besoin de cohérence ne justifie pas l’accès aux dix pages sans rapport avec les paragraphes à traduire."],
+          ["Transmettre les deux paragraphes et un court glossaire autorisé des termes définis ailleurs, puis faire vérifier le sens et la terminologie.", "Correct. Cette méthode apporte le contexte utile sans élargir inutilement le contenu transmis."],
+          ["Transmettre uniquement les deux paragraphes sans glossaire et demander au modèle de conserver tels quels tous les termes ambigus.", "Incorrect. La minimisation est respectée, mais l’absence du contexte terminologique nécessaire augmente le risque d’une traduction incohérente."],
+          ["Joindre une ancienne traduction approuvée de la procédure complète comme exemple de style.", "Incorrect. Un exemple utile doit lui aussi être limité aux passages nécessaires et autorisés."],
+          ["Faire résumer les deux paragraphes, puis traduire le résumé pour réduire encore le volume.", "Incorrect. Traduire un résumé change le contenu et peut supprimer des obligations présentes dans le texte source."]
         ]
       ),
       question(
         "scenario",
         "Mail · Revue humaine",
-        "Chat rédige un e-mail annonçant un changement de procédure aux équipes. Le texte paraît fluide. Quelle est la prochaine étape ?",
+        "Chat rédige un e-mail annonçant un changement de procédure qui entre en vigueur à des dates différentes selon les bureaux. Le texte paraît fluide. Quelle revue apporte le plus de sécurité avant l’envoi ?",
         "Présentation septembre 2026, slides 2 et 3 : l’IA accélère le brouillon, mais l’ADMIN reste responsable du message final.",
         3,
         [
-          ["Envoyer immédiatement : un texte fluide est suffisamment fiable.", "Incorrect. La fluidité ne garantit ni l’exactitude, ni le bon ton, ni la conformité à la procédure."],
-          ["Ajouter une mention indiquant que l’e-mail a été produit par une IA, puis l’envoyer sans autre contrôle.", "Incorrect. Une mention ne remplace pas la vérification du fond et l’approbation humaine."],
-          ["Demander au modèle de confirmer lui-même que toutes les informations sont exactes.", "Incorrect. Le modèle ne peut pas être sa propre source de validation."],
+          ["Contrôler uniquement les dates, puisque le reste du texte reprend la formulation fournie dans le prompt.", "Incorrect. Les dates sont critiques, mais les destinataires, les exceptions locales et le ton peuvent aussi avoir été mal interprétés."],
+          ["Transmettre le brouillon au responsable de la procédure et considérer son accord général comme suffisant pour l’envoi.", "Incorrect. L’accord du responsable est utile, mais il faut encore vérifier la liste des destinataires et l’adaptation par bureau."],
+          ["Faire relire le message par un second modèle et retenir la version sur laquelle les deux modèles convergent.", "Incorrect. La convergence entre modèles ne remplace pas la comparaison avec la procédure de référence."],
           ["Vérifier dates, destinataires, règles citées et ton, puis obtenir l’approbation requise avant envoi.", "Correct. Le brouillon IA devient utilisable seulement après revue et décision humaines."],
-          ["Conserver l’e-mail comme modèle permanent sans tester d’autres situations.", "Incorrect. La réutilisation exige une méthode stable et des contrôles adaptés à chaque envoi."]
+          ["Envoyer d’abord le message à un petit bureau pour identifier les incompréhensions avant la diffusion générale.", "Incorrect. Un pilote ne doit pas servir à détecter des erreurs factuelles qui peuvent être vérifiées avant tout envoi."]
         ]
       ),
       question(
         "qcm",
         "Support · Outil approuvé",
-        "Quelle règle s’applique à toute tâche ADMIN réalisée avec une IA, même lorsque le contenu semble banal ?",
+        "Un collègue propose un outil externe plus rapide pour reformuler un message non sensible, en activant l’option « ne pas conserver mes données ». Quel critère reste décisif ?",
         "Présentation septembre 2026, slide 2 : utiliser exclusivement un outil approuvé avec l’accès professionnel autorisé.",
         0,
         [
-          ["Utiliser un outil approuvé par Advancy avec son accès professionnel, dans le périmètre autorisé.", "Correct. L’outil, le compte et le contenu doivent tous être autorisés."],
-          ["Utiliser n’importe quel outil gratuit si aucun nom de client n’apparaît.", "Incorrect. L’absence de nom de client ne rend pas un outil non approuvé acceptable."],
-          ["Utiliser un compte personnel si la réponse reste sur l’ordinateur.", "Incorrect. Le contenu est transmis au service avant que la réponse n’apparaisse sur l’ordinateur."],
-          ["Installer une extension de navigateur si elle permet de gagner du temps.", "Incorrect. Les extensions non approuvées font partie des interdits absolus."],
-          ["Partager une connexion entre collègues pour centraliser les usages.", "Incorrect. Les connexions et comptes partagés ne sont pas autorisés."]
+          ["L’outil doit être approuvé par Advancy et utilisé avec l’accès professionnel prévu, même si le texte est non sensible.", "Correct. Les réglages proposés par un fournisseur ne remplacent pas la validation de l’outil et du compte."],
+          ["L’outil peut être utilisé si le collègue confirme par écrit qu’aucune donnée personnelle n’apparaît.", "Incorrect. L’autorisation du contenu ne vaut pas approbation de l’outil."],
+          ["L’outil peut être testé sur un seul message, car un essai ponctuel crée une exposition négligeable.", "Incorrect. Une utilisation ponctuelle reste une transmission à un service non approuvé."],
+          ["L’outil est acceptable si un compte professionnel est utilisé et si l’historique est désactivé.", "Incorrect. Un compte professionnel et l’absence d’historique ne suffisent pas lorsque le service lui-même n’est pas approuvé."],
+          ["L’accord du Manager suffit si le gain de temps est documenté.", "Incorrect. Un bénéfice opérationnel et un accord local ne remplacent pas le processus d’approbation de l’outil."]
         ]
       ),
       question(
@@ -94,207 +94,207 @@
         "Présentation septembre 2026, slides 4 à 7 : Chat convient aux demandes ponctuelles, ciblées et conversationnelles.",
         1,
         [
-          ["Créer immédiatement un assistant permanent avec accès à tous les dossiers ADMIN.", "Incorrect. La tâche est ponctuelle et ne justifie ni assistant réutilisable ni accès étendu."],
+          ["Utiliser Work avec un brief formel, produire un fichier de variantes et l’archiver pour de futurs rappels.", "Incorrect. Work pourrait réaliser la tâche, mais ajoute une exécution et un livrable inutiles pour ce besoin ponctuel."],
           ["Utiliser Chat avec le message nécessaire, demander trois variantes, puis choisir et relire la version finale.", "Correct. Chat est adapté à une itération courte sans chaîne d’outils ni livrable complexe."],
-          ["Utiliser Codex pour modifier les paramètres de messagerie des destinataires.", "Incorrect. Aucune action technique sur les comptes n’est nécessaire."],
-          ["Utiliser Work pour rechercher automatiquement toutes les politiques de réservation de l’entreprise.", "Incorrect. Le besoin est déjà cadré et ne demande pas de recherche ou d’exécution multiétape."],
-          ["Envoyer le premier brouillon généré pour économiser des crédits.", "Incorrect. L’économie de crédits ne justifie pas l’absence de revue humaine."]
+          ["Créer un Chat Project afin de conserver durablement le contexte et toutes les versions du rappel.", "Incorrect. Un Project devient utile pour un travail récurrent ; ici, la conservation du contexte n’apporte pas assez de valeur."],
+          ["Créer un assistant no-code proposant les trois tons à chaque nouvelle demande.", "Incorrect. Industrialiser une tâche avant d’en avoir confirmé la fréquence et la méthode serait prématuré."],
+          ["Demander à Chat une seule version très aboutie, puis la relire avant envoi.", "Incorrect. Cette approche est possible, mais elle répond moins bien au besoin explicite de comparer plusieurs tons avant de choisir."]
         ]
       ),
       question(
         "scenario",
         "Excel · Choix de Work",
-        "Vous devez consolider plusieurs fichiers autorisés de suivi logistique, nettoyer les colonnes et produire un classeur Excel final avec contrôles. Quel environnement choisir ?",
+        "Vous souhaitez utiliser l’IA pour consolider quatre fichiers autorisés de suivi logistique. Les colonnes diffèrent selon les bureaux et le livrable attendu est un Excel contrôlé ; la méthode n’est pas encore stabilisée. Quel environnement choisir ?",
         "Présentation septembre 2026, slides 5 à 7 : Work est adapté aux fichiers, aux outils et aux livrables multiétapes.",
         3,
         [
-          ["Chat, en copiant successivement chaque ligne des fichiers dans la conversation.", "Incorrect. Cette méthode fragmente le contexte et augmente les risques d’oubli ou de copie."],
-          ["Un traducteur automatique, puisque les colonnes comportent du texte.", "Incorrect. Le besoin principal est une consolidation structurée et contrôlée, pas une traduction."],
-          ["Un assistant permanent créé avant d’avoir défini les contrôles du classeur.", "Incorrect. Il faut d’abord stabiliser la méthode et les critères de qualité."],
+          ["Demander à Chat des règles génériques de nettoyage, puis appliquer manuellement ces règles dans chaque fichier.", "Incorrect. Cette approche peut aider à réfléchir, mais elle ne traite pas efficacement la consolidation ni la traçabilité du livrable."],
+          ["Développer immédiatement avec Codex un script permanent couvrant toutes les variantes de colonnes observées.", "Incorrect. Un script réutilisable est prématuré tant que les variantes et les contrôles ne sont pas stabilisés."],
+          ["Créer un assistant no-code qui apprend les correspondances au fil des fichiers et corrige ses erreurs en production.", "Incorrect. Les règles de correspondance doivent être explicites et testées avant d’être réutilisées."],
           ["Work, avec les seuls fichiers nécessaires, un brief précis, les permissions minimales et une revue du classeur produit.", "Correct. Work correspond à une exécution multiétape sur fichiers avec livrable fini et contrôles explicites."],
-          ["Le modèle le plus coûteux, sans préciser le format attendu.", "Incorrect. Le choix d’un modèle ne remplace pas le brief, les permissions ou les contrôles Excel."]
+          ["Créer un Chat Project pour conserver les quatre fichiers et demander ensuite un tableau récapitulatif dans la conversation.", "Incorrect. Le Project organise le contexte, mais n’est pas le meilleur choix pour produire et contrôler un fichier Excel multiétape."]
         ]
       ),
       question(
         "scenario",
         "Support · Permissions",
-        "Dans Work, un agent de support propose d’ouvrir tout le disque partagé et d’envoyer directement une réponse à un prestataire. Quelle décision prendre ?",
+        "Dans Work, un agent de support doit rechercher une procédure dans un dossier précis puis préparer une réponse à un prestataire. Il propose un accès plus large pour éviter les erreurs de contexte et un envoi automatique. Quel réglage est le plus équilibré ?",
         "Présentation septembre 2026, slide 7 : distinguer accès et actions, appliquer le moindre privilège et confirmer avant toute action externe.",
         0,
         [
-          ["Limiter l’accès au dossier strictement nécessaire et conserver l’envoi externe sous validation humaine.", "Correct. Les permissions doivent être minimales et l’action vers un tiers doit rester explicitement contrôlée."],
-          ["Autoriser tout le disque pour éviter que l’agent manque de contexte.", "Incorrect. Un accès large augmente inutilement l’exposition de données."],
-          ["Autoriser l’envoi automatique si le prestataire est déjà connu.", "Incorrect. Une relation existante ne dispense pas du contrôle du contenu et du destinataire."],
-          ["Donner un accès complet pendant une heure, puis le révoquer.", "Incorrect. Une durée courte ne justifie pas un périmètre d’accès excessif."],
-          ["Laisser l’agent choisir les autorisations dont il pense avoir besoin.", "Incorrect. Les autorisations sont définies par l’utilisateur responsable avant l’exécution."]
+          ["Donner un accès en lecture au seul dossier utile, limiter l’agent à la préparation d’un brouillon et valider le message avant l’envoi.", "Correct. Le réglage sépare correctement l’accès nécessaire de l’action externe qui engage l’entreprise."],
+          ["Donner un accès en lecture à tout le disque partagé, mais interdire l’envoi automatique.", "Incorrect. Le contrôle de l’envoi est adéquat, mais le périmètre de lecture reste excessif."],
+          ["Limiter l’accès au bon dossier et autoriser l’envoi automatique uniquement vers ce prestataire déjà référencé.", "Incorrect. Le périmètre documentaire est correct, mais la qualité et le contexte de chaque message doivent encore être vérifiés."],
+          ["Donner un accès complet pendant la recherche, puis réduire les droits avant la rédaction du message.", "Incorrect. Une permission temporaire reste trop large si la recherche peut être réalisée dans un dossier identifié."],
+          ["Copier les documents utiles dans un dossier dédié et autoriser l’agent à préparer puis envoyer la réponse.", "Incorrect. Le dossier dédié réduit l’accès, mais l’envoi externe ne doit pas être délégué sans validation du contenu final."]
         ]
       ),
       question(
         "scenario",
         "Finance · Qualité du brief",
-        "Vous demandez à Work de comparer des offres fournisseurs autorisées dans un tableau. Quel brief donne la meilleure base de travail ?",
+        "Vous demandez à Work de comparer quatre offres fournisseurs autorisées. Deux offres omettent certains frais et le choix final reste au responsable achats. Quel brief donne la base d’analyse la plus fiable ?",
         "Présentation septembre 2026, slide 8 : préciser objectif, contexte, sources, exclusions, format de sortie et contrôles.",
         4,
         [
-          ["Compare ces offres et dis-moi laquelle est la meilleure.", "Incorrect. Les critères, le format et les contrôles restent indéfinis."],
-          ["Fais un tableau très complet en utilisant toutes les informations disponibles.", "Incorrect. Le périmètre est trop large et la notion de complétude n’est pas contrôlable."],
-          ["Utilise ton jugement pour combler les prix ou conditions manquants.", "Incorrect. Le modèle ne doit pas inventer des données financières absentes."],
-          ["Choisis automatiquement le fournisseur et prépare le bon de commande final.", "Incorrect. La recommandation et l’engagement financier exigent une validation humaine."],
+          ["Compare les prix connus, classe les offres et recommande la première ; les frais manquants seront vérifiés ensuite.", "Incorrect. Le classement serait trompeur tant que des composantes de coût importantes restent inconnues."],
+          ["Construis le tableau le plus complet possible à partir des offres et d’informations publiques sur les fournisseurs.", "Incorrect. Ajouter des sources non demandées élargit le périmètre sans résoudre de façon contrôlée les données manquantes."],
+          ["Estime les frais manquants à partir de la moyenne des autres offres et indique clairement qu’il s’agit d’hypothèses.", "Incorrect. Une hypothèse visible peut servir à une simulation, mais ne doit pas être confondue avec la comparaison factuelle demandée."],
+          ["Produis l’Excel comparatif et propose un fournisseur, en laissant au responsable achats le soin de vérifier les données.", "Incorrect. La décision reste humaine, mais le brief ne prévoit ni signalement systématique des lacunes ni traçabilité des sources."],
           ["Compare uniquement les fichiers autorisés, selon les critères fournis, signale les données manquantes et livre un Excel avec sources et contrôles.", "Correct. Le brief rend le périmètre, les critères, la sortie et la vérification explicites."]
         ]
       ),
       question(
         "qcm",
         "RH · Crédits",
-        "Selon le support de septembre 2026, quelle conduite adopter avant de lancer une tâche RH non sensible et autorisée, susceptible de consommer beaucoup de crédits ?",
+        "Une tâche RH non sensible et autorisée doit produire 60 fiches à partir du même modèle. Un essai sur trois fiches est satisfaisant avec un modèle intermédiaire. Quelle stratégie est la plus rationnelle ?",
         "Présentation septembre 2026, slide 9 : enveloppe mensuelle de 1 500 crédits et approbation requise pour une augmentation.",
         2,
         [
-          ["Lancer la tâche plusieurs fois et conserver la meilleure réponse.", "Incorrect. Les répétitions non cadrées consomment des crédits sans améliorer la méthode."],
-          ["Utiliser systématiquement le modèle le plus avancé pour éviter de recommencer.", "Incorrect. Le modèle le plus avancé n’est pas toujours nécessaire ni le plus efficient."],
-          ["Estimer le besoin, commencer avec la capacité suffisante et demander l’approbation avant toute augmentation de crédits.", "Correct. La consommation doit être proportionnée et toute hausse suit le processus d’approbation."],
-          ["Fractionner la tâche entre plusieurs comptes pour contourner la limite.", "Incorrect. Le contournement des limites et le partage de comptes ne sont pas autorisés."],
-          ["Attendre la fin du mois sans vérifier la consommation prévue.", "Incorrect. Le bon réflexe est de cadrer le besoin avant l’exécution."]
+          ["Passer au modèle le plus avancé pour les 60 fiches afin de réduire au maximum le risque d’une reprise.", "Incorrect. Le pilote n’indique pas que la capacité supplémentaire soit nécessaire ; cette hausse augmenterait le coût sans problème identifié."],
+          ["Produire directement les 60 fiches avec le modèle intermédiaire, puisque le pilote a réussi, puis contrôler seulement la dernière.", "Incorrect. Le choix du modèle est raisonnable, mais le plan de contrôle est insuffisant pour détecter une dérive en cours de série."],
+          ["Estimer les crédits, conserver le modèle suffisant, traiter par lots avec contrôles intermédiaires et demander une approbation seulement si une hausse devient nécessaire.", "Correct. La stratégie combine maîtrise du coût, contrôle qualité et respect du processus d’augmentation des crédits."],
+          ["Répartir les fiches entre plusieurs sessions afin que chaque exécution paraisse moins coûteuse.", "Incorrect. Le fractionnement masque la consommation globale sans améliorer ni la méthode ni les contrôles."],
+          ["Reporter toute la tâche au mois suivant pour préserver l’enveloppe actuelle.", "Incorrect. Le report ne se justifie pas tant que le besoin peut être estimé et exécuté dans l’enveloppe avec un modèle suffisant."]
         ]
       ),
       question(
         "scenario",
         "Traduction · Modèle et effort",
-        "Vous devez traduire un court message logistique non sensible, puis vérifier la terminologie. Quel réglage est le plus rationnel ?",
+        "Vous devez traduire une invitation logistique non sensible. Un glossaire approuvé existe et le texte contient une formule idiomatique qui avait posé problème lors d’un précédent essai. Quel réglage est le plus rationnel ?",
         "Présentation septembre 2026, slides 10 et 11 : choisir le niveau de capacité et d’effort nécessaire, puis augmenter seulement face à un problème identifié.",
         3,
         [
-          ["Utiliser toujours le modèle frontière avec l’effort maximal.", "Incorrect. Une tâche simple ne justifie pas automatiquement la capacité et le coût les plus élevés."],
-          ["Choisir au hasard afin d’éviter un biais de sélection.", "Incorrect. Le choix doit dépendre de la complexité, de la qualité requise et du coût."],
-          ["Utiliser le modèle le plus rapide et envoyer la traduction sans contrôle.", "Incorrect. L’efficacité ne supprime pas la vérification de la terminologie et du sens."],
-          ["Commencer avec un modèle suffisant et un effort adapté, contrôler la traduction, puis augmenter seulement si un défaut précis apparaît.", "Correct. Cette approche suit le compromis coût-intelligence présenté dans le support."],
-          ["Traduire le document complet pour donner davantage de contexte, même si un seul message est requis.", "Incorrect. Le choix du modèle ne dispense pas du principe de minimisation."]
+          ["Utiliser le modèle frontière avec l’effort maximal pour éviter toute ambiguïté, puis vérifier seulement la mise en page.", "Incorrect. Une capacité maximale ne dispense pas de contrôler le sens, notamment sur l’expression déjà identifiée comme difficile."],
+          ["Utiliser le modèle le plus rapide et confier la vérification intégrale à un collègue bilingue.", "Incorrect. Cette solution peut fonctionner, mais transfère inutilement tout l’effort de qualité à la revue humaine."],
+          ["Faire traduire le texte par deux modèles et retenir les formulations sur lesquelles ils convergent.", "Incorrect. Un consensus entre modèles ne garantit ni le respect du glossaire ni la justesse de l’expression idiomatique."],
+          ["Utiliser le glossaire avec un modèle suffisant, demander une alternative pour la formule idiomatique, contrôler le résultat, puis augmenter la capacité seulement si ce point reste défaillant.", "Correct. La stratégie cible le risque connu et n’augmente le coût qu’en réponse à un défaut observé."],
+          ["Découper l’invitation phrase par phrase afin de simplifier la tâche pour un modèle moins coûteux.", "Incorrect. Le découpage réduit la complexité locale mais peut faire perdre le ton et la cohérence d’ensemble."]
         ]
       ),
       question(
         "scenario",
         "RH · Choix du workflow",
-        "Vous préparez une FAQ d’onboarding à partir de procédures internes autorisées. Une première version existe, mais les réponses sont parfois incomplètes. Quelle amélioration tester d’abord ?",
+        "Une FAQ d’onboarding répond correctement à 14 questions sur 20. Les six échecs concernent tous des règles décrites dans une annexe autorisée mais absente des sources fournies. Quelle amélioration tester d’abord ?",
         "Présentation septembre 2026, slides 5, 8, 10 et 12 : diagnostiquer le défaut, améliorer brief et sources, puis ajuster le modèle si nécessaire.",
         1,
         [
-          ["Donner immédiatement accès à tous les dossiers RH.", "Incorrect. L’augmentation des accès ne doit jamais être la réponse par défaut à un problème de qualité."],
-          ["Identifier les réponses manquantes, préciser les sources et le format attendu, puis retester avant d’augmenter la capacité du modèle.", "Correct. Le défaut est traité de façon ciblée, en privilégiant d’abord le cadrage et l’évidence."],
-          ["Supprimer les références aux procédures pour rendre les réponses plus fluides.", "Incorrect. La fluidité ne doit pas affaiblir la traçabilité ou l’exactitude."],
-          ["Publier la FAQ et corriger seulement si un salarié signale une erreur.", "Incorrect. Une revue humaine doit précéder la diffusion."],
-          ["Transformer immédiatement la FAQ en assistant permanent.", "Incorrect. La méthode doit être stabilisée et validée avant d’être réutilisée à grande échelle."]
+          ["Passer au modèle le plus puissant en conservant exactement les mêmes sources.", "Incorrect. Le problème observé vient d’une information absente, pas d’une capacité de raisonnement insuffisante."],
+          ["Ajouter l’annexe autorisée, préciser que chaque réponse doit citer sa procédure et rejouer les 20 questions de test avant tout changement de modèle.", "Correct. La correction vise la cause identifiée et permet de vérifier qu’elle n’introduit pas de régression."],
+          ["Donner accès à l’ensemble du dossier RH afin de couvrir d’éventuelles autres lacunes.", "Incorrect. L’accès serait disproportionné alors que la source manquante est précisément identifiée."],
+          ["Corriger manuellement les six réponses et publier la FAQ, puisque les autres réponses sont déjà satisfaisantes.", "Incorrect. Cette action corrige les exemples, mais pas le mécanisme qui produira les prochaines réponses."],
+          ["Transformer la FAQ en assistant avec une consigne d’escalade lorsqu’une réponse semble incomplète.", "Incorrect. L’escalade est utile, mais l’industrialisation doit attendre la correction et la validation de la méthode."]
         ]
       ),
       question(
         "scenario",
         "Excel · Revue de l’évidence",
-        "Work extrait des montants depuis des factures autorisées et construit un suivi Excel. Comment valider le livrable ?",
+        "Work extrait 240 factures autorisées dans un Excel de pré-validation mensuelle. Le fichier servira à préparer, mais pas à déclencher, les paiements. Quel plan de contrôle offre le meilleur équilibre entre fiabilité et efficacité ?",
         "Présentation septembre 2026, slide 12 : vérifier l’évidence, la couverture, les calculs et les incohérences avant usage.",
         4,
         [
-          ["Contrôler uniquement que le total final paraît plausible.", "Incorrect. Un total plausible peut masquer des lignes oubliées ou mal lues."],
-          ["Vérifier seulement les trois plus gros montants.", "Incorrect. Un échantillon limité ne suffit pas si le fichier doit servir de suivi officiel."],
-          ["Demander au modèle s’il est certain de ses extractions.", "Incorrect. Une déclaration de confiance du modèle n’est pas une preuve."],
-          ["Comparer le total avec le mois précédent et accepter s’il est proche.", "Incorrect. Une proximité historique ne valide pas les pièces, les formules ou l’exhaustivité."],
-          ["Rapprocher les lignes des sources, contrôler les formules, repérer les champs manquants et faire valider le fichier avant usage.", "Correct. La validation couvre les preuves, les calculs, l’exhaustivité et la responsabilité humaine."]
+          ["Rapprocher le total global avec la comptabilité et vérifier une facture choisie au hasard par fournisseur.", "Incorrect. Ce contrôle peut manquer des erreurs concentrées sur certains formats, montants ou champs manquants."],
+          ["Contrôler toutes les factures au-dessus d’un seuil élevé et accepter automatiquement les autres.", "Incorrect. Le montant est un facteur de risque, mais les petits montants peuvent aussi présenter des erreurs systématiques."],
+          ["Relancer la même extraction et considérer comme fiables les lignes identiques dans les deux résultats.", "Incorrect. Deux exécutions peuvent reproduire la même erreur et ne valident pas les formules du classeur."],
+          ["Effectuer une double saisie manuelle complète des 240 factures dans un second fichier, puis comparer les deux versions.", "Incorrect. La méthode serait robuste mais disproportionnée pour une pré-validation et supprimerait l’essentiel du gain attendu."],
+          ["Rapprocher les totaux, contrôler les formules, vérifier toutes les exceptions et lignes à risque, échantillonner le reste et étendre le contrôle si des erreurs apparaissent.", "Correct. Le plan combine contrôles exhaustifs ciblés, échantillonnage et règle d’escalade proportionnée au risque."]
         ]
       ),
       question(
         "scenario",
         "Communication · Validation finale",
-        "Une IA prépare une note interne résumant une nouvelle procédure de support. Quelle règle d’arrêt appliquer avant diffusion ?",
+        "Une IA prépare une note interne sur une nouvelle procédure de support. La procédure comporte une règle générale et une exception pour un ancien outil encore utilisé par deux bureaux. Quelle validation appliquer avant diffusion ?",
         "Présentation septembre 2026, slides 3, 12 et 16 : arrêter l’automatisation au point de décision et appliquer un contrôle humain final.",
         0,
         [
-          ["Un ADMIN vérifie la note contre la procédure source, corrige les écarts et approuve explicitement la diffusion.", "Correct. La décision de publier et la responsabilité du contenu restent humaines."],
-          ["Diffuser dès que la note ne contient aucune faute d’orthographe.", "Incorrect. L’orthographe ne prouve pas l’exactitude de la procédure."],
-          ["Diffuser si le modèle cite au moins une source.", "Incorrect. Une citation isolée ne garantit ni couverture ni fidélité."],
-          ["Laisser le modèle décider si son niveau de confiance est suffisant.", "Incorrect. La confiance déclarée par le modèle ne remplace pas un contrôle indépendant."],
-          ["Diffuser automatiquement aux petites équipes seulement.", "Incorrect. La taille du public ne supprime pas la responsabilité humaine."]
+          ["Comparer la note à la source, tester explicitement le cas des deux bureaux, corriger les écarts et faire approuver la version destinée à chaque public.", "Correct. La revue couvre la règle générale, l’exception et l’adéquation des destinataires avant diffusion."],
+          ["Vérifier uniquement le passage modifié, puisque le reste de la note reprend une procédure déjà connue.", "Incorrect. Une modification peut créer une incohérence avec les autres parties ou l’exception existante."],
+          ["Accepter la note si elle cite la procédure et mentionne qu’une exception existe.", "Incorrect. Il faut vérifier que l’exception est correctement expliquée aux bureaux concernés, pas seulement signalée."],
+          ["Faire approuver la note par un expert support sans lui fournir la procédure source, afin d’obtenir une revue indépendante.", "Incorrect. L’expertise aide, mais une validation fiable nécessite l’accès au texte de référence."],
+          ["Diffuser d’abord aux bureaux non concernés par l’exception, puis adapter le message en fonction de leurs retours.", "Incorrect. Les retours d’un public non concerné ne valident pas le traitement du cas exceptionnel."]
         ]
       ),
       question(
         "qcm",
         "Agenda · Chat Projects",
-        "Quand un Chat Project est-il particulièrement utile pour une activité ADMIN ?",
+        "Pendant quatre mois, vous organisez chaque semaine le même comité : mêmes modèles, documents de référence et suivi de décisions. Les invitations restent gérées dans l’agenda officiel. Quel usage apporte le plus de continuité sans automatisation excessive ?",
         "Présentation septembre 2026, slide 13 : regrouper conversations, fichiers et instructions pour un travail récurrent et contextualisé.",
         2,
         [
-          ["Pour envoyer automatiquement toutes les invitations d’agenda sans contrôle.", "Incorrect. Un Project organise le contexte ; il n’autorise pas des actions externes automatiques."],
-          ["Pour contourner les restrictions d’accès aux fichiers partagés.", "Incorrect. Les règles d’accès restent inchangées dans un Project."],
-          ["Pour suivre dans la durée l’organisation d’un cycle de réunions avec les mêmes instructions et documents autorisés.", "Correct. Le Project maintient un contexte de travail récurrent sans redémarrer chaque échange."],
-          ["Pour stocker des données RH sensibles qui ne doivent pas être utilisées ailleurs.", "Incorrect. Un Project ne transforme pas une donnée interdite en donnée autorisée."],
-          ["Pour remplacer l’agenda officiel de l’entreprise.", "Incorrect. Le Project complète le workflow, mais ne remplace pas le système de référence."]
+          ["Ouvrir un nouveau Chat chaque semaine et copier le dernier compte rendu pour éviter que le contexte ancien influence la réunion suivante.", "Incorrect. Cette méthode limite les biais de contexte mais multiplie les recopies et augmente le risque d’oublier des décisions antérieures."],
+          ["Utiliser Work pour créer et envoyer automatiquement les invitations, comptes rendus et relances à partir des fichiers du comité.", "Incorrect. L’exécution automatique dépasse le besoin exprimé et introduit des actions externes inutiles."],
+          ["Créer un Chat Project avec les instructions, modèles et documents autorisés du comité, tout en conservant l’agenda officiel et la validation des communications.", "Correct. Le Project apporte la continuité recherchée sans se substituer aux systèmes ni aux décisions de diffusion."],
+          ["Créer un assistant no-code dès la deuxième réunion afin qu’il réponde à toutes les questions relatives au comité.", "Incorrect. Un assistant permanent serait prématuré avant de stabiliser les besoins et les cas d’usage récurrents."],
+          ["Créer une skill Codex pour générer chaque semaine les invitations et modifier automatiquement les fichiers de suivi.", "Incorrect. La tâche principale est la continuité du contexte, pas une séquence technique déterministe à exécuter sur des fichiers."]
         ]
       ),
       question(
         "scenario",
         "Support · Assistant no-code",
-        "L’équipe ADMIN reçoit chaque semaine les mêmes questions sur une procédure de support stable et autorisée. Quand créer un assistant no-code ?",
+        "L’équipe ADMIN reçoit chaque semaine 40 questions sur une procédure stable. L’analyse montre que 85 % suivent six réponses types et que 15 % nécessitent un expert. Quand un assistant no-code devient-il pertinent ?",
         "Présentation septembre 2026, slide 14 : transformer une méthode répétable et validée en assistant réutilisable avec garde-fous.",
         4,
         [
-          ["Dès la première question, avant d’identifier les variantes et les erreurs possibles.", "Incorrect. Une méthode non stabilisée ne doit pas être industrialisée."],
-          ["Après avoir donné à l’assistant accès à tous les dossiers pour qu’il apprenne seul.", "Incorrect. Les accès doivent rester limités aux sources nécessaires et autorisées."],
-          ["Seulement si l’assistant peut répondre sans jamais demander une validation humaine.", "Incorrect. Les cas ambigus et les actions sensibles doivent toujours être escaladés."],
-          ["Quand le volume est élevé, même si la procédure change chaque jour.", "Incorrect. Une forte instabilité rend la méthode difficile à fiabiliser et à maintenir."],
-          ["Après validation des sources, réponses types, limites, cas d’escalade et tests sur des exemples représentatifs.", "Correct. L’assistant réutilise une méthode déjà comprise, contrôlée et documentée."]
+          ["Dès que les six réponses types sont rédigées, en demandant aux utilisateurs de signaler les erreurs après le lancement.", "Incorrect. Les réponses types sont une base utile, mais un test avant diffusion reste nécessaire."],
+          ["Après avoir ajouté l’ensemble des archives du support afin que l’assistant puisse traiter aussi les 15 % de cas atypiques.", "Incorrect. Élargir les sources ne garantit pas la qualité des cas atypiques et augmente inutilement les accès."],
+          ["Lorsque l’assistant peut proposer une réponse à chaque question, quitte à faire relire un échantillon hebdomadaire.", "Incorrect. Les cas hors périmètre doivent être reconnus et escaladés, pas couverts par une réponse forcée."],
+          ["Dès maintenant pour un petit groupe, car un pilote en conditions réelles remplacera un jeu de tests théorique.", "Incorrect. Un pilote est utile après des tests préalables ; il ne doit pas exposer les utilisateurs aux erreurs évitables."],
+          ["Après validation des six réponses, définition d’un refus avec escalade pour les autres cas, tests représentatifs et désignation d’un responsable de mise à jour.", "Correct. L’assistant automatise le périmètre stable tout en conservant une voie sûre pour les 15 % de cas complexes."]
         ]
       ),
       question(
         "scenario",
         "Excel · Skill Codex",
-        "Chaque mois, vous devez renommer des fichiers non sensibles, vérifier leur présence et générer le même tableau de contrôle. Quel usage de Codex est pertinent ?",
+        "Chaque mois, 120 fichiers non sensibles doivent être contrôlés, renommés selon une règle stable et recensés dans un Excel. Les doublons doivent être signalés mais jamais supprimés automatiquement. Quel usage de Codex est pertinent ?",
         "Présentation septembre 2026, slide 15 : créer une skill pour une séquence technique répétable, bornée et testable.",
         0,
         [
-          ["Créer une skill bornée aux dossiers autorisés, avec étapes explicites, contrôles et validation avant toute action irréversible.", "Correct. La séquence est stable, technique et testable, ce qui correspond à une skill Codex."],
-          ["Donner à Codex un accès général à l’ordinateur afin qu’il retrouve seul les fichiers.", "Incorrect. L’accès doit être limité aux dossiers strictement nécessaires."],
-          ["Créer un assistant de conversation qui devine les règles de nommage.", "Incorrect. Les règles doivent être formalisées et testées, pas déduites au hasard."],
-          ["Exécuter directement la suppression des fichiers manquants ou en double.", "Incorrect. Une action destructive nécessite une cible certaine et une validation explicite."],
-          ["Utiliser Chat et copier manuellement tous les noms de fichiers chaque mois.", "Incorrect. Cette solution ne tire pas parti du caractère répétable et vérifiable de la tâche."]
+          ["Créer une skill limitée au dossier autorisé, avec mode simulation, manifeste des renommages, signalement des doublons et validation avant application.", "Correct. La séquence est déterministe, répétable et contrôlable sans déléguer la suppression."],
+          ["Demander chaque mois à Codex d’écrire puis d’exécuter un nouveau script à partir d’une consigne libre.", "Incorrect. Cette approche peut fonctionner, mais elle réintroduit chaque mois une variation inutile dans une méthode stable."],
+          ["Créer un assistant no-code qui parcourt le dossier et propose les nouveaux noms dans la conversation.", "Incorrect. Le besoin porte sur une opération technique répétable sur fichiers, mieux adaptée à une skill bornée et testable."],
+          ["Créer une skill qui renomme les fichiers et supprime automatiquement les doublons exacts après comparaison de leur taille.", "Incorrect. La taille ne suffit pas à prouver l’identité et la suppression automatique contredit la règle du scénario."],
+          ["Conserver une checklist manuelle et utiliser Chat uniquement pour générer la formule du tableau de contrôle.", "Incorrect. La solution est prudente mais laisse inutilisé le potentiel d’automatisation d’une séquence stable et vérifiable."]
         ]
       ),
       question(
         "scenario",
         "Finance · Escalade",
-        "On vous demande en urgence de résumer un document financier interne dont la sensibilité et l’autorisation IA ne sont pas claires. Quelle réaction est correcte ?",
-        "Présentation septembre 2026, slides 2 et 16 : en cas de doute sur le périmètre, s’arrêter et escalader avant toute transmission.",
+        "On vous demande en urgence de résumer un document financier interne contenant des prévisions non publiques. Personne n’a confirmé que ce document pouvait être traité par une IA. Quelle réaction est correcte ?",
+        "Présentation septembre 2026, slides 2 et 16 : lorsqu’une information non publique n’est pas explicitement autorisée, s’arrêter et demander une source permise avant toute transmission.",
         2,
         [
-          ["Le charger dans Chat en précisant dans le prompt qu’il est confidentiel.", "Incorrect. Mentionner la confidentialité ne crée pas une autorisation d’usage."],
-          ["Le déposer dans Work parce que la demande est urgente.", "Incorrect. L’urgence ne remplace pas la classification ou l’autorisation."],
-          ["Suspendre l’usage de l’IA, demander la classification et l’autorisation, puis reprendre seulement avec un extrait permis.", "Correct. La règle d’arrêt protège le périmètre lorsque le statut du document est incertain."],
-          ["Traduire d’abord le document pour masquer sa nature financière.", "Incorrect. Une traduction ne change ni la sensibilité ni les restrictions du document."],
-          ["Retirer le logo Advancy avant de le transmettre à l’outil.", "Incorrect. La suppression du logo ne neutralise pas les informations confidentielles."]
+          ["Extraire uniquement les titres de sections pour que Chat propose la structure du résumé, puis compléter avec les chiffres hors de l’outil.", "Incorrect. Les titres peuvent eux-mêmes révéler le contenu du document et aucune autorisation n’a été confirmée."],
+          ["Utiliser Work en lecture seule et demander que les prévisions ne soient pas reprises dans la réponse finale.", "Incorrect. L’exclusion dans la sortie n’empêche pas la transmission initiale des prévisions à l’outil."],
+          ["Bloquer l’usage du document, prévenir le demandeur et proposer en attendant un gabarit générique construit sans son contenu, jusqu’à réception d’une version autorisée.", "Correct. La réponse protège les informations tout en permettant d’avancer sur la structure sans exposer le document."],
+          ["Demander à un collègue de paraphraser les prévisions, puis utiliser cette reformulation comme entrée.", "Incorrect. Une paraphrase conserve la substance non publique et ne crée pas d’autorisation."],
+          ["Rédiger manuellement un premier résumé, puis utiliser l’IA uniquement pour en améliorer le style.", "Incorrect. Le résumé manuel contient encore les informations issues du document non autorisé."]
         ]
       ),
       question(
         "scenario",
         "Communication · Idée d’agent",
-        "Après la formation, vous souhaitez suggérer un agent pour préparer les communications récurrentes de l’équipe ADMIN. Quelle description est la plus utile et la plus sûre ?",
+        "Vous proposez un agent pour préparer chaque lundi une communication interne à partir de consignes validées. Les faits doivent être traçables et aucun message ne doit partir sans approbation. Quelle spécification est la plus solide ?",
         "Présentation septembre 2026, slides 8, 14 et 16 : décrire le processus, les entrées autorisées, la sortie, les contrôles et les cas d’escalade.",
         1,
         [
-          ["Un agent qui lit tous les e-mails et envoie automatiquement les réponses appropriées.", "Incorrect. Le périmètre, les permissions, les garde-fous et la validation sont absents."],
+          ["Un agent qui lit les e-mails du dossier ADMIN, produit et envoie le message, avec un contrôle humain aléatoire une fois par mois.", "Incorrect. L’accès est trop large et l’échantillonnage a posteriori ne respecte pas l’approbation exigée pour chaque envoi."],
           ["Un agent qui transforme des consignes internes autorisées en brouillons, cite ses sources, signale les informations manquantes et attend une validation avant envoi.", "Correct. Le cas d’usage précise la donnée, la sortie, la traçabilité et la décision humaine."],
-          ["Un agent très intelligent pour faire gagner du temps à tout le monde.", "Incorrect. La formulation ne définit ni tâche, ni entrée, ni livrable, ni contrôle."],
-          ["Un agent qui centralise des informations RH, finance et fournisseurs dans une base unique.", "Incorrect. Cette centralisation élargit inutilement l’accès à des données potentiellement sensibles."],
-          ["Un agent qui choisit seul le bon destinataire et le bon moment d’envoi.", "Incorrect. Les décisions de diffusion doivent rester explicites et contrôlées."]
+          ["Un agent qui utilise uniquement les consignes validées et cite ses sources, mais complète les informations manquantes à partir des communications précédentes.", "Incorrect. La traçabilité est prévue, mais la réutilisation de faits antérieurs peut introduire des informations périmées ou non autorisées."],
+          ["Un agent qui centralise les consignes de communication, les informations RH et les données fournisseurs, puis soumet chaque brouillon à validation.", "Incorrect. La validation finale est correcte, mais le périmètre de données est beaucoup plus large que le besoin."],
+          ["Un agent qui produit un brouillon sourcé et laisse l’utilisateur choisir les destinataires, mais publie automatiquement dès que le texte n’est pas modifié pendant 24 heures.", "Incorrect. L’absence de modification n’équivaut pas à une approbation explicite."]
         ]
       ),
       question(
         "scenario",
         "Agenda · Cas intégré ADMIN",
-        "Vous organisez un séminaire interne : agenda, e-mails, traduction d’une invitation, suivi Excel et réponses de support, à partir de contenus autorisés. Quel enchaînement est le plus solide ?",
+        "Vous organisez un séminaire interne : agenda évolutif, invitation bilingue, suivi Excel des inscriptions et FAQ logistique. Les sources sont autorisées, mais chaque communication externe doit être approuvée. Quel plan de travail est le plus solide ?",
         "Présentation septembre 2026, synthèse des slides 2, 5, 7, 8, 12 et 16.",
         3,
         [
-          ["Ouvrir tous les dossiers disponibles dans Work, puis décider des livrables à la fin.", "Incorrect. Le périmètre, les sources et les livrables doivent être définis avant l’exécution."],
-          ["Utiliser Chat pour tout produire en une seule réponse, puis envoyer les éléments si l’ensemble paraît cohérent.", "Incorrect. Le cas combine fichiers, outils, contrôles et actions qui exigent un workflow structuré."],
-          ["Créer immédiatement un assistant permanent qui gère seul agenda, e-mails et support.", "Incorrect. La méthode et les garde-fous doivent d’abord être testés et validés."],
-          ["Classifier les contenus, définir brief et permissions, choisir Chat ou Work par tâche, vérifier chaque livrable, puis faire valider les envois.", "Correct. L’enchaînement couvre autorisation, choix d’outil, qualité, preuve et responsabilité humaine."],
-          ["Utiliser le modèle le plus avancé pour réduire le besoin de contrôles.", "Incorrect. Un modèle plus puissant ne supprime ni les permissions, ni les vérifications, ni l’approbation finale."]
+          ["Utiliser Work pour produire tous les livrables en une seule exécution, puis effectuer une revue globale juste avant les envois.", "Incorrect. Une revue uniquement finale risque de laisser se propager une erreur d’agenda dans la traduction, le suivi et la FAQ."],
+          ["Traiter chaque livrable dans un Chat séparé avec un extrait adapté, puis consolider manuellement les versions approuvées.", "Incorrect. La minimisation est bonne, mais la fragmentation rend difficile la cohérence entre l’agenda, l’invitation, l’Excel et la FAQ."],
+          ["Créer un assistant dédié au séminaire après un premier brouillon satisfaisant et lui confier les mises à jour jusqu’au jour J.", "Incorrect. Un premier résultat ne suffit pas à stabiliser les règles, les exceptions et les validations d’un processus évolutif."],
+          ["Vérifier que chaque source est autorisée et sans donnée exclue, définir brief et permissions, choisir Chat ou Work, contrôler les livrables, puis faire valider les envois.", "Correct. L’enchaînement couvre autorisation, choix d’outil, qualité, preuve et responsabilité humaine."],
+          ["Utiliser Work avec des accès en lecture aux dossiers du séminaire, automatiser les mises à jour et demander une validation uniquement pour les e-mails externes.", "Incorrect. Les permissions sont raisonnables, mais les mises à jour de l’agenda et du suivi doivent aussi être contrôlées car elles alimentent les communications."]
         ]
       )
     ],

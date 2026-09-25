@@ -31,7 +31,7 @@ L’accès public est désactivé. Le questionnaire exige une invitation individ
 
 | Thème de la présentation | Slides | Questions |
 |---|---:|---:|
-| Classification, restrictions, minimisation et escalade | 2 | 1 à 5, 18 |
+| Autorisations, restrictions, minimisation et escalade | 2 | 1 à 5, 18 |
 | Responsabilité humaine | 3 | 4, 14 |
 | Choix entre Chat, Work, assistant et Codex | 4 à 7 | 6 à 8, 16, 17, 20 |
 | Permissions et moindre privilège | 7 | 8, 20 |
@@ -47,8 +47,10 @@ L’accès public est désactivé. Le questionnaire exige une invitation individ
 
 - Chaque question se rattache à une ou plusieurs slides identifiées.
 - Tous les scénarios appartiennent à une activité ADMIN explicitement demandée.
+- Les situations décrivent directement les informations autorisées, exclues ou non confirmées ; aucune taxonomie par couleur n’est requise pour répondre.
 - Une option seulement satisfait pleinement le scénario.
-- Les distracteurs représentent des erreurs plausibles : outil approuvé confondu avec donnée autorisée, limite de dix pages traitée comme une permission, accès trop large, action externe non validée, ou modèle puissant utilisé comme substitut au cadrage.
+- Chaque scénario impose un arbitrage entre au moins deux dimensions : vitesse, périmètre d’accès, qualité, coût, traçabilité ou responsabilité.
+- Les distracteurs sont volontairement plausibles : ils appliquent une partie de la bonne méthode mais omettent un contrôle déterminant, élargissent légèrement le périmètre ou déplacent le risque vers la revue humaine.
 - Les formulations « toutes les réponses » et « aucune des réponses » sont exclues.
 - La position des bonnes réponses est équilibrée afin de supprimer un indice de structure.
 - Les corrections expliquent la règle en jeu sans seulement répéter « vrai » ou « faux ».
@@ -56,4 +58,4 @@ L’accès public est désactivé. Le questionnaire exige une invitation individ
 
 ## Validation automatisée
 
-Le script `scripts/validate-french-quiz.mjs` vérifie la structure, l’unicité, les longueurs, les explications, les huit activités ADMIN, l’accès sur invitation, la couverture des slides, l’équilibre A-E et l’identité de la clé de correction entre le navigateur et le serveur.
+Le script `scripts/validate-french-quiz.mjs` vérifie la structure, l’unicité, un niveau minimal de contexte pour chaque arbitrage, l’absence de codes couleur, les explications, les huit activités ADMIN, l’accès sur invitation, la couverture des slides, l’équilibre A-E et l’identité de la clé de correction entre le navigateur et le serveur.

@@ -27,14 +27,20 @@ assert.equal(questions.length, 20, "the French assessment must contain exactly 2
 
 const questionTexts = new Set();
 const scenarioCount = questions.filter((question) => question.kind === "scenario").length;
-assert.ok(scenarioCount >= 14, "the assessment needs a strong majority of applied scenarios");
-assert.ok(questions.some((question) => question.kind === "qcm"), "the assessment also needs concise knowledge checks");
+assert.equal(scenarioCount, 17, "the assessment needs 17 applied scenarios");
+assert.equal(questions.length - scenarioCount, 3, "the assessment needs 3 concise knowledge checks");
+assert.doesNotMatch(
+  JSON.stringify(questions),
+  /\b(?:orange|rouge|vert|verte|couleur)\b/i,
+  "the ADMIN questions must describe concrete permissions and risks without a color taxonomy"
+);
 
 questions.forEach((question, index) => {
   const label = `question ${index + 1}`;
   assert.ok(["scenario", "qcm"].includes(question.kind), `${label} needs a valid kind`);
   assert.ok(typeof question.theme === "string" && question.theme.trim(), `${label} needs a theme`);
   assert.ok(typeof question.q === "string" && question.q.trim(), `${label} needs text`);
+  assert.ok(question.q.length >= 120, `${label} needs enough context to support a judgment call`);
   assert.ok(question.q.length <= 360, `${label} is too long`);
   const normalizedQuestion = question.q.trim().toLocaleLowerCase("fr");
   assert.ok(!questionTexts.has(normalizedQuestion), `${label} duplicates another question`);
@@ -46,6 +52,7 @@ questions.forEach((question, index) => {
   const optionTexts = new Set();
   question.options.forEach((option, optionIndex) => {
     assert.ok(option && typeof option.text === "string" && option.text.trim(), `${label} option ${optionIndex + 1} needs text`);
+    assert.ok(option.text.length >= 55, `${label} option ${optionIndex + 1} is too simplistic`);
     assert.ok(option.text.length <= 280, `${label} option ${optionIndex + 1} is too long`);
     assert.ok(typeof option.why === "string" && option.why.trim(), `${label} option ${optionIndex + 1} needs feedback`);
     assert.ok(option.why.length <= 440, `${label} option ${optionIndex + 1} feedback is too long`);

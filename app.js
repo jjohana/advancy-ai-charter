@@ -220,7 +220,10 @@
   }
 
   function updateSectionContext() {
-    if (sectionLabelNode) sectionLabelNode.textContent = uiText("sectionContext");
+    if (sectionLabelNode) {
+      sectionLabelNode.hidden = false;
+      sectionLabelNode.textContent = uiText("sectionContext");
+    }
   }
 
   function configureAssessment() {
@@ -971,7 +974,10 @@
 
   function renderAccessGate() {
     if (!cardNode) return;
-    if (sectionLabelNode) sectionLabelNode.textContent = uiText("secureAccess");
+    if (sectionLabelNode) {
+      sectionLabelNode.textContent = uiText("secureAccess");
+      sectionLabelNode.hidden = Boolean(config.focusedFeedback);
+    }
     cardNode.replaceChildren();
     const section = document.createElement("section");
     section.className = "access-gate";

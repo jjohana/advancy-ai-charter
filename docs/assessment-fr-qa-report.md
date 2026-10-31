@@ -1,87 +1,81 @@
-# Revue qualité du questionnaire français — ADMIN
+# Evaluation IA - ADMIN — revue du 31 octobre 2026
 
-## Périmètre
+Référence : présentation française de 16 slides pour la formation Advancy du 2 novembre 2026.
+20 questions relues : 3 conservées avec leurs références actualisées, 6 refondues et 11 remplacées.
+Le questionnaire conserve 17 mises en situation, 3 questions de repérage, cinq options par question, une seule réponse correcte et un seuil de 70 %.
+Les positions A–E sont équilibrées : quatre bonnes réponses par lettre. Tous les choix ont une explication.
 
-Le questionnaire est réservé aux équipes ADMIN. Il reprend exclusivement les messages de la présentation `Advancy_Generative_AI_Overview_September_2026.pptx` et les transpose dans huit activités demandées : communication, e-mails, traduction, Excel, support, finance, RH et gestion d’agenda.
+## Revue question par question
 
-L’accès public est désactivé. Le questionnaire exige une invitation individuelle ou un lien d’inscription protégé affecté à la campagne ADMIN.
-
-## Architecture pédagogique
-
-- 20 questions, cinq options et une seule réponse correcte par question.
-- 17 mises en situation ADMIN et 3 questions de repérage.
-- Seuil de réussite : 70 %, soit 14 bonnes réponses.
-- Répartition exacte des bonnes réponses : 4 en A, 4 en B, 4 en C, 4 en D et 4 en E.
-- Correction immédiate de chaque option, y compris des distracteurs.
-
-## Couverture des activités ADMIN
-
-| Activité | Questions | Situations principales |
-|---|---:|---|
-| Communication | 1, 14, 19 | Communication interne, validation finale, idée d’agent |
-| E-mails | 4, 6 | Annonce de procédure, rappel de réservation |
-| Traduction | 3, 11 | Minimisation du contenu, choix du modèle |
-| Excel | 7, 13, 17 | Consolidation, contrôle de factures, skill Codex |
-| Support | 5, 8, 16 | Outil approuvé, permissions, assistant no-code |
-| Finance | 2, 9, 18 | Données sensibles, comparaison d’offres, escalade |
-| RH | 10, 12 | Crédits, FAQ d’onboarding |
-| Agenda | 15, 20 | Chat Project, organisation d’un séminaire |
+| N° | Ancien thème | Décision et motif | Nouveau thème | Slides |
+|---|---|---|---|---|
+| 1 | Communication · Charte IA | Conservée, références actualisées. La situation est cohérente avec la Charte et la FAQ actuelles. Les anciens renvois sont remplacés par les slides 2 et 16. | Communication · Charte IA | 2, 16 |
+| 2 | Finance · Données interdites | Remplacée. L’ancien cas de paiements financiers ne couvrait pas le recrutement présenté le 2 novembre. | Recrutement · Données autorisées | 2, 7 |
+| 3 | Traduction · Minimisation | Conservée, références actualisées. La question de traduction reste pertinente. Le glossaire est désormais relié explicitement à la slide 13, sans assimiler dix pages à une permission de dépôt. | Traduction · Minimisation | 2, 13 |
+| 4 | Mail · Revue humaine | Remplacée. L’ancienne question de relecture de mail répétait les contrôles déjà évalués. Elle ne testait pas les nouveautés de la slide 3. | Nouveautés · Capacités et autorisations | 2, 3 |
+| 5 | Support · Outil approuvé | Conservée, références actualisées. La distinction entre outil approuvé et autorisation du contenu est directement présente dans la slide 2. | Support · Outil approuvé | 2 |
+| 6 | Mail · Choix de méthode | Refondue. La formulation précédente opposait trop fortement les environnements et utilisait des numéros de slides devenus inexacts. | Chat, Work et Codex · Repères d’usage | 4, 16 |
+| 7 | Excel · Consolidation de fichiers | Remplacée. La consolidation logistique de l’ancien cas est remplacée par le compte rendu d’entretien réellement présenté. | Recrutement · Synthèse d’entretien | 7 |
+| 8 | Support · Permissions | Remplacée. Le contrôle générique des permissions est remplacé par le cas écoles/PPT de la slide 8. | Recrutement · Présentation écoles | 8 |
+| 9 | Finance · Qualité du brief | Refondue. Le principe du brief est conservé, mais la comparaison d’offres financières est recentrée sur le KPI recrutement du support actuel. | Brief · Tableau de bord recrutement | 5, 9 |
+| 10 | RH · Crédits | Refondue. La gouvernance des crédits reste dans la FAQ actuelle. La question est rattachée au plafond rappelé dans le support, sans inventer un tarif de modèle. | Usage · Crédits et validation | 3, 16 |
+| 11 | Traduction · Modèle et effort | Remplacée. L’ancien réglage de modèle pour une traduction ne couvrait pas la nouvelle slide sur les qualités et la reformulation par l’IA. | Qualités IA · Précision verbale et créativité | 5, 6 |
+| 12 | RH · Choix du workflow | Remplacée. Le cas de FAQ RH incomplet est remplacé par l’esprit critique et l’itération, explicitement enseignés en slide 6. | Qualités IA · Esprit critique et persévérance | 5, 6 |
+| 13 | Excel · Fiabilité des résultats | Remplacée. Le contrôle de factures et l’échantillonnage n’étaient pas enseignés dans le support actuel. Le cas est remplacé par les conversions de la slide 9. | Recrutement · KPI et dénominateurs | 9 |
+| 14 | Communication · Validation finale | Remplacée. Une seconde question générique de validation de note est remplacée par le cas LinkedIn/newsletter absent de l’ancienne banque. | Marketing · LinkedIn et newsletter | 10 |
+| 15 | Agenda · Continuité du travail | Refondue. Le cas de comité est élargi à la distinction projet/skill réellement enseignée en slide 15, sans exiger qu’un skill soit uniquement du code. | Projets et skills · Contexte et méthode | 15 |
+| 16 | Support · Assistant no-code | Remplacée. Les seuils fictifs d’un assistant FAQ sont remplacés par le rétroplanning interactif de la slide 11. | Événements · Rétroplanning interactif | 11 |
+| 17 | Excel · Automatisation répétable | Refondue. Le cas technique est conservé mais recentré sur le suivi recrutement, avec un rôle de Codex cohérent avec la slide 4. | Codex · Transformations récurrentes | 4, 5, 9, 15 |
+| 18 | Finance · Escalade | Remplacée. La nouvelle question couvre la slide Canva/météo, absente de l’ancienne banque, sans promettre une automatisation non testée. | Marketing · Météo et Canva | 12 |
+| 19 | Communication · Idée d’agent | Refondue. Le brouillon de communication devient le rappel récurrent précisément présenté, avec ses contrôles de destinataires, fraîcheur et doublons. | Automatisations · Rappel, brouillon et envoi | 14, 16 |
+| 20 | Agenda · Cas intégré ADMIN | Remplacée. Le cas intégré de séminaire est remplacé par la transformation de notes en compte rendu, désormais explicitement évaluée. | Documents · Notes en compte rendu | 13 |
 
 ## Couverture du support
 
-| Thème de la présentation | Slides | Questions |
-|---|---:|---:|
-| Autorisations, restrictions, minimisation et escalade | 2 | 1 à 5, 18 |
-| Responsabilité humaine | 3 | 4, 14 |
-| Choix entre Chat, Work, assistant et Codex | 4 à 7 | 6 à 8, 16, 17, 20 |
-| Permissions et moindre privilège | 7 | 8, 20 |
-| Brief et format de sortie | 8 | 9, 12, 19, 20 |
-| Crédits et approbation | 9 | 10 |
-| Modèle et effort de raisonnement | 10 et 11 | 11, 12 |
-| Revue de l’évidence et règle d’arrêt | 12 et 16 | 13, 14, 18, 20 |
-| Chat Projects | 13 | 15 |
-| Assistant no-code | 14 | 16, 19 |
-| Skills Codex | 15 | 17 |
+| Slide | Questions |
+|---|---|
+| 2 | 1, 2, 3, 4, 5 |
+| 3 | 4, 10 |
+| 4 | 6, 17 |
+| 5 | 9, 11, 12, 17 |
+| 6 | 11, 12 |
+| 7 | 2, 7 |
+| 8 | 8 |
+| 9 | 9, 13, 17 |
+| 10 | 14 |
+| 11 | 16 |
+| 12 | 18 |
+| 13 | 3, 20 |
+| 14 | 19 |
+| 15 | 15, 17 |
+| 16 | 1, 6, 10, 19 |
 
-## Contrôles appliqués
+## Points de cohérence vérifiés
 
-- Chaque question se rattache à une ou plusieurs slides identifiées.
-- Tous les scénarios appartiennent à une activité ADMIN explicitement demandée.
-- Les situations décrivent directement les informations autorisées, exclues ou non confirmées ; aucune taxonomie par couleur n’est requise pour répondre.
-- Une option seulement satisfait pleinement le scénario.
-- Chaque scénario impose un arbitrage entre au moins deux dimensions : vitesse, périmètre d’accès, qualité, coût, traçabilité ou responsabilité.
-- Les distracteurs sont volontairement plausibles : ils appliquent une partie de la bonne méthode mais omettent un contrôle déterminant, élargissent légèrement le périmètre ou déplacent le risque vers la revue humaine.
-- Les formulations « toutes les réponses » et « aucune des réponses » sont exclues.
-- La position des bonnes réponses est équilibrée afin de supprimer un indice de structure.
-- Les corrections expliquent la règle en jeu sans seulement répéter « vrai » ou « faux ».
-- Les informations susceptibles d’évoluer, notamment les crédits et les modèles, sont explicitement rattachées au support de septembre 2026.
+- Autorisation du contenu distincte de l’approbation de l’outil ; anonymiser ne vaut pas autoriser.
+- Noms réels seulement si nécessaires et autorisés ; aucune décision d’embauche déléguée à l’IA.
+- Chat, Work et Codex présentés comme des repères d’usage, sans interdictions techniques artificielles.
+- Grille d’entretien, objets PowerPoint modifiables et dénominateurs des KPI conformes aux cas du support.
+- Références de style distinctes des faits nouveaux ; collecte météo distincte de la mise à jour Canva.
+- Automatisation : rappel, brouillon et envoi distingués ; échec de source, doublons et clôture traités.
+- Reformulation, créativité, esprit critique et persévérance évalués dans des situations concrètes.
+- Le plafond de crédits est présenté comme la règle interne rappelée par le support, sans en déduire de tarif par modèle.
 
-## Relecture pédagogique et parcours — 25 septembre 2026
+## Version et continuité
 
-Les 20 questions ont été relues. Les positions des bonnes réponses restent identiques à la clé du serveur.
+Version du questionnaire : `2026-11-02-admin-fr`. La version de septembre et sa clé sont conservées pour les résultats historiques.
+L’accès reste sur invitation, la notice conserve sa version et aucune donnée de participant n’est modifiée par cette révision.
+Le titre visible est « Evaluation IA - ADMIN ». La version anglaise et sa banque de questions restent inchangées.
 
-Corrections principales :
+## Contrôles réalisés
 
-- Q3 : existence du glossaire et absence de pertinence des autres sections rendues explicites.
-- Q5 : statut non confirmé de l’outil précisé.
-- Q6 : besoin ponctuel explicite ; suppression du nom de la bonne solution dans le thème.
-- Q7 : titre neutre et distracteur Codex recentré sur l’absence de validation des correspondances, plutôt que sur une exclusion générale de l’outil.
-- Q9 : comparaison factuelle sans estimation ni classement provisoire explicitement demandée.
-- Q12 : assistant destiné à traiter de nouvelles demandes, pour distinguer correction d’exemples et correction de la méthode.
-- Q13 : échantillonnage rattaché à une règle interne hypothétique du scénario, sans le présenter comme une règle universelle de contrôle financier.
-- Q15 et Q17 : retrait des noms de solutions dans les titres affichés avant réponse.
-- Q20 : dépendance entre les horaires et les livrables explicite ; réponse attendue fondée sur un agenda de référence et des contrôles à chaque changement.
+- Syntaxe JavaScript du client et du contrôleur : conforme.
+- Validation française : 20 questions, 17 scénarios, 3 questions de repérage, toutes les slides 2 à 16 couvertes, 100 explications et clés client/serveur identiques.
+- Banque anglaise et contrat unifié : inchangés et validés.
+- Tests du Worker : 17 réussis, dont maintien du corrigé de septembre et métadonnées de version des reçus.
+- Compilation Cloudflare en simulation : réussie, sans modification de D1.
+- Parcours navigateur local avec données fictives : les 20 questions et leurs corrections ont été parcourues ; une erreur volontaire conduit à 19/20 et 95 %.
+- Reprise d’un résultat de septembre : étiqueté comme antérieur ; il n’est pas affiché comme score du nouveau questionnaire.
+- Le stockage de l’invitation conserve le même espace de noms ; les réponses en cours sont déjà isolées par version du questionnaire.
 
-Parcours observé dans le navigateur local :
-
-1. Entrée : en-tête et panneau compacts ; consigne de choix contextualisée ; durée indicative. Capture avant : `output/admin-review/01-before.png`.
-2. Réponse et correction : bonne réponse et erreur testées ; votre choix puis réponse attendue ; explications restantes dépliables ; référence à la formation visible. Capture : `output/admin-review/02-correction.png`.
-3. Mobile à 390 px : pas de débordement horizontal (largeur de contenu 375 px), contrôles et textes lisibles. Capture : `output/admin-review/03-mobile.png`.
-4. Ordinateur à 1280 px : parcours des 20 questions, score local 20/20 ; reprise à la question 13 après actualisation ; annulation du redémarrage sans perte. Capture : `output/admin-review/04-desktop.png`.
-5. Fin : formulaire facultatif de satisfaction, commentaires et idées d’agents accessible. Capture : `output/admin-review/05-final.png`.
-
-Le contrôle suit le guide Product Design Audit pour la capture du parcours et les vérifications visuelles. Les captures de cette revue sont locales et ne sont pas des preuves de mise en production. Le formulaire final n’a pas été envoyé à la base de production. Aucun audit complet avec lecteur d’écran ni validation psychométrique auprès d’ADMIN réels n’a été réalisé. Les tests automatiques vérifient la structure et la notation ; la qualité pédagogique repose sur la relecture décrite ci-dessus.
-
-### Contrôles automatiques
-
-Le script `scripts/validate-french-quiz.mjs` vérifie la structure, l’unicité, un niveau minimal de contexte pour chaque arbitrage, l’absence de codes couleur, les explications, les huit activités ADMIN, l’accès sur invitation, la couverture des slides, l’équilibre A-E et l’identité de la clé de correction entre le navigateur et le serveur.
+La publication exige le service de score révisé avant le site statique.

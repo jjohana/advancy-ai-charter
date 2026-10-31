@@ -1,5 +1,6 @@
 export const QUIZ_VERSION = "2026-07-29";
-export const ADMIN_FRENCH_QUIZ_VERSION = "2026-09-25-admin-fr";
+export const ADMIN_FRENCH_QUIZ_VERSION = "2026-11-02-admin-fr";
+export const PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION = "2026-09-25-admin-fr";
 export const LEGACY_QUIZ_VERSION = "2026-07-09";
 
 const UNIFIED_KEY = Object.freeze([2, 0, 4, 1, 3, 1, 4, 0, 2, 3, 0, 4, 1, 2, 3, 4, 2, 1, 0, 3]);
@@ -19,8 +20,15 @@ const definitions = [
   },
   {
     id: "advancy-ai-admin-fr",
-    name: "Évaluation IA générative — ADMIN",
+    name: "Evaluation IA - ADMIN",
     version: ADMIN_FRENCH_QUIZ_VERSION,
+    passThreshold: 0.7,
+    answerKey: ADMIN_FRENCH_KEY
+  },
+  {
+    id: "advancy-ai-admin-fr",
+    name: "Évaluation IA générative — ADMIN",
+    version: PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION,
     passThreshold: 0.7,
     answerKey: ADMIN_FRENCH_KEY
   },
@@ -81,6 +89,7 @@ export const QUIZZES = new Map(definitions.map((quiz) => {
   return [`${immutable.id}@${immutable.version}`, immutable];
 }));
 export const QUIZ_IDS = Object.freeze([...new Set(definitions.map((quiz) => quiz.id))]);
+export const QUIZ_VERSIONS = Object.freeze([...new Set(definitions.map((quiz) => quiz.version))]);
 export const DEFAULT_QUIZ_IDS = Object.freeze(["advancy-ai-assessment-normal"]);
 export const LEGACY_QUIZ_IDS = Object.freeze([
   "advancy-ai-assessment-normal",

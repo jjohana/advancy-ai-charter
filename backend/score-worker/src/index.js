@@ -2,12 +2,13 @@ import {
   DEFAULT_QUIZ_IDS,
   LEGACY_QUIZ_VERSION,
   QUIZ_IDS,
+  QUIZ_VERSIONS,
   QUIZ_VERSION,
   findQuiz,
   scoreAnswers
 } from "./quizzes.js";
 
-const API_VERSION = "2.1.0";
+const API_VERSION = "2.2.0";
 const PUBLIC_HEADERS = new Set(["authorization", "content-type", "idempotency-key", "x-request-id"]);
 const ENROLLMENT_KEYS = new Set([
   "first_name",
@@ -413,7 +414,7 @@ export function sqliteTimestamp(value) {
   return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null;
 }
 
-function receiptFromAttempt(row) {
+export function receiptFromAttempt(row) {
   if (!row) return null;
   const score = {
     correct: Number(row.correct),
@@ -433,6 +434,8 @@ function receiptFromAttempt(row) {
   }
   return {
     receipt_id: row.receipt_id,
+    quiz_id: row.quiz_id,
+    quiz_version: row.quiz_version,
     submitted_at: sqliteTimestamp(row.submitted_at),
     attempt_number: Number(row.attempt_number),
     score
@@ -953,7 +956,7 @@ async function handleAdminExport(request, env, requestId) {
   const testId = url.searchParams.get("test_id");
   if (testId && !QUIZ_IDS.includes(testId)) throw new HttpError(400, "INVALID_TEST_ID", "test_id is invalid.");
   const quizVersion = url.searchParams.get("quiz_version");
-  if (quizVersion && ![QUIZ_VERSION, LEGACY_QUIZ_VERSION].includes(quizVersion)) {
+  if (quizVersion && !QUIZ_VERSIONS.includes(quizVersion)) {
     throw new HttpError(400, "INVALID_QUIZ_VERSION", "quiz_version is invalid.");
   }
   const cohortId = url.searchParams.get("cohort_id");

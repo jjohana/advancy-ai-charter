@@ -73,6 +73,8 @@
     assessmentRecorded: "Assessment recorded",
     assessmentAlreadyRecorded: "Assessment already recorded",
     latestResult: "Your latest recorded result and receipt are shown below.",
+    previousVersionResult: "Result from an earlier assessment version",
+    previousVersionCopy: "This result belongs to version {version}. Start another attempt, if your invitation allows it, to take the current assessment.",
     startAnotherAttempt: "Start another attempt",
     chooseAnswer: "Choose one answer.",
     submitAnswer: "Submit answer",
@@ -675,8 +677,13 @@
         !validIsoTimestamp(value.submitted_at) || !Number.isInteger(value.attempt_number) || value.attempt_number < 1) {
       throw invalidContract();
     }
+    if (value.quiz_version !== undefined && (typeof value.quiz_version !== "string" || !/^[A-Za-z0-9-]{1,40}$/.test(value.quiz_version))) {
+      throw invalidContract();
+    }
+    if (value.quiz_id !== undefined && value.quiz_id !== config.quizId) throw invalidContract();
     return {
       receipt_id: value.receipt_id,
+      ...(value.quiz_version ? { quiz_version: value.quiz_version } : {}),
       submitted_at: new Date(value.submitted_at).toISOString(),
       attempt_number: value.attempt_number,
       score: validateScoreResult(value.score)
@@ -713,6 +720,8 @@
       ...payload,
       ...validateReceipt({
         receipt_id: payload.receipt_id,
+        quiz_id: payload.quiz_id,
+        quiz_version: payload.quiz_version,
         submitted_at: payload.submitted_at,
         attempt_number: payload.attempt_number,
         score: payload.score
@@ -1182,16 +1191,23 @@
     }
   }
 
+  function isPreviousVersion(receipt) {
+    return Boolean(receipt && receipt.quiz_version && receipt.quiz_version !== config.quizVersion);
+  }
+
   function renderCompletedGate() {
-    if (sectionLabelNode) sectionLabelNode.textContent = uiText("assessmentRecorded");
+    const previous = isPreviousVersion(state.recoveredSubmission);
+    if (sectionLabelNode) sectionLabelNode.textContent = uiText(previous ? "previousVersionResult" : "assessmentRecorded");
     cardNode.replaceChildren();
     const section = document.createElement("section");
     section.className = "access-gate completed-gate";
     section.dataset.testid = "recorded-attempt";
     const title = document.createElement("h2");
-    title.textContent = uiText("assessmentAlreadyRecorded");
+    title.textContent = uiText(previous ? "previousVersionResult" : "assessmentAlreadyRecorded");
     const copy = document.createElement("p");
-    copy.textContent = uiText("latestResult");
+    copy.textContent = previous
+      ? uiText("previousVersionCopy", { version: state.recoveredSubmission.quiz_version })
+      : uiText("latestResult");
     section.append(title, copy);
     if (state.session && state.session.can_submit) {
       const another = document.createElement("button");
@@ -1501,6 +1517,7 @@
     const total = Number(scoreResult.total);
     const percent = Number(scoreResult.percent);
     const passed = scoreResult.passed;
+    const previous = isPreviousVersion(response);
     resultNode.replaceChildren();
     resultNode.setAttribute("aria-busy", "false");
     resultNode.style.display = "block";
@@ -1508,12 +1525,14 @@
     const title = document.createElement("h2");
     title.className = "result-title";
     title.tabIndex = -1;
-    title.textContent = (passed ? uiText("passed") : uiText("notPassed")) +
+    title.textContent = (previous ? uiText("previousVersionResult") : passed ? uiText("passed") : uiText("notPassed")) +
       " - " + correct + "/" + total + " (" + percent + "%)";
     const copy = document.createElement("p");
     copy.className = "result-copy save-status save-ok";
     copy.setAttribute("role", "status");
-    copy.textContent = recovered
+    copy.textContent = previous
+      ? uiText("previousVersionCopy", { version: response.quiz_version })
+      : recovered
       ? uiText("recoveredResult")
       : uiText("recordedResult");
     const receipt = document.createElement("p");
@@ -1543,7 +1562,7 @@
       resultNode.append(sectionTitle, sectionList);
     }
     resultNode.appendChild(receipt);
-    if (scoreNode) scoreNode.textContent = correct + " / " + total;
+    if (scoreNode) scoreNode.textContent = previous ? "— / " + questions.length : correct + " / " + total;
     window.requestAnimationFrame(function () { title.focus(); });
   }
 

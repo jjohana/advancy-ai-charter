@@ -1,5 +1,11 @@
 .admin-assessment .masthead { grid-template-columns: 180px 1fr; gap: 24px; padding: 24px 0; }
 .admin-assessment .logo { width: 180px; }
+.admin-assessment .training-provider { background: #fff; color: var(--advancy-blue); border-bottom: 1px solid var(--line); }
+.admin-assessment .training-provider-inner { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
+.admin-assessment .training-provider-logo { display: block; width: 56px; height: 56px; flex: 0 0 56px; object-fit: contain; }
+.admin-assessment .training-provider-label { display: block; color: #565d65; font-size: .75rem; }
+.admin-assessment .training-provider-copy p { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; margin: 0; font-size: .9rem; }
+.admin-assessment .training-provider-copy strong { font-size: 1.1rem; }
 .admin-assessment h1 { font-size: clamp(1.7rem, 3vw, 2.5rem); line-height: 1.15; }
 .admin-assessment .headline { text-align: left; justify-items: start; }
 .admin-assessment .question-heading h2 { font-size: clamp(1.15rem, 2vw, 1.45rem); line-height: 1.4; }

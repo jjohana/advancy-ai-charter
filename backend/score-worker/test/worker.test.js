@@ -19,6 +19,7 @@ import {
   DEFAULT_QUIZ_IDS,
   ADMIN_FRENCH_QUIZ_VERSION,
   PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION,
+  FIRST_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION,
   LEGACY_QUIZ_IDS,
   LEGACY_QUIZ_VERSION,
   QUIZ_IDS,
@@ -37,6 +38,7 @@ const EXPECTED_DEFINITIONS = [
   { id: "advancy-ai-assessment-normal", version: QUIZ_VERSION, key: UNIFIED_KEY },
   { id: "advancy-ai-admin-fr", version: ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
   { id: "advancy-ai-admin-fr", version: PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
+  { id: "advancy-ai-admin-fr", version: FIRST_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
   { id: "advancy-ai-assessment-normal", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...COMBINED_NORMAL_KEY] },
   { id: "advancy-ai-assessment-advanced", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...USAGE_ADVANCED_KEY] },
   { id: "advancy-ai-charter", version: LEGACY_QUIZ_VERSION, key: CHARTER_KEY },
@@ -111,7 +113,10 @@ test("the unified assessment has 20 balanced answer positions", () => {
 });
 
 test("the revised French assessment preserves previous scoring and labels historical receipts", () => {
-  assert.equal(ADMIN_FRENCH_QUIZ_VERSION, "2026-11-02-admin-fr");
+  assert.equal(ADMIN_FRENCH_QUIZ_VERSION, "2026-11-02-admin-fr-r2");
+  const firstNovember = findQuiz("advancy-ai-admin-fr", FIRST_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION);
+  assert.equal(scoreAnswers(firstNovember, ADMIN_FRENCH_KEY).percent, 100);
+  assert.notEqual(firstNovember.version, ADMIN_FRENCH_QUIZ_VERSION);
   const current = findQuiz("advancy-ai-admin-fr", ADMIN_FRENCH_QUIZ_VERSION);
   const previous = findQuiz("advancy-ai-admin-fr", PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION);
   assert.equal(current.name, "Evaluation IA - ADMIN");

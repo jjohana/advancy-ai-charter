@@ -40,8 +40,8 @@ questions.forEach((question, index) => {
   assert.ok(["scenario", "qcm"].includes(question.kind), `${label} needs a valid kind`);
   assert.ok(typeof question.theme === "string" && question.theme.trim(), `${label} needs a theme`);
   assert.ok(typeof question.q === "string" && question.q.trim(), `${label} needs text`);
-  assert.ok(question.q.length >= 120, `${label} needs enough context to support a judgment call`);
-  assert.ok(question.q.length <= 360, `${label} is too long`);
+  assert.ok(question.q.length >= 60, `${label} needs a clear, self-contained question`);
+  assert.ok(question.q.length <= 260, `${label} is too long for this introductory assessment`);
   const normalizedQuestion = question.q.trim().toLocaleLowerCase("fr");
   assert.ok(!questionTexts.has(normalizedQuestion), `${label} duplicates another question`);
   questionTexts.add(normalizedQuestion);
@@ -55,8 +55,8 @@ questions.forEach((question, index) => {
   const optionTexts = new Set();
   question.options.forEach((option, optionIndex) => {
     assert.ok(option && typeof option.text === "string" && option.text.trim(), `${label} option ${optionIndex + 1} needs text`);
-    assert.ok(option.text.length >= 35, `${label} option ${optionIndex + 1} is too simplistic`);
-    assert.ok(option.text.length <= 280, `${label} option ${optionIndex + 1} is too long`);
+    // Short labels and numerical choices are valid; clarity does not require padding.
+    assert.ok(option.text.length <= 160, `${label} option ${optionIndex + 1} is too long`);
     assert.ok(typeof option.why === "string" && option.why.trim(), `${label} option ${optionIndex + 1} needs feedback`);
     assert.ok(option.why.length <= 440, `${label} option ${optionIndex + 1} feedback is too long`);
     const normalizedOption = option.text.trim().toLocaleLowerCase("fr");

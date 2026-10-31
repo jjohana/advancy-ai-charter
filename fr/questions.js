@@ -7,7 +7,8 @@
     "date": "2026-11-02",
     "slideCount": 16,
     "title": "L’IA chez Advancy",
-    "revision": "2026-11-02-admin-fr-r2"
+    "revision": "2026-11-02-admin-fr-r2",
+    "feedbackRevision": "2026-10-31-feedback-1"
   },
   "questions": [
     {
@@ -23,23 +24,23 @@
       "options": [
         {
           "text": "Toutes les notes, en demandant à l’IA de retirer les noms.",
-          "why": "Incorrect. Les noms seraient déjà transmis avant leur retrait par l’IA."
+          "why": "Incorrect. Les noms seraient déjà transmis à l’IA avant leur retrait dans la réponse. Une consigne d’anonymisation ne respecte donc pas l’exclusion donnée par le responsable. Préparez d’abord un extrait sans noms, limité aux informations autorisées, en utilisant les rôles utiles."
         },
         {
           "text": "Les notes et l’annuaire pour identifier les collègues.",
-          "why": "Incorrect. L’annuaire ajouterait des noms explicitement exclus."
+          "why": "Incorrect. L’annuaire ajoute précisément les noms que le responsable a exclus. Il ne faut pas compléter le contexte avec des informations non autorisées. Retirez les noms des notes et utilisez les rôles nécessaires au message ; l’annuaire reste hors de la transmission."
         },
         {
           "text": "Un extrait autorisé sans noms, en utilisant les rôles utiles.",
-          "why": "Correct. Retirez les noms avant l’envoi à l’IA. Le support recommande les rôles ; les noms réels exigent nécessité et autorisation."
+          "why": "Correct. L’exclusion porte sur les données transmises, pas seulement sur le mail final. Retirez les noms avant de copier les notes et ne gardez que l’extrait autorisé utile. Les rôles peuvent suffire ; des noms réels ne sont utilisables que s’ils sont nécessaires et autorisés. Le responsable relit ensuite le résultat."
         },
         {
           "text": "Les notes avec les noms, mais sans les afficher dans le mail final.",
-          "why": "Incorrect. Ne pas afficher un nom dans la sortie n’empêche pas sa transmission."
+          "why": "Incorrect. Ne pas afficher un nom dans le mail final n’empêche pas sa présence dans les notes reçues par l’IA. Le choix enfreint donc l’exclusion dès l’entrée. Il faut retirer les noms avant la transmission, puis rédiger à partir des informations autorisées et des rôles utiles."
         },
         {
           "text": "Le fichier complet avec les noms masqués à l’écran.",
-          "why": "Incorrect. Masquer les noms à l’écran ne les retire pas du fichier."
+          "why": "Incorrect. Masquer les noms à l’écran ne signifie pas les supprimer du fichier transmis. Le fichier complet peut donc encore contenir les informations exclues. Créez un extrait distinct dont les noms sont réellement retirés, vérifiez son contenu, puis transmettez uniquement cet extrait autorisé."
         }
       ]
     },
@@ -56,23 +57,23 @@
       "options": [
         {
           "text": "Le dossier candidat complet, pour conserver le contexte.",
-          "why": "Incorrect. Le dossier complet dépasse les notes autorisées."
+          "why": "Incorrect. Le dossier complet peut contenir d’autres informations que les notes autorisées. Le besoin de contexte ne donne pas l’autorisation de les transmettre. Créez un extrait des seules notes validées, contrôlez-le et utilisez un identifiant candidat avant de le fournir à l’IA."
         },
         {
           "text": "Le dossier complet, après remplacement du nom par un identifiant.",
-          "why": "Incorrect. Changer le nom ne rend pas les autres données du dossier autorisées."
+          "why": "Incorrect. Remplacer le nom par un identifiant ne retire pas les autres informations du dossier et ne les rend pas autorisées. Il faut d’abord limiter le contenu aux seules notes validées. L’identifiant candidat s’ajoute à cette sélection ; il ne remplace pas l’autorisation sur les données."
         },
         {
           "text": "Le dossier complet, avec les rubriques non autorisées masquées.",
-          "why": "Incorrect. Les rubriques masquées restent dans le fichier transmis."
+          "why": "Incorrect. Des rubriques masquées restent dans le fichier complet : leur invisibilité à l’écran ne garantit pas leur retrait. Préparez un nouveau fichier contenant uniquement les notes autorisées, vérifiez qu’il ne conserve pas les autres rubriques, puis utilisez un identifiant candidat."
         },
         {
           "text": "Un accès en lecture seule au dossier candidat complet.",
-          "why": "Incorrect. La lecture seule ne limite pas les informations accessibles."
+          "why": "Incorrect. La lecture seule limite la modification du dossier, pas les informations auxquelles l’outil a accès. Le dossier complet dépasse toujours le périmètre autorisé. Fournissez un extrait contrôlé des seules notes validées, avec un identifiant candidat."
         },
         {
           "text": "Un extrait vérifié des seules notes autorisées, avec un identifiant candidat.",
-          "why": "Correct. L’extrait respecte l’autorisation. Le support prévoit un identifiant candidat et une décision prise par le recruteur habilité."
+          "why": "Correct. Le contenu transmis reste dans le périmètre autorisé, et l’identifiant évite d’ajouter le nom sans nécessité. L’IA utilise ces notes avec la grille approuvée, conserve les rubriques, distingue propos et observations et n’invente ni note ni citation. Le recruteur habilité valide l’évaluation et prend la décision."
         }
       ]
     },
@@ -89,23 +90,23 @@
       "options": [
         {
           "text": "La procédure complète, pour ajouter du contexte.",
-          "why": "Incorrect. Le support demande le plus petit extrait autorisé utile à la tâche."
+          "why": "Incorrect. La tâche porte sur deux paragraphes ; la procédure complète ajoute du contenu qui n’est pas nécessaire à cette demande. Le support demande le plus petit extrait autorisé utile. Transmettez les deux paragraphes et les entrées pertinentes du glossaire, sans élargir le dépôt pour le seul confort du contexte."
         },
         {
           "text": "Les deux paragraphes et les entrées utiles du glossaire.",
-          "why": "Correct. Le texte à traduire et le vocabulaire validé apportent les informations nécessaires. Il faut ensuite vérifier le sens et les chiffres."
+          "why": "Correct. Les paragraphes apportent le texte à traduire et le glossaire fixe le vocabulaire à respecter. Ne fournissez que les entrées utiles et autorisées. Après traduction, vérifiez le sens, la terminologie, les noms et les chiffres ; signalez les formulations ambiguës plutôt que de les résoudre au hasard."
         },
         {
           "text": "Les deux paragraphes sans le glossaire.",
-          "why": "Incorrect. Le glossaire fixe ici la terminologie à respecter."
+          "why": "Incorrect. Le texte est présent, mais la référence terminologique demandée manque. L’IA risque d’employer une autre traduction des termes alors qu’un choix a déjà été validé. Joignez les entrées utiles du glossaire et vérifiez que le texte traduit les respecte sans modifier le sens."
         },
         {
           "text": "Uniquement le glossaire, sans les paragraphes.",
-          "why": "Incorrect. Le glossaire ne contient pas le texte à traduire."
+          "why": "Incorrect. Le glossaire indique comment traduire les termes ; il ne remplace pas les deux paragraphes à traduire. L’IA ne doit pas reconstituer le contenu absent. Fournissez les paragraphes autorisés et les seules entrées utiles du glossaire, puis contrôlez le sens de la traduction."
         },
         {
           "text": "Un résumé des deux paragraphes, à traduire.",
-          "why": "Incorrect. Traduire un résumé ne restitue pas intégralement les deux paragraphes."
+          "why": "Incorrect. Un résumé peut omettre des précisions ou des nuances du texte source. Le traduire ne répond donc pas à la demande de traduction intégrale des deux paragraphes. Utilisez le texte original autorisé avec le glossaire, puis vérifiez que le résultat conserve le sens et les informations."
         }
       ]
     },
@@ -113,31 +114,32 @@
       "kind": "qcm",
       "theme": "Nouveautés · Tâches d’équipe Work",
       "q": "Une tâche d’équipe est lancée dans Work. Qui doit valider le résultat avant son utilisation ?",
-      "source": "Formation Advancy du 2 novembre 2026, slide 3 : désigner un responsable pour les tâches partagées et vérifier les accès aux nouvelles fonctions.",
+      "source": "Formation Advancy du 2 novembre 2026, slides 2, 3 : validation humaine par un responsable désigné ; accès et autorisations vérifiés pour les tâches partagées.",
       "slides": [
+        2,
         3
       ],
       "correct": 3,
       "options": [
         {
           "text": "La première personne qui ouvre le fichier.",
-          "why": "Incorrect. Ouvrir un fichier ne désigne pas son valideur."
+          "why": "Incorrect. L’ouverture du fichier ne désigne pas automatiquement la personne chargée de le valider. Cette personne peut être le valideur si elle a été désignée, mais ce n’est pas le critère proposé ici. Il faut identifier le responsable de la tâche partagée et lui faire contrôler le résultat avant utilisation."
         },
         {
           "text": "L’IA, une fois la tâche terminée.",
-          "why": "Incorrect. L’IA ne remplace pas le responsable humain."
+          "why": "Incorrect. L’IA produit ou prépare le résultat, mais ne remplace pas la responsabilité humaine prévue par le support. La fin de la tâche ne vaut pas validation. Un responsable désigné doit vérifier le résultat et les autorisations applicables avant son utilisation."
         },
         {
           "text": "La personne qui a le moins de tâches en cours.",
-          "why": "Incorrect. La charge de travail ne désigne pas le valideur."
+          "why": "Incorrect. La disponibilité peut aider à répartir le travail, mais elle n’attribue pas à elle seule la responsabilité de validation. La personne retenue doit être explicitement désignée pour la tâche et contrôler le résultat avant utilisation, quel que soit son niveau de charge."
         },
         {
           "text": "Le responsable désigné pour cette tâche.",
-          "why": "Correct. Le support demande de désigner un responsable des tâches partagées. Les nouvelles fonctions restent soumises aux accès et autorisations Advancy."
+          "why": "Correct. Le travail partagé a besoin d’un responsable identifié pour éviter que chacun suppose la validation faite par un autre. Ce responsable contrôle l’exactitude, les sources et la confidentialité avant utilisation. Les nouvelles fonctions de Work restent soumises aux accès disponibles et aux autorisations Advancy."
         },
         {
           "text": "Personne, si le modèle utilisé est récent.",
-          "why": "Incorrect. Un modèle récent ne supprime pas la validation humaine."
+          "why": "Incorrect. Un modèle récent n’exonère pas l’équipe de contrôler les faits, les calculs, les sources et la confidentialité. La performance annoncée ne constitue pas une validation du cas traité. Il faut toujours un responsable désigné pour vérifier le résultat de la tâche partagée."
         }
       ]
     },
@@ -153,23 +155,23 @@
       "options": [
         {
           "text": "Obtenir l’approbation Advancy et utiliser le compte professionnel prévu.",
-          "why": "Correct. L’approbation de l’outil et du compte reste nécessaire, même pour un texte non sensible."
+          "why": "Correct. L’approbation de l’outil et l’usage du compte professionnel prévu sont deux conditions de départ. Le caractère non sensible du message et les réglages d’historique ne les remplacent pas. Vérifiez aussi que le contenu transmis est autorisé ; en cas de doute, consultez le Manager / Principal avant tout dépôt."
         },
         {
           "text": "L’utiliser si le texte ne contient aucun nom.",
-          "why": "Incorrect. L’absence de noms ne remplace pas l’approbation de l’outil."
+          "why": "Incorrect. L’absence de noms ne suffit pas à autoriser l’outil : le contrôle porte aussi sur le service et le compte utilisés. Un texte sans nom peut rester professionnel ou confidentiel. Faites confirmer l’approbation Advancy et utilisez l’accès professionnel prévu avant de transmettre le message."
         },
         {
           "text": "L’utiliser pour un seul essai.",
-          "why": "Incorrect. Un essai reste un usage du service non approuvé."
+          "why": "Incorrect. Un essai unique transmet déjà du contenu au service. Son caractère ponctuel ne remplace donc pas l’approbation de l’outil. Attendez la validation Advancy et utilisez le compte prévu ; pour cette formation, les exemples sont fictifs ou anonymisés et restent soumis aux règles internes."
         },
         {
           "text": "L’utiliser dès que l’historique est désactivé.",
-          "why": "Incorrect. Un réglage du fournisseur ne remplace pas l’approbation Advancy."
+          "why": "Incorrect. Désactiver l’historique est un réglage du fournisseur, pas une approbation Advancy du service. Cela ne donne aucune autorisation supplémentaire sur les données ou le compte. Faites confirmer l’outil et l’accès professionnel, puis limitez le contenu à l’extrait autorisé nécessaire."
         },
         {
           "text": "L’utiliser avec un compte personnel.",
-          "why": "Incorrect. Le support exclut l’utilisation d’un compte personnel pour ce travail."
+          "why": "Incorrect. Le support exclut le compte personnel pour ce travail professionnel. Il ne permet pas de contourner l’absence d’approbation du service et ne remplace pas l’accès Advancy prévu. Utilisez un outil approuvé avec le compte professionnel autorisé et faites clarifier tout doute avant le dépôt."
         }
       ]
     },
@@ -186,23 +188,23 @@
       "options": [
         {
           "text": "Reformuler une accroche LinkedIn dans une conversation.",
-          "why": "Incorrect. C’est l’exemple donné pour Chat dans le support."
+          "why": "Incorrect. L’accroche LinkedIn est l’exemple donné pour Chat : explorer ou reformuler un texte dans une conversation. La question demande l’exemple choisi pour Codex, à savoir une transformation répétée de fichiers dont on contrôle les scripts et les modifications. Ces repères ne sont pas des limites exclusives entre outils."
         },
         {
           "text": "Fiabiliser une transformation répétée de fichiers en contrôlant les modifications.",
-          "why": "Correct. Le repère Codex est le contrôle technique des scripts et transformations de fichiers. Work est illustré par un classeur à reprendre, Chat par une reformulation."
+          "why": "Correct. Le support illustre Codex par le contrôle technique : utiliser les fichiers locaux autorisés, voir les scripts et les modifications, puis fiabiliser une transformation répétée. Chat est illustré par une accroche LinkedIn et Work par un classeur à reprendre. Ce sont des repères d’usage, pas des interdictions d’utiliser un autre mode."
         },
         {
           "text": "Explorer une première idée par un échange de questions.",
-          "why": "Incorrect. Cet exemple relève du repère de conversation présenté pour Chat."
+          "why": "Incorrect. Explorer une idée par un échange correspond au repère de conversation présenté pour Chat. Ici, il faut reconnaître l’exemple Codex du support : contrôler et répéter une transformation de fichiers locaux. La distinction décrit les exemples enseignés, sans rendre les capacités des outils exclusives."
         },
         {
           "text": "Clarifier la demande avant de commencer un texte.",
-          "why": "Incorrect. Clarifier la demande est une étape commune, pas l’exemple Codex présenté."
+          "why": "Incorrect. Clarifier le brief est utile dans tous les modes. Ce n’est donc pas l’exemple spécifique de Codex demandé par la question. Le support met en avant, pour Codex, les fichiers locaux, les scripts visibles et les transformations répétées dont on examine les modifications et les résultats."
         },
         {
           "text": "Obtenir une ébauche en réponse à une question.",
-          "why": "Incorrect. La FAQ associe une question ou une ébauche au repère Chat."
+          "why": "Incorrect. La FAQ du support associe une question, une reformulation ou une ébauche au repère Chat. L’exemple Codex est un processus sur fichiers avec contrôle technique et transformations répétées. Il s’agit d’identifier l’exemple présenté, pas d’affirmer qu’une ébauche serait impossible dans un autre mode."
         }
       ]
     },
@@ -218,23 +220,23 @@
       "options": [
         {
           "text": "La moyenne des autres notes.",
-          "why": "Incorrect. Une moyenne des autres critères ne prouve rien sur celui-ci."
+          "why": "Incorrect. Une moyenne décrit les autres critères, pas celui pour lequel les notes n’apportent aucune preuve. L’utiliser créerait une évaluation non documentée. Conservez le critère dans la grille, indiquez « Non évalué » et listez le point à clarifier avec le recruteur."
         },
         {
           "text": "Une note déduite de l’aisance orale du candidat.",
-          "why": "Incorrect. Cette déduction n’est pas documentée par les notes."
+          "why": "Incorrect. L’énoncé ne fournit aucun élément sur le critère ; déduire une note de l’aisance orale ajouterait une appréciation non documentée. Il faut séparer les propos du candidat des observations du recruteur et ne noter que ce qui est étayé. Ici, indiquez « Non évalué » et demandez une clarification."
         },
         {
           "text": "Une note de zéro.",
-          "why": "Incorrect. L’absence d’information ne justifie pas une note de zéro."
+          "why": "Incorrect. Une note de zéro est une évaluation négative, alors que l’absence d’information signifie seulement que le critère n’a pas été évalué. Elle ne doit pas être inventée. Gardez la rubrique, indiquez « Non évalué » et signalez le besoin d’un élément complémentaire."
         },
         {
           "text": "« Non évalué », avec un point à clarifier.",
-          "why": "Correct. Le support demande « Non évalué » sans preuve. La grille est conservée et le recruteur valide l’évaluation."
+          "why": "Correct. « Non évalué » distingue une absence de preuve d’une mauvaise performance. Le critère reste dans la grille approuvée, sans note ni citation inventée. Listez les questions complémentaires et les contradictions à clarifier. Le recruteur habilité valide l’évaluation et décide de la suite."
         },
         {
           "text": "Supprimer ce critère de la grille.",
-          "why": "Incorrect. Le support demande de conserver les rubriques de la grille."
+          "why": "Incorrect. Supprimer la rubrique masque le fait que l’évaluation est incomplète et modifie la grille approuvée. Le support demande de conserver les rubriques et leur ordre. Indiquez « Non évalué » pour ce critère et faites apparaître le point à clarifier avant validation par le recruteur."
         }
       ]
     },
@@ -250,23 +252,23 @@
       "options": [
         {
           "text": "Un PowerPoint respectant le modèle, avec des objets modifiables.",
-          "why": "Correct. Le support prévoit de garder le masque, les polices et les couleurs, puis de livrer des textes, tableaux et graphiques modifiables."
+          "why": "Correct. Les textes, tableaux et graphiques doivent rester modifiables dans PowerPoint. Il faut garder le masque, les polices et les couleurs approuvés, adapter le récit au public étudiant et conserver les faits vérifiés. Avant diffusion, relisez le diaporama et contrôlez que ses objets sont réellement éditables."
         },
         {
           "text": "Un PowerPoint composé uniquement d’images des slides.",
-          "why": "Incorrect. Des images ne permettent pas de modifier les textes et graphiques séparément."
+          "why": "Incorrect. L’extension PowerPoint ne suffit pas : une image de slide ne contient pas les textes et graphiques comme objets séparés à modifier. Elle peut préserver l’apparence tout en empêchant les retouches demandées. Livrez les objets natifs modifiables en conservant le modèle approuvé."
         },
         {
           "text": "Un PDF sans le fichier PowerPoint.",
-          "why": "Incorrect. Un PDF seul ne fournit pas le PowerPoint modifiable demandé."
+          "why": "Incorrect. Un PDF peut être utile pour diffuser une version figée, mais il ne fournit pas le PowerPoint modifiable demandé à l’équipe. Il faut livrer le fichier PowerPoint source avec textes, tableaux et graphiques éditables ; un PDF peut s’y ajouter pour la consultation."
         },
         {
           "text": "Une vidéo du diaporama.",
-          "why": "Incorrect. Une vidéo ne fournit pas les objets à modifier."
+          "why": "Incorrect. La vidéo permet de regarder le diaporama, pas de modifier les textes et graphiques dans le fichier PowerPoint. Elle ne remplit donc pas le besoin de réutilisation. Fournissez le support source modifiable, avec le modèle du cabinet et les faits vérifiés."
         },
         {
           "text": "Des captures d’écran de chaque slide.",
-          "why": "Incorrect. Les captures ne fournissent pas les objets PowerPoint modifiables."
+          "why": "Incorrect. Les captures montrent l’apparence des slides, sans fournir leurs objets PowerPoint séparés. Les retouches demanderaient de reconstituer le contenu. Livrez plutôt les textes, tableaux et graphiques modifiables dans le modèle approuvé, puis vérifiez la mise en page avant diffusion."
         }
       ]
     },
@@ -283,23 +285,23 @@
       "options": [
         {
           "text": "Choisir les définitions les plus courantes.",
-          "why": "Incorrect. Un usage courant ne remplace pas la définition retenue par l’équipe."
+          "why": "Incorrect. Une définition courante peut différer de celle retenue par l’équipe : par exemple, le dénominateur d’un taux peut changer. L’IA ne doit pas choisir cette convention à votre place. Faites préciser les définitions manquantes, puis appliquez-les de façon stable au classeur."
         },
         {
           "text": "Déduire les définitions à partir du nom des colonnes.",
-          "why": "Incorrect. Un nom de colonne peut avoir plusieurs interprétations."
+          "why": "Incorrect. Un intitulé de colonne ne précise pas toujours la population, la période ou le dénominateur du calcul. Déduire la définition risquerait de produire un indicateur juste en apparence mais différent de celui attendu. Faites clarifier la règle et les données nécessaires avant le calcul."
         },
         {
           "text": "Remplacer les valeurs inconnues par zéro.",
-          "why": "Incorrect. Zéro est une valeur ; il ne remplace pas une information absente."
+          "why": "Incorrect. Zéro est une donnée numérique ; une valeur inconnue est une information manquante. Remplacer la seconde par la première peut fausser les totaux et les taux. Signalez la lacune, faites préciser la définition de l’indicateur et les données nécessaires, puis calculez uniquement ce qui est étayé."
         },
         {
           "text": "Reprendre les chiffres de la semaine précédente.",
-          "why": "Incorrect. Les chiffres précédents ne définissent pas le calcul attendu."
+          "why": "Incorrect. Les chiffres précédents ne définissent pas la méthode de calcul et ne décrivent pas nécessairement la période actuelle. Les recopier masquerait la lacune. Faites clarifier les indicateurs, puis recalculez-les à partir de l’export autorisé en vérifiant formules, dates, doublons et dénominateurs."
         },
         {
           "text": "Repérer les définitions manquantes et les faire clarifier.",
-          "why": "Correct. Le brief demande de signaler les lacunes et de poser les questions dont dépend le résultat. Les indicateurs ont besoin de définitions stables."
+          "why": "Correct. Le brief doit rendre les lacunes visibles au lieu de laisser l’IA inventer une règle. Faites préciser, pour chaque indicateur, ce qui est compté, la période ou le groupe de candidats et le dénominateur du taux. Distinguez l’activité hebdomadaire de la conversion d’une même cohorte, puis vérifiez les formules et totaux."
         }
       ]
     },
@@ -307,8 +309,9 @@
       "kind": "scenario",
       "theme": "Usage · Crédits et validation",
       "q": "Le support rappelle une enveloppe de 1 500 crédits. Le travail prévu risque de la dépasser. Que faire avant de le lancer ?",
-      "source": "Formation Advancy du 2 novembre 2026, slides 3, 16 : règle interne rappelée : enveloppe de 1 500 crédits et accord au-delà ; vérifier qualité et consommation.",
+      "source": "Formation Advancy du 2 novembre 2026, slides 2, 3, 16 : outils et comptes approuvés ; estimation de la consommation et accord au-delà de l’enveloppe de 1 500 crédits rappelée dans le support.",
       "slides": [
+        2,
         3,
         16
       ],
@@ -316,23 +319,23 @@
       "options": [
         {
           "text": "Lancer le travail puis demander un accord après le dépassement.",
-          "why": "Incorrect. L’accord doit précéder le dépassement prévu."
+          "why": "Incorrect. La règle rappelée dans le support exige un accord avant d’engager le dépassement prévu. Une demande après consommation ne respecte pas ce préalable. Estimez le besoin, choisissez une capacité adaptée à la qualité attendue et obtenez l’accord requis avant de dépasser l’enveloppe."
         },
         {
           "text": "Choisir le modèle le plus puissant sans estimer la consommation.",
-          "why": "Incorrect. La puissance du modèle ne remplace pas l’estimation et l’accord."
+          "why": "Incorrect. Le modèle le plus puissant n’autorise pas automatiquement une consommation supérieure à l’enveloppe. Le support demande de vérifier qualité, effort et consommation. Estimez le besoin, retenez une capacité suffisante pour la tâche et demandez l’accord requis si le travail dépasse le plafond rappelé."
         },
         {
           "text": "Estimer le besoin et obtenir l’accord requis avant de dépasser l’enveloppe.",
-          "why": "Correct. Cette conduite respecte la règle interne rappelée dans le support. Elle ne constitue pas un tarif de modèle."
+          "why": "Correct. Les 1 500 crédits sont la règle interne rappelée par le support, pas un tarif universel des modèles. Il faut estimer la consommation du travail prévu, tester une capacité adaptée et obtenir l’accord requis avant d’engager le dépassement. Un résultat satisfaisant lors d’un essai ne remplace pas cet accord."
         },
         {
           "text": "Découper le travail en petites tâches pour éviter de demander un accord.",
-          "why": "Incorrect. Le découpage ne supprime pas la consommation totale."
+          "why": "Incorrect. Découper le travail peut aider à le contrôler, mais ne supprime pas la consommation totale. Ce découpage ne permet donc pas d’éviter l’accord prévu pour un dépassement de l’enveloppe. Estimez l’ensemble du besoin et obtenez la validation requise avant de l’engager."
         },
         {
           "text": "Terminer le travail avec un compte personnel.",
-          "why": "Incorrect. Le support impose les outils et comptes Advancy approuvés."
+          "why": "Incorrect. Le compte personnel contournerait le cadre de travail approuvé sans résoudre la question de l’autorisation. Le support exige les outils et comptes Advancy prévus. Restez dans ce cadre, estimez le besoin et demandez l’accord requis pour le dépassement au lieu de changer de compte."
         }
       ]
     },
@@ -349,23 +352,23 @@
       "options": [
         {
           "text": "Demander trois versions sans préciser davantage le besoin.",
-          "why": "Incorrect. Les variantes reposeraient sur un besoin encore ambigu."
+          "why": "Incorrect. Demander plusieurs versions est utile pour explorer des idées, mais un besoin encore ambigu peut conduire à trois réponses inadaptées. Commencez par faire reformuler la demande et préciser le public, les contraintes et le résultat attendu. Comparez ensuite les variantes sur ces critères."
         },
         {
           "text": "Laisser l’IA choisir ce que « dynamique » signifie.",
-          "why": "Incorrect. Une interprétation non vérifiée peut conduire au mauvais résultat."
+          "why": "Incorrect. « Dynamique » peut viser le récit, la mise en page ou l’animation. Laisser l’IA choisir sans vérifier son interprétation risque de produire le mauvais changement. Faites reformuler le besoin, clarifiez le résultat attendu et les contraintes, puis demandez plusieurs approches."
         },
         {
           "text": "Répéter la même demande en ajoutant « très professionnel ».",
-          "why": "Incorrect. Ce qualificatif ne précise pas le changement attendu."
+          "why": "Incorrect. « Très professionnel » reste un jugement général : il ne précise ni le problème à résoudre ni le résultat attendu. Répéter la même demande ne lève donc pas le malentendu. Faites reformuler l’objectif et précisez le public, les changements souhaités et les contraintes avant les variantes."
         },
         {
           "text": "Faire reformuler le besoin et préciser le public, les contraintes et le résultat.",
-          "why": "Correct. La reformulation vérifie la compréhension. La créativité intervient ensuite pour explorer plusieurs approches adaptées au brief."
+          "why": "Correct. La reformulation permet de vérifier ce que l’IA a compris de « plus dynamique ». Précisez le public, l’objectif, le format, les contraintes et ce qui doit changer. Vérifiez cette compréhension, puis mobilisez la créativité avec plusieurs approches à comparer. Les retours précis permettent ensuite d’améliorer le résultat."
         },
         {
           "text": "Choisir les couleurs avant de définir l’objectif.",
-          "why": "Incorrect. Les couleurs ne suffisent pas à définir le changement attendu."
+          "why": "Incorrect. Les couleurs règlent un aspect visuel, mais ne définissent pas l’objectif ni le sens de « dynamique ». Elles ne suffisent donc pas à éviter le malentendu. Clarifiez d’abord le besoin et faites-le reformuler, puis choisissez des solutions graphiques cohérentes avec ce brief."
         }
       ]
     },
@@ -382,23 +385,23 @@
       "options": [
         {
           "text": "Retenir la réponse la mieux rédigée.",
-          "why": "Incorrect. La qualité de rédaction ne prouve pas l’exactitude des chiffres."
+          "why": "Incorrect. Une explication fluide ou détaillée peut accompagner un chiffre faux. Le style ne permet pas de départager deux résultats d’un même calcul. Revenez aux données et à la formule, identifiez l’écart, donnez un retour précis à l’IA puis vérifiez le résultat corrigé."
         },
         {
           "text": "Vérifier les sources et calculs, faire corriger l’erreur puis contrôler la correction.",
-          "why": "Correct. L’esprit critique confronte le résultat aux preuves. La persévérance consiste à corriger avec un retour précis et à vérifier la nouvelle version."
+          "why": "Correct. Pour un même calcul sur les mêmes données, revenez aux sources, à la formule et aux hypothèses pour identifier l’écart. Expliquez précisément ce qui doit être corrigé, puis refaites le contrôle sur la nouvelle réponse. C’est l’association de l’esprit critique et de la persévérance : itérer jusqu’à un résultat vérifié, sans se fier à l’assurance du texte."
         },
         {
           "text": "Retenir la réponse approuvée par le plus de modèles.",
-          "why": "Incorrect. Un accord entre modèles ne remplace pas les sources."
+          "why": "Incorrect. Un vote entre modèles ne prouve pas quel calcul correspond aux sources. Plusieurs réponses peuvent reprendre la même hypothèse erronée. Utilisez les données et la règle de calcul comme référence, expliquez l’erreur identifiée à l’IA et contrôlez sa correction."
         },
         {
           "text": "Relancer jusqu’à obtenir deux réponses identiques.",
-          "why": "Incorrect. Deux réponses identiques peuvent répéter la même erreur."
+          "why": "Incorrect. La répétition d’un résultat indique une stabilité, pas sa justesse : une même erreur peut être reproduite. Il faut confronter les réponses aux sources et refaire le calcul attendu. Corrigez ensuite avec un retour précis et vérifiez la nouvelle version, même si elle paraît convaincante."
         },
         {
           "text": "Accepter la réponse du modèle le plus récent.",
-          "why": "Incorrect. Un modèle récent peut aussi produire une erreur."
+          "why": "Incorrect. La nouveauté du modèle ne garantit pas l’exactitude de ce calcul particulier. Changer de modèle peut aider, mais ne remplace pas le diagnostic. Vérifiez les données, la formule et les hypothèses, faites corriger l’écart identifié puis contrôlez le résultat obtenu."
         }
       ]
     },
@@ -414,23 +417,23 @@
       "options": [
         {
           "text": "25,0 %",
-          "why": "Incorrect. Le calcul est 4 offres acceptées divisées par 6 offres faites, soit 66,7 %."
+          "why": "Incorrect. 25 % représente un quart, alors que 4 acceptations sur 6 offres représentent deux tiers. Le calcul demandé est acceptations ÷ offres, puis multiplication par 100 : 4 ÷ 6 × 100 = 66,666… %, soit 66,7 % à une décimale. Les 4 et les 6 portent sur le même groupe de candidats."
         },
         {
           "text": "40,0 %",
-          "why": "Incorrect. Il faut diviser 4 par 6, et non par 10."
+          "why": "Incorrect. 40 % correspondrait à 4 sur 10, mais le nombre d’offres donné est 6. Il faut garder le bon dénominateur : 4 acceptations ÷ 6 offres × 100 = 66,666… %. Le taux d’acceptation des offres est donc 66,7 % à une décimale, sur ce même groupe de candidats."
         },
         {
           "text": "50,0 %",
-          "why": "Incorrect. La moitié de 6 serait 3 acceptations ; il y en a 4."
+          "why": "Incorrect. 50 % de 6 offres ferait 3 acceptations ; l’énoncé en indique 4. Utilisez les chiffres fournis et la définition du taux : 4 acceptations ÷ 6 offres × 100. Le résultat est 66,666… %, arrondi à 66,7 % à une décimale."
         },
         {
           "text": "75,0 %",
-          "why": "Incorrect. Le rapport 4/6 est environ 0,667, soit 66,7 %."
+          "why": "Incorrect. 75 % ne correspond pas au rapport de 4 acceptations à 6 offres. Il faut calculer 4 ÷ 6, puis multiplier par 100 : on obtient 66,666… %. L’arrondi demandé donne 66,7 %, sans changer le nombre d’offres au dénominateur."
         },
         {
           "text": "66,7 %",
-          "why": "Correct. Le taux d’acceptation est 4/6 × 100 = 66,7 %. Le dénominateur est le nombre d’offres de ce même groupe."
+          "why": "Correct. Le numérateur est le nombre d’offres acceptées, soit 4 ; le dénominateur est le nombre d’offres faites au même groupe, soit 6. Le calcul est 4 ÷ 6 × 100 = 66,666… %, arrondi à 66,7 %. Ce taux ne se calcule ni sur toutes les candidatures ni sur des événements provenant de groupes différents."
         }
       ]
     },
@@ -446,23 +449,23 @@
       "options": [
         {
           "text": "Reprendre le ton des publications et les faits du nouvel événement.",
-          "why": "Correct. Les publications donnent le style ; les nouvelles notes donnent les faits. Il faut ensuite adapter le brouillon à LinkedIn ou à la newsletter et le faire valider."
+          "why": "Correct. Les publications validées servent à repérer le ton, la structure et la longueur ; les nouvelles notes fournissent les faits de l’événement. Signalez ce qui reste à confirmer et n’inventez pas de détail. Proposez des accroches, adaptez le brouillon à LinkedIn ou à la newsletter et faites-le valider avant toute publication autorisée."
         },
         {
           "text": "Changer le nom d’un ancien événement et garder ses chiffres.",
-          "why": "Incorrect. Les anciens chiffres ne décrivent pas nécessairement le nouvel événement."
+          "why": "Incorrect. Changer le nom ne rend pas les chiffres d’un ancien événement applicables au nouveau. Ils ne peuvent être repris que s’ils sont aussi vérifiés pour le cas actuel. Utilisez les anciennes publications pour le style et les nouvelles notes pour les faits ; signalez les informations à confirmer."
         },
         {
           "text": "Choisir un ton très promotionnel, différent des références.",
-          "why": "Incorrect. La demande est de conserver le ton habituel, pas de le remplacer."
+          "why": "Incorrect. Le ton proposé s’éloigne explicitement des références alors que la demande est de conserver le style habituel. Analysez d’abord les publications validées, puis rédigez avec les nouveaux faits. Les formulations trop promotionnelles ou éloignées de ce style doivent être signalées et retravaillées."
         },
         {
           "text": "Recopier une publication sans tenir compte des nouvelles notes.",
-          "why": "Incorrect. La publication doit présenter les faits du nouvel événement."
+          "why": "Incorrect. Une publication de référence donne un exemple de style, pas le contenu du nouvel événement. La recopier sans utiliser les notes risque de conserver des faits devenus inadaptés. Rédigez un nouveau brouillon avec les faits actuels, le ton habituel et une adaptation au canal, puis faites-le valider."
         },
         {
           "text": "Inventer les détails manquants pour rendre le message plus vivant.",
-          "why": "Incorrect. Les détails à confirmer doivent être signalés, sans être inventés."
+          "why": "Incorrect. La créativité porte sur les accroches et la formulation, pas sur l’invention des faits. Les détails absents des notes doivent rester à confirmer. Utilisez les publications pour le ton, les nouvelles notes pour le contenu et soumettez un brouillon adapté au canal avant publication."
         }
       ]
     },
@@ -478,23 +481,23 @@
       "options": [
         {
           "text": "À conserver uniquement le résultat du premier essai.",
-          "why": "Incorrect. Un résultat passé ne décrit pas une méthode réutilisable."
+          "why": "Incorrect. Un résultat passé peut illustrer le rendu attendu, mais ne suffit pas à expliquer comment produire et vérifier les prochains résultats. Le skill doit réunir la méthode, les consignes, les modèles et les contrôles réutilisables. Les sources de chaque nouvelle exécution doivent rester autorisées et à jour."
         },
         {
           "text": "À supprimer la validation humaine des résultats.",
-          "why": "Incorrect. Un responsable reste chargé de valider le résultat."
+          "why": "Incorrect. Réutiliser une méthode ne rend pas automatiquement exact chaque nouveau résultat : les données et les situations peuvent changer. Le skill conserve aussi les contrôles et les cas d’erreur connus. Un responsable entretient la méthode et valide le résultat ; la revue humaine n’est pas supprimée."
         },
         {
           "text": "À réunir les consignes, modèles et contrôles réutilisables.",
-          "why": "Correct. Le projet rassemble le contexte autorisé ; le skill formalise la méthode, les modèles et les contrôles. Un responsable entretient cette méthode."
+          "why": "Correct. Le projet réunit le brief, les références et les fichiers autorisés, avec des droits de partage vérifiés. Le skill formalise une méthode réutilisable : consignes, modèles, exemples, contrôles et cas d’erreur connus. Un responsable entretient cette méthode et valide les résultats à chaque utilisation."
         },
         {
           "text": "À donner automatiquement accès à tous les fichiers de l’équipe.",
-          "why": "Incorrect. Les droits de partage doivent être vérifiés ; le skill ne les élargit pas."
+          "why": "Incorrect. La création d’un skill ne donne aucune autorisation supplémentaire pour partager les données. Le projet doit rester limité au contexte autorisé et aux droits vérifiés. Le rôle du skill est de réutiliser la méthode, les modèles et les contrôles, pas d’élargir l’accès aux fichiers."
         },
         {
           "text": "À remplacer le modèle approuvé par un format choisi à chaque fois.",
-          "why": "Incorrect. La méthode réutilisable conserve les modèles et contrôles approuvés."
+          "why": "Incorrect. Changer le format au hasard à chaque exécution fait perdre la cohérence de la méthode validée. Le skill réutilise les modèles et les contrôles approuvés ; son responsable peut les entretenir et les faire évoluer. Il ne remplace pas systématiquement le modèle par un format improvisé."
         }
       ]
     },
@@ -510,23 +513,23 @@
       "options": [
         {
           "text": "Un PDF avec des dates fixes.",
-          "why": "Incorrect. Les dates fixes du PDF ne se recalculent pas avec le jour J."
+          "why": "Incorrect. Un PDF à dates fixes peut servir à diffuser un état du planning, mais il ne recalcule pas les échéances lorsque le jour J change. Le suivi doit être un tableau modifiable dont les dates dépendent du jour J. Une nouvelle version de consultation peut ensuite être produite à partir de ce suivi actualisé."
         },
         {
           "text": "Un Excel dont toutes les dates sont saisies manuellement.",
-          "why": "Incorrect. Les dates saisies manuellement ne sont pas reliées au jour J."
+          "why": "Incorrect. Excel convient au suivi, mais des dates saisies manuellement ne changent pas automatiquement avec le jour J. Le choix proposé laisse donc les échéances à reprendre une par une. Reliez les dates à J et aux dépendances utiles, puis contrôlez le résultat après tout report de l’événement."
         },
         {
           "text": "Un texte qui énumère les anciennes échéances.",
-          "why": "Incorrect. La liste ne recalcule pas les dates."
+          "why": "Incorrect. Énumérer les anciennes échéances conserve une description du planning initial, sans relation de calcul avec la nouvelle date. Le suivi doit recalculer les dates à partir de J et rendre visibles les responsabilités, priorités, dépendances et retards. Une liste figée ne remplit pas cette fonction."
         },
         {
           "text": "Une image du calendrier initial.",
-          "why": "Incorrect. Une image ne permet pas ce recalcul."
+          "why": "Incorrect. Une image peut aider à communiquer un calendrier, mais elle ne porte pas les calculs et statuts modifiables nécessaires au suivi. Elle ne recalcule donc rien lorsque J change. Utilisez un Excel ou tableau partagé approuvé avec des dates liées à J, puis vérifiez les échéances actualisées."
         },
         {
           "text": "Un tableau modifiable avec des dates calculées à partir du jour J.",
-          "why": "Correct. Les dates liées au jour J se recalculent quand il change. Le suivi présenté ajoute aussi responsables, contacts, priorités, dépendances et statuts."
+          "why": "Correct. Les échéances calculées à partir du jour J se mettent à jour lorsque la date change. Le suivi comporte aussi responsables, contacts, priorités, dépendances, filtres et statuts modifiables. Adaptez les délais illustratifs à l’événement réel, vérifiez le recalcul et désignez les responsables avant de programmer les rappels."
         }
       ]
     },
@@ -545,23 +548,23 @@
       "options": [
         {
           "text": "Comparer ses données et formules aux sources et règles validées.",
-          "why": "Correct. Une exécution réussie ne garantit pas des calculs justes. Il faut contrôler les résultats, les formules et les modifications par rapport aux sources et règles attendues."
+          "why": "Correct. L’absence d’erreur d’exécution prouve que le script a terminé, pas que le classeur est juste. Comparez les données et formules aux sources et règles validées, puis vérifiez totaux, dates, doublons et dénominateurs. Examinez aussi les modifications et la mise en page. Le fichier doit répondre au brief et être validé avant utilisation."
         },
         {
           "text": "Constater que le programme affiche un message de réussite.",
-          "why": "Incorrect. Le message prouve la fin de l’exécution, pas l’exactitude des résultats."
+          "why": "Incorrect. Un message de réussite indique que le programme est allé à son terme ; il ne démontre pas que les règles métier et les chiffres sont corrects. Une mauvaise formule peut s’exécuter sans erreur. Comparez le classeur aux sources et définitions validées, puis contrôlez formules, totaux et modifications."
         },
         {
           "text": "Vérifier seulement que le fichier existe dans le bon dossier.",
-          "why": "Incorrect. La présence du fichier ne prouve pas l’exactitude de son contenu."
+          "why": "Incorrect. Le bon dossier et la présence du fichier sont des contrôles de livraison, pas des preuves d’exactitude du contenu. Un fichier présent peut contenir des omissions ou des calculs faux. Il faut aussi comparer ses données et formules aux sources et règles validées, puis vérifier les résultats attendus."
         },
         {
           "text": "Vérifier seulement que le classeur s’ouvre.",
-          "why": "Incorrect. Un classeur peut s’ouvrir et contenir des calculs faux."
+          "why": "Incorrect. L’ouverture du classeur vérifie qu’il est lisible, pas que ses valeurs et formules sont justes. Un fichier peut s’ouvrir normalement malgré une erreur de calcul ou une donnée manquante. Contrôlez les chiffres, les totaux, les définitions et les modifications par rapport aux sources autorisées."
         },
         {
           "text": "Comparer uniquement la taille du nouveau fichier à l’ancien.",
-          "why": "Incorrect. La taille du fichier n’indique pas si ses chiffres et formules sont justes."
+          "why": "Incorrect. La taille du fichier peut varier pour des raisons sans rapport avec l’exactitude des chiffres. Une taille similaire ne prouve pas que les formules et les données sont correctes. Vérifiez le contenu du classeur par rapport aux sources et règles validées, ainsi que les modifications produites par le script."
         }
       ]
     },
@@ -577,23 +580,23 @@
       "options": [
         {
           "text": "Remplacer directement la présentation d’origine.",
-          "why": "Incorrect. Le support prévoit un test sur une copie avant remplacement."
+          "why": "Incorrect. Remplacer directement l’original saute le contrôle de données déjà signalées comme anciennes et l’essai prévu sur une copie. Vérifiez d’abord les villes, les périodes, la fraîcheur et les champs Canva. Gardez la dernière version vérifiée, testez une copie et faites valider le remplacement ou la publication."
         },
         {
           "text": "Réutiliser les valeurs anciennes sans le signaler.",
-          "why": "Incorrect. Les valeurs anciennes ou absentes doivent être signalées."
+          "why": "Incorrect. Une valeur ancienne ne doit pas être présentée comme une météo fraîche sans signalement. Contrôlez la date de collecte, le lieu, la période et la source ; signalez ce qui est absent ou ancien. Si la mise à jour n’est pas vérifiée, conservez la dernière version vérifiée au lieu de la remplacer silencieusement."
         },
         {
           "text": "Vérifier les données et les champs Canva, puis tester une copie.",
-          "why": "Correct. Vérifiez villes, périodes, unités et fraîcheur des données, ainsi que les champs et accès Canva. Testez une copie avant validation ; la collecte et la mise à jour sont deux étapes distinctes."
+          "why": "Correct. La collecte météo et la mise à jour Canva sont deux étapes. Vérifiez source approuvée, ville, date, fuseau, observation ou prévision, unités et fraîcheur ; signalez les valeurs absentes ou anciennes. Vérifiez ensuite les accès ainsi que les noms et types des champs Canva, remplissez une copie et contrôlez le résultat avant remplacement ou publication validés."
         },
         {
           "text": "Appliquer la même météo à toutes les villes.",
-          "why": "Incorrect. Les données doivent correspondre aux villes et périodes des bureaux."
+          "why": "Incorrect. La météo dépend du lieu et de la période : appliquer une même valeur à toutes les villes peut associer des informations inadaptées aux bureaux. Préparez une ligne par bureau avec ville, période locale, conditions, température, source et date de collecte. Vérifiez ces données avant l’essai sur une copie Canva."
         },
         {
           "text": "Supposer que les champs Canva se rempliront sans vérification.",
-          "why": "Incorrect. La mise à jour dépend des champs, des accès et du paramétrage."
+          "why": "Incorrect. Des données météo correctes ne garantissent pas que les champs et accès du design permettent leur mise à jour. Vérifiez les noms et types des champs, les accès et le paramétrage. Testez le remplissage sur une copie et contrôlez les lieux, périodes et valeurs avant de valider le remplacement."
         }
       ]
     },
@@ -610,23 +613,23 @@
       "options": [
         {
           "text": "Envoyer les relances puis demander votre validation.",
-          "why": "Incorrect. La validation demandée doit précéder l’envoi."
+          "why": "Incorrect. La demande impose de valider le texte et les destinataires avant tout envoi. Un contrôle après l’envoi ne satisfait pas cette condition. La tâche doit préparer les brouillons à partir du suivi autorisé, les présenter au pilote et attendre l’accord explicite ; l’envoi nécessite aussi une connexion compatible."
         },
         {
           "text": "Préparer les brouillons et attendre votre validation avant l’envoi.",
-          "why": "Correct. La tâche prépare les brouillons. L’envoi reste distinct et exige la validation demandée, une connexion compatible et l’accord explicite."
+          "why": "Correct. La tâche consulte le suivi autorisé et prépare les brouillons pour les responsables concernés. Elle attend la validation du texte et des destinataires avant tout envoi, qui nécessite une connexion compatible et un accord explicite. Précisez horaire et fuseau, signalez une source absente ou ancienne, évitez les doublons et arrêtez le suivi à la clôture."
         },
         {
           "text": "Afficher un simple rappel sans préparer les brouillons demandés.",
-          "why": "Incorrect. Ce rappel ne produit pas les brouillons explicitement demandés."
+          "why": "Incorrect. Un rappel personnel peut aider à penser aux relances, mais il ne produit pas les brouillons explicitement demandés. Programmez la lecture du suivi autorisé et la préparation des messages pour les actions concernées. Les textes et destinataires restent à valider avant l’envoi, avec signalement d’une source indisponible ou ancienne."
         },
         {
           "text": "Envoyer sans validation les messages aux destinataires déjà connus.",
-          "why": "Incorrect. La demande de validation s’applique aussi aux destinataires connus."
+          "why": "Incorrect. Connaître déjà le destinataire ne valide ni le contenu de la relance ni l’état actuel de ses tâches. La consigne de validation préalable s’applique à tous les messages. Préparez les brouillons à partir du suivi à jour, puis faites valider texte et destinataires avant tout envoi autorisé."
         },
         {
           "text": "Envoyer l’ancien message à tous les contacts.",
-          "why": "Incorrect. Le texte et les destinataires doivent être vérifiés avant tout envoi."
+          "why": "Incorrect. L’ancien message peut ne plus correspondre aux tâches, aux responsables ou aux échéances actuels. Un envoi à tous risque aussi de relancer des actions closes ou de créer des doublons. Utilisez le suivi autorisé, préparez les brouillons utiles et faites valider le texte et chaque destinataire avant l’envoi."
         }
       ]
     },
@@ -642,23 +645,23 @@
       "options": [
         {
           "text": "Choisir comme responsable la personne qui en a le plus parlé.",
-          "why": "Incorrect. Les notes ne permettent pas d’attribuer cette responsabilité."
+          "why": "Incorrect. La personne qui parle le plus d’une action n’en est pas nécessairement responsable. Les notes ne permettent pas ici de l’attribuer sans inventer une décision. Conservez l’action, indiquez que responsable et échéance sont à préciser et faites compléter ces points par le pilote lors de la validation."
         },
         {
           "text": "Fixer automatiquement une échéance pour la semaine suivante.",
-          "why": "Incorrect. Cette échéance serait inventée."
+          "why": "Incorrect. Une date standard pour la semaine suivante n’apparaît pas dans les notes : elle serait inventée. L’IA doit rendre la lacune visible plutôt que créer un engagement. Gardez l’action avec « Responsable et échéance à préciser », puis faites confirmer ces informations par le pilote."
         },
         {
           "text": "Supprimer l’action du compte rendu.",
-          "why": "Incorrect. L’information manquante doit être signalée, sans supprimer l’action."
+          "why": "Incorrect. Supprimer l’action ferait perdre une information utile des notes au lieu de montrer ce qui reste à clarifier. Conservez-la fidèlement, sans transformer une discussion en décision confirmée. Signalez le responsable et l’échéance manquants, puis soumettez le compte rendu au pilote pour validation."
         },
         {
           "text": "Conserver l’action et indiquer « Responsable et échéance à préciser ».",
-          "why": "Correct. Le compte rendu reste fidèle aux notes. Les informations absentes sont rendues visibles pour la validation par le pilote."
+          "why": "Correct. Le compte rendu reste fidèle aux notes et n’invente pas de responsabilité ni de date. Conservez l’action avec les informations absentes signalées et distinguez discussions et décisions. Pour les autres actions, reprenez les responsables et échéances effectivement indiqués. Le pilote complète les points ouverts et valide le compte rendu."
         },
         {
           "text": "Reprendre le responsable et la date d’une ancienne réunion.",
-          "why": "Incorrect. Une ancienne réunion ne permet pas de compléter cette action sans confirmation."
+          "why": "Incorrect. Une ancienne réunion peut fournir une piste à vérifier, mais elle ne prouve pas que le même responsable et la même date s’appliquent ici. Ne les recopiez pas comme des faits confirmés. Signalez les informations manquantes et faites-les clarifier par le pilote avant validation du compte rendu."
         }
       ]
     }

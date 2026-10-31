@@ -3,7 +3,7 @@
 Cloudflare Worker + D1 backend for the Advancy assessment websites. It serves two current 20-question assessments:
 
 - `advancy-ai-assessment-normal` at version `2026-07-29`: AI Charter and practical AI usage, including two Chat/Work/Codex routing questions
-- `advancy-ai-admin-fr` at version `2026-11-02-admin-fr-r2`: invite-only French assessment aligned with the 2 November training
+- `advancy-ai-admin-fr` at version `2026-11-02-admin-fr-r3`: invite-only French assessment aligned with the 2 November training
 
 The former Normal, Advanced, Charter-only and Usage-only quiz IDs remain accepted only at version `2026-07-09` for explicitly assigned cutover cohorts. This directory is deployment-ready but changes are **not deployed automatically**.
 
@@ -18,9 +18,9 @@ The single canonical GitHub Pages site is a static client. D1 is bound only to t
 5. The Worker derives identity from the token, validates the cohort and invitation window, computes the score from its versioned answer key, and inserts an append-only attempt.
 6. Admin reads require `ADMIN_TOKEN`; admin endpoints reject browser `Origin` requests.
 
-The current English answer-key version is `2026-07-29`; the current French ADMIN version is `2026-11-02-admin-fr-r2`. A submission is accepted only for a known `(test_id, quiz_version)` pair, preserving auditability after future question changes. New imports receive only the unified English ID unless `quiz_ids` is supplied explicitly. The prior five quiz IDs and their `2026-07-09` keys remain available for cutover compatibility.
+The current English answer-key version is `2026-07-29`; the current French ADMIN version is `2026-11-02-admin-fr-r3`. A submission is accepted only for a known `(test_id, quiz_version)` pair, preserving auditability after future question changes. New imports receive only the unified English ID unless `quiz_ids` is supplied explicitly. The prior five quiz IDs and their `2026-07-09` keys remain available for cutover compatibility.
 
-The previous French ADMIN versions `2026-11-02-admin-fr` and `2026-09-25-admin-fr` remain supported for historical receipts and scoring. Receipts include `quiz_id` and `quiz_version`, allowing the client to identify a prior assessment without labelling its result as the current one. Existing invitation assignments and the session-wide attempt quota are unchanged. Admin exports accept all registered quiz versions.
+The previous French ADMIN versions `2026-11-02-admin-fr-r2`, `2026-11-02-admin-fr` and `2026-09-25-admin-fr` remain supported for historical receipts and scoring. Receipts include `quiz_id` and `quiz_version`, allowing the client to identify a prior assessment without labelling its result as the current one. Existing invitation assignments and the session-wide attempt quota are unchanged. Admin exports accept all registered quiz versions.
 
 ## Persisted data
 

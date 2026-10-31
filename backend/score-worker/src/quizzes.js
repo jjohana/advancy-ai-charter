@@ -1,5 +1,6 @@
 export const QUIZ_VERSION = "2026-07-29";
-export const ADMIN_FRENCH_QUIZ_VERSION = "2026-11-02-admin-fr-r2";
+export const ADMIN_FRENCH_QUIZ_VERSION = "2026-11-02-admin-fr-r3";
+export const PREVIOUS_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION = "2026-11-02-admin-fr-r2";
 export const FIRST_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION = "2026-11-02-admin-fr";
 export const PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION = "2026-09-25-admin-fr";
 export const LEGACY_QUIZ_VERSION = "2026-07-09";
@@ -23,6 +24,13 @@ const definitions = [
     id: "advancy-ai-admin-fr",
     name: "Evaluation IA - ADMIN",
     version: ADMIN_FRENCH_QUIZ_VERSION,
+    passThreshold: 0.7,
+    answerKey: ADMIN_FRENCH_KEY
+  },
+  {
+    id: "advancy-ai-admin-fr",
+    name: "Evaluation IA - ADMIN",
+    version: PREVIOUS_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION,
     passThreshold: 0.7,
     answerKey: ADMIN_FRENCH_KEY
   },

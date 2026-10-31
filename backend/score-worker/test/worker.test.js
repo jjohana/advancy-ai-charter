@@ -18,6 +18,7 @@ import {
 import {
   DEFAULT_QUIZ_IDS,
   ADMIN_FRENCH_QUIZ_VERSION,
+  PREVIOUS_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION,
   PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION,
   FIRST_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION,
   LEGACY_QUIZ_IDS,
@@ -37,6 +38,7 @@ const USAGE_ADVANCED_KEY = [3, 0, 4, 1, 2, 4, 1, 3, 0, 2, 1, 4, 2, 0, 3, 2, 3, 0
 const EXPECTED_DEFINITIONS = [
   { id: "advancy-ai-assessment-normal", version: QUIZ_VERSION, key: UNIFIED_KEY },
   { id: "advancy-ai-admin-fr", version: ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
+  { id: "advancy-ai-admin-fr", version: PREVIOUS_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
   { id: "advancy-ai-admin-fr", version: PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
   { id: "advancy-ai-admin-fr", version: FIRST_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
   { id: "advancy-ai-assessment-normal", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...COMBINED_NORMAL_KEY] },
@@ -113,7 +115,17 @@ test("the unified assessment has 20 balanced answer positions", () => {
 });
 
 test("the revised French assessment preserves previous scoring and labels historical receipts", () => {
-  assert.equal(ADMIN_FRENCH_QUIZ_VERSION, "2026-11-02-admin-fr-r2");
+  assert.equal(ADMIN_FRENCH_QUIZ_VERSION, "2026-11-02-admin-fr-r3");
+  assert.equal(PREVIOUS_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION, "2026-11-02-admin-fr-r2");
+  const priorNovember = findQuiz("advancy-ai-admin-fr", PREVIOUS_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION);
+  assert.equal(scoreAnswers(priorNovember, ADMIN_FRENCH_KEY).percent, 100);
+  const priorReceipt = receiptFromAttempt({
+    receipt_id: "rct_historical_admin_r2_test", submitted_at: "2026-10-31 16:00:00", attempt_number: 1,
+    quiz_id: priorNovember.id, quiz_version: priorNovember.version, correct: 19, total: 20, percent: 95, passed: 1
+  });
+  assert.equal(priorReceipt.quiz_version, PREVIOUS_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION);
+  assert.equal(priorReceipt.score.correct, 19);
+  assert.notEqual(priorReceipt.quiz_version, ADMIN_FRENCH_QUIZ_VERSION);
   const firstNovember = findQuiz("advancy-ai-admin-fr", FIRST_NOVEMBER_ADMIN_FRENCH_QUIZ_VERSION);
   assert.equal(scoreAnswers(firstNovember, ADMIN_FRENCH_KEY).percent, 100);
   assert.notEqual(firstNovember.version, ADMIN_FRENCH_QUIZ_VERSION);

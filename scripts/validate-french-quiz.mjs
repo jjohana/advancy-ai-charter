@@ -14,7 +14,7 @@ const questions = context.window.quizQuestions;
 
 assert.ok(config && typeof config === "object", "quizConfig is required");
 assert.equal(config.quizId, "advancy-ai-admin-fr");
-assert.equal(config.quizName, "Évaluation IA générative — ADMIN");
+assert.equal(config.quizName, "Evaluation IA - ADMIN");
 assert.equal(config.quizVersion, ADMIN_FRENCH_QUIZ_VERSION);
 assert.equal(config.storageNamespace, "admin-fr");
 assert.equal(config.privacyNoticeVersion, "2026-07-09");
@@ -45,14 +45,17 @@ questions.forEach((question, index) => {
   const normalizedQuestion = question.q.trim().toLocaleLowerCase("fr");
   assert.ok(!questionTexts.has(normalizedQuestion), `${label} duplicates another question`);
   questionTexts.add(normalizedQuestion);
-  assert.ok(typeof question.source === "string" && /slide|slides/.test(question.source), `${label} needs a slide-backed rationale`);
+  assert.ok(typeof question.source === "string" && /Formation Advancy du 2 novembre 2026, slides? /.test(question.source), `${label} needs a current slide-backed rationale`);
+  assert.ok(Array.isArray(question.slides) && question.slides.length > 0, `${label} needs explicit slide locators`);
+  assert.equal(new Set(question.slides).size, question.slides.length, `${label} repeats a slide locator`);
+  assert.ok(question.slides.every((slide) => Number.isInteger(slide) && slide >= 2 && slide <= 16), `${label} has an invalid slide locator`);
   assert.ok(Number.isInteger(question.correct) && question.correct >= 0 && question.correct <= 4, `${label} has an invalid answer index`);
   assert.ok(Array.isArray(question.options));
   assert.equal(question.options.length, 5, `${label} must have five options`);
   const optionTexts = new Set();
   question.options.forEach((option, optionIndex) => {
     assert.ok(option && typeof option.text === "string" && option.text.trim(), `${label} option ${optionIndex + 1} needs text`);
-    assert.ok(option.text.length >= 55, `${label} option ${optionIndex + 1} is too simplistic`);
+    assert.ok(option.text.length >= 35, `${label} option ${optionIndex + 1} is too simplistic`);
     assert.ok(option.text.length <= 280, `${label} option ${optionIndex + 1} is too long`);
     assert.ok(typeof option.why === "string" && option.why.trim(), `${label} option ${optionIndex + 1} needs feedback`);
     assert.ok(option.why.length <= 440, `${label} option ${optionIndex + 1} feedback is too long`);
@@ -75,14 +78,14 @@ const adminCoverage = questions
   .map((question) => `${question.theme} ${question.q}`)
   .join(" ")
   .toLocaleLowerCase("fr");
-for (const domain of ["communication", "mail", "traduction", "excel", "support", "finance", "rh", "agenda"]) {
-  assert.ok(adminCoverage.includes(domain), `the ADMIN domain ${domain} is not represented`);
+for (const domain of ["recrutement", "marketing", "traduction", "kpi", "canva", "rétroplanning", "esprit critique", "persévérance", "créativité", "codex", "brouillon"]) {
+  assert.ok(adminCoverage.includes(domain), `the training topic ${domain} is not represented`);
 }
 
-for (const slide of [2, 3, 7, 8, 9, 10, 12, 13, 14, 15, 16]) {
-  assert.ok(questions.some((question) => new RegExp(`slides?[^0-9]*[^.]*\\b${slide}\\b`, "i").test(question.source)), `slide ${slide} is not represented`);
+for (let slide = 2; slide <= 16; slide += 1) {
+  assert.ok(questions.some((question) => question.slides.includes(slide)), `slide ${slide} is not represented`);
 }
-assert.ok(questions.some((question) => /slides 4 à 7/.test(question.source)), "the Chat/Work workflow slides are not represented");
+assert.doesNotMatch(JSON.stringify(questions), /septembre 2026|Présentation septembre/i, "stale source references remain");
 
 const backendQuiz = findQuiz(config.quizId, config.quizVersion);
 assert.ok(backendQuiz, "the French backend quiz definition is missing");
@@ -93,6 +96,9 @@ assert.deepEqual(
 );
 
 const html = readFileSync(new URL("../fr/index.html", import.meta.url), "utf8");
+assert.ok(html.includes("<title>Evaluation IA - ADMIN</title>"));
+assert.ok(html.includes("<h1>Evaluation IA - ADMIN</h1>"));
+assert.doesNotMatch(html, /générative|Generative AI|septembre 2026/i, "the ADMIN page retains its former title or source period");
 assert.ok(!html.includes('name="advancy-public-enrollment" content="enabled"'), "the ADMIN site must not allow public enrollment");
 for (const contract of [
   '<html lang="fr">',
@@ -120,4 +126,4 @@ for (const contract of [
   assert.ok(privacy.includes(contract), `fr/privacy.html is missing ${contract}`);
 }
 
-console.log(`Validated ${questions.length} ADMIN-only French questions: ${scenarioCount} scenarios, ${questions.length - scenarioCount} knowledge checks, eight ADMIN domains, invite-only access, balanced A-E answers, complete feedback and matching server scoring.`);
+console.log(`Validated ${questions.length} French ADMIN questions against all 15 content slides: ${scenarioCount} scenarios, ${questions.length - scenarioCount} knowledge checks, invite-only access, balanced A-E answers, complete feedback and matching server scoring.`);

@@ -3,10 +3,10 @@
 The project serves the original English assessment and a separate French assessment:
 
 - [Advancy AI Knowledge Assessment](https://jjohana.github.io/advancy-ai-charter/)
-- [Évaluation IA générative — ADMIN](https://jjohana.github.io/advancy-ai-charter/fr/)
+- [Evaluation IA - ADMIN](https://jjohana.github.io/advancy-ai-charter/fr/)
 - 20 mixed multiple-choice questions in each version
 - one correct answer per question
-- the French version is invite-only, follows the September 2026 Generative AI overview, and covers ADMIN work: communication, email, translation, Excel, support, finance, HR, and calendar management
+- the French version is invite-only, follows the 2 November 2026 French training presentation, and covers recruiting, marketing, translation, KPI workbooks, project planning, Canva, recurring reminders and critical review
 - one short optional feedback and AI use-case form after the QCM
 
 The former `advancy-ai-usage` and `advancy-ai-usage-advanced` Pages sites remain compatibility redirects to the canonical questionnaire.
@@ -36,7 +36,9 @@ Reviewed source banks are stored in:
 
 `scripts/build-unified-questions.mjs` selects and interleaves the 20 deployable questions, adds the two current Chat/Work/Codex routing questions, balances the A-E answer positions, and deterministically generates `questions.js`.
 
-The reviewed French ADMIN question set is stored in `fr/questions.js`. `scripts/validate-french-quiz.mjs` checks its structure, the eight requested ADMIN domains, invite-only access, source coverage, scenario mix, balanced A-E answer positions, option-by-option feedback, and client/server answer-key alignment. The review record is in `docs/assessment-fr-qa-report.md`.
+The reviewed French ADMIN question set is stored in `fr/questions.js`. `scripts/validate-french-quiz.mjs` checks its structure, all fifteen content slides of the current training, invite-only access, source coverage, scenario mix, balanced A-E answer positions, option-by-option feedback, and client/server answer-key alignment. The review record is in `docs/assessment-fr-qa-report.md`.
+
+The current French question version is `2026-11-02-admin-fr`. The September question bank is archived in `question-banks/admin-fr-2026-09-25.json`, and the API retains its scoring key. Historical receipts identify their quiz version; existing invitations and attempt limits are preserved.
 
 ## Data and privacy
 

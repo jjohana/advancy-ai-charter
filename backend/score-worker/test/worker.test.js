@@ -8,6 +8,7 @@ import {
   encodeCursor,
   enrollmentFingerprint,
   rejectExistingEnrollment,
+  receiptFromAttempt,
   sqliteTimestamp,
   validateEnrollmentPayload,
   validateImport,
@@ -17,6 +18,7 @@ import {
 import {
   DEFAULT_QUIZ_IDS,
   ADMIN_FRENCH_QUIZ_VERSION,
+  PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION,
   LEGACY_QUIZ_IDS,
   LEGACY_QUIZ_VERSION,
   QUIZ_IDS,
@@ -34,6 +36,7 @@ const USAGE_ADVANCED_KEY = [3, 0, 4, 1, 2, 4, 1, 3, 0, 2, 1, 4, 2, 0, 3, 2, 3, 0
 const EXPECTED_DEFINITIONS = [
   { id: "advancy-ai-assessment-normal", version: QUIZ_VERSION, key: UNIFIED_KEY },
   { id: "advancy-ai-admin-fr", version: ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
+  { id: "advancy-ai-admin-fr", version: PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION, key: ADMIN_FRENCH_KEY },
   { id: "advancy-ai-assessment-normal", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...COMBINED_NORMAL_KEY] },
   { id: "advancy-ai-assessment-advanced", version: LEGACY_QUIZ_VERSION, key: [...CHARTER_KEY, ...USAGE_ADVANCED_KEY] },
   { id: "advancy-ai-charter", version: LEGACY_QUIZ_VERSION, key: CHARTER_KEY },
@@ -105,6 +108,23 @@ test("the unified assessment has 20 balanced answer positions", () => {
     [0, 1, 2, 3, 4].map((answer) => quiz.answerKey.filter((value) => value === answer).length),
     [4, 4, 4, 4, 4]
   );
+});
+
+test("the revised French assessment preserves previous scoring and labels historical receipts", () => {
+  assert.equal(ADMIN_FRENCH_QUIZ_VERSION, "2026-11-02-admin-fr");
+  const current = findQuiz("advancy-ai-admin-fr", ADMIN_FRENCH_QUIZ_VERSION);
+  const previous = findQuiz("advancy-ai-admin-fr", PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION);
+  assert.equal(current.name, "Evaluation IA - ADMIN");
+  assert.notEqual(current.version, previous.version);
+  assert.equal(scoreAnswers(previous, ADMIN_FRENCH_KEY).percent, 100);
+  const receipt = receiptFromAttempt({
+    receipt_id: "rct_historical_admin_test", submitted_at: "2026-09-25 10:00:00", attempt_number: 2,
+    quiz_id: previous.id, quiz_version: previous.version, correct: 14, total: 20, percent: 70, passed: 1
+  });
+  assert.equal(receipt.quiz_id, previous.id);
+  assert.equal(receipt.quiz_version, PREVIOUS_ADMIN_FRENCH_QUIZ_VERSION);
+  assert.equal(receipt.score.correct, 14);
+  assert.equal(receipt.score.passed, true);
 });
 
 test("legacy Normal keeps its rotated module answer positions", () => {

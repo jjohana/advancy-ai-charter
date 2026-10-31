@@ -13,37 +13,42 @@
   <meta name="description" content="Questionnaire français réservé aux équipes ADMIN, aligné sur la formation Advancy du 2 novembre 2026." />
   <link rel="icon" href="../assets/advancy-logo.png" />
   <link rel="stylesheet" href="../styles.css?v=20260925-1" />
-  <link rel="stylesheet" href="assessment.css?v=20261031-1" />
+  <link rel="stylesheet" href="assessment.css?v=20261031-design-1" />
 </head>
 <body class="admin-assessment">
   <a class="skip-link" href="#question-card">Aller au questionnaire</a>
   <header class="topline">
-    <div class="wrap masthead">
-      <img class="logo" src="../assets/advancy-logo.png" alt="Advancy - Driving strategy to results" />
-      <div class="headline">
-        <div class="eyebrow">Formation IA · 2 novembre 2026</div>
-        <h1>Evaluation IA - ADMIN</h1>
-        <p class="tagline">20 questions sur les usages présentés le 2 novembre 2026 : recrutement, marketing, documents, projets et automatisations.</p>
-      </div>
-    </div>
-    <div class="orange-rule" aria-hidden="true"></div>
-    <div class="training-provider">
-      <div class="wrap training-provider-inner">
-        <img class="training-provider-logo" src="../assets/pythonia-logo.svg" width="56" height="56" alt="Logo Pythonia" />
-        <div class="training-provider-copy">
-          <span class="training-provider-label">Organisme de formation</span>
-          <p><strong>PYTHONIA</strong><span>Centre de formation Python &amp; IA</span></p>
+    <div class="brand-bar">
+      <div class="wrap brand-bar-inner">
+        <img class="logo" src="../assets/advancy-logo.png" width="160" height="74" alt="Advancy - Driving strategy to results" />
+        <div class="training-provider">
+          <div class="training-provider-inner">
+            <img class="training-provider-logo" src="../assets/pythonia-logo.svg" width="44" height="44" alt="Logo Pythonia" />
+            <div class="training-provider-copy">
+              <span class="training-provider-label">Organisme de formation</span>
+              <p><strong>PYTHONIA</strong><span>Centre de formation Python &amp; IA</span></p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <div class="wrap masthead">
+      <div class="headline">
+        <div class="eyebrow">Formation IA · 2 novembre 2026</div>
+        <h1>Evaluation IA - ADMIN</h1>
+        <p class="tagline">20 questions pour mettre en pratique la formation : recrutement, marketing, documents, projets et automatisations.</p>
+      </div>
+    </div>
+    <div class="orange-rule" aria-hidden="true"></div>
   </header>
 
   <main>
     <div id="assessment-experience">
       <div class="wrap assessment-grid">
         <aside class="side-panel" aria-labelledby="assessment-summary">
-          <h2 id="assessment-summary">Réservé aux équipes ADMIN</h2>
-          <p>Chaque question porte sur un cas vu en formation. Choisissez une seule réponse, puis consultez l’explication.</p>
+          <span class="side-eyebrow">Réservé aux équipes ADMIN</span>
+          <h2 id="assessment-summary">Votre parcours</h2>
+          <p class="sidebar-intro">Chaque question porte sur un cas vu en formation. Choisissez une seule réponse, puis consultez l’explication.</p>
           <div class="metrics" aria-label="Caractéristiques du questionnaire">
             <div class="metric"><strong id="question-count-metric">20</strong><span>Questions</span></div>
             <div class="metric"><strong>20–30</strong><span>Minutes environ</span></div>
@@ -63,12 +68,10 @@
             <span id="session-status" class="session-status" data-testid="session-status" role="status" aria-live="polite">Vérification de votre invitation ADMIN…</span>
             <span id="attempt-status"></span>
           </div>
-          <div class="participant-card privacy-confirmation" hidden>
-            <label for="privacy-acknowledged">
-              <input id="privacy-acknowledged" data-testid="privacy-acknowledged" type="checkbox" disabled />
-              <span>J’ai lu la <a href="privacy.html" target="_blank" rel="noopener noreferrer">notice de confidentialité du questionnaire</a>.</span>
-            </label>
-            <p>N’indiquez aucune information client, financière, RH, confidentielle, personnelle ou sensible dans les commentaires facultatifs.</p>
+
+          <div class="topic-overview">
+            <span class="topic-label">Au programme</span>
+            <ul class="topic-list"><li>Recrutement</li><li>Marketing</li><li>Documents et projets</li><li>Automatisations</li></ul>
           </div>
         </aside>
 
@@ -83,7 +86,22 @@
               <button type="button" class="button button-secondary" id="restart-top" disabled>Recommencer</button>
             </div>
           </div>
+          <div class="participant-card privacy-confirmation" hidden>
+            <label for="privacy-acknowledged">
+              <input id="privacy-acknowledged" data-testid="privacy-acknowledged" type="checkbox" disabled />
+              <span>J’ai lu la <a href="privacy.html" target="_blank" rel="noopener noreferrer">notice de confidentialité du questionnaire</a>.</span>
+            </label>
+            <p>N’indiquez aucune information client, financière, RH, confidentielle, personnelle ou sensible dans les commentaires facultatifs.</p>
+          </div>
           <div id="question-card" class="question-card" tabindex="-1"></div>
+          <aside class="access-guide" aria-label="Le déroulement du questionnaire">
+            <ol>
+              <li><span class="step-number" aria-hidden="true">01</span><div><strong>Ouvrir votre invitation</strong><p>Un lien individuel pour accéder au questionnaire.</p></div></li>
+              <li><span class="step-number" aria-hidden="true">02</span><div><strong>Répondre aux 20 cas</strong><p>Une seule bonne réponse pour chaque situation.</p></div></li>
+              <li><span class="step-number" aria-hidden="true">03</span><div><strong>Comprendre les choix</strong><p>Une explication détaillée après chaque réponse.</p></div></li>
+            </ol>
+            <a href="privacy.html">Lire la notice de confidentialité</a>
+          </aside>
         </section>
       </div>
       <div class="wrap">

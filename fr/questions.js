@@ -7,8 +7,9 @@
     "date": "2026-11-02",
     "slideCount": 16,
     "title": "L’IA chez Advancy",
-    "revision": "2026-11-02-admin-fr-r2",
-    "feedbackRevision": "2026-10-31-feedback-1"
+    "revision": "2026-11-02-admin-fr-r3",
+    "feedbackRevision": "2026-10-31-feedback-1",
+    "kpiAnalysisRevision": "2026-10-31-kpi-ai-1"
   },
   "questions": [
     {
@@ -407,33 +408,34 @@
     },
     {
       "kind": "scenario",
-      "theme": "Recrutement · KPI et dénominateurs",
-      "q": "Dans un même groupe de candidats, 6 offres ont été faites et 4 acceptées. Quel est le taux d’acceptation des offres, arrondi à une décimale ?",
-      "source": "Formation Advancy du 2 novembre 2026, slide 9 : taux d’acceptation : 4 acceptations / 6 offres, soit 66,7 %, pour une même cohorte.",
+      "theme": "Recrutement · Analyse des KPI avec l’IA",
+      "q": "Un Excel autorisé présente les KPI de recrutement des quatre dernières semaines. Vous voulez comprendre leur évolution. Que demander à l’IA ?",
+      "source": "Formation Advancy du 2 novembre 2026, slides 5, 9 : analyser les tendances et anomalies d’un export autorisé, avec des définitions stables et des contrôles des calculs et des données manquantes.",
       "slides": [
+        5,
         9
       ],
       "correct": 4,
       "options": [
         {
-          "text": "25,0 %",
-          "why": "Incorrect. 25 % représente un quart, alors que 4 acceptations sur 6 offres représentent deux tiers. Le calcul demandé est acceptations ÷ offres, puis multiplication par 100 : 4 ÷ 6 × 100 = 66,666… %, soit 66,7 % à une décimale. Les 4 et les 6 portent sur le même groupe de candidats."
+          "text": "Expliquer chaque baisse par une cause certaine.",
+          "why": "Incorrect. Une baisse observée ne suffit pas à prouver sa cause. Plusieurs explications peuvent être possibles et le fichier ne permet pas toujours de les départager. Demandez à l’IA de distinguer les constats chiffrés des hypothèses, puis de préciser les informations à recueillir pour vérifier ces pistes avant de conclure."
         },
         {
-          "text": "40,0 %",
-          "why": "Incorrect. 40 % correspondrait à 4 sur 10, mais le nombre d’offres donné est 6. Il faut garder le bon dénominateur : 4 acceptations ÷ 6 offres × 100 = 66,666… %. Le taux d’acceptation des offres est donc 66,7 % à une décimale, sur ce même groupe de candidats."
+          "text": "Comparer les taux même si leur définition change.",
+          "why": "Incorrect. Deux taux ne sont comparables que si leur définition, leur période et leur population sont cohérentes. Un changement de dénominateur peut créer une variation artificielle. Demandez à l’IA de signaler ces différences et de limiter la comparaison aux indicateurs comparables, en distinguant activité hebdomadaire et conversion d’une même cohorte."
         },
         {
-          "text": "50,0 %",
-          "why": "Incorrect. 50 % de 6 offres ferait 3 acceptations ; l’énoncé en indique 4. Utilisez les chiffres fournis et la définition du taux : 4 acceptations ÷ 6 offres × 100. Le résultat est 66,666… %, arrondi à 66,7 % à une décimale."
+          "text": "Remplacer les valeurs manquantes par zéro.",
+          "why": "Incorrect. Zéro représente une valeur connue ; une donnée manquante représente une information absente. Les confondre fausse les totaux, les taux et les tendances. Demandez à l’IA de signaler les lacunes, d’expliquer leur effet sur l’analyse et de préciser les données nécessaires. Les chiffres absents doivent être complétés depuis une source autorisée."
         },
         {
-          "text": "75,0 %",
-          "why": "Incorrect. 75 % ne correspond pas au rapport de 4 acceptations à 6 offres. Il faut calculer 4 ÷ 6, puis multiplier par 100 : on obtient 66,666… %. L’arrondi demandé donne 66,7 %, sans changer le nombre d’offres au dénominateur."
+          "text": "Résumer l’activité sans préciser les chiffres utilisés.",
+          "why": "Incorrect. Un résumé sans chiffres ni périodes ne permet pas de vérifier les écarts annoncés. Demandez à l’IA d’appuyer chaque constat sur les valeurs du fichier, d’indiquer les semaines comparées et de montrer les calculs utiles. Contrôlez ces éléments dans Excel avant de valider la synthèse et de la diffuser."
         },
         {
-          "text": "66,7 %",
-          "why": "Correct. Le numérateur est le nombre d’offres acceptées, soit 4 ; le dénominateur est le nombre d’offres faites au même groupe, soit 6. Le calcul est 4 ÷ 6 × 100 = 66,666… %, arrondi à 66,7 %. Ce taux ne se calcule ni sur toutes les candidatures ni sur des événements provenant de groupes différents."
+          "text": "Comparer les KPI, chiffrer les écarts et proposer des pistes à vérifier.",
+          "why": "Correct. L’IA peut comparer les semaines, chiffrer les écarts et rédiger une synthèse des tendances et anomalies. Demandez les chiffres et périodes utilisés, avec des définitions de KPI identiques. Les causes proposées restent des hypothèses à vérifier. Faites signaler les données manquantes, puis contrôlez les calculs et validez l’analyse avant diffusion."
         }
       ]
     },
@@ -683,7 +685,7 @@
   window.quizConfig = {
     quizId: "advancy-ai-admin-fr",
     quizName: "Evaluation IA - ADMIN",
-    quizVersion: "2026-11-02-admin-fr-r2",
+    quizVersion: "2026-11-02-admin-fr-r3",
     storageNamespace: "admin-fr",
     focusedFeedback: true,
     confirmRestart: true,

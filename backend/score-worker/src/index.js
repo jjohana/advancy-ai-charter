@@ -8,7 +8,7 @@ import {
   scoreAnswers
 } from "./quizzes.js";
 
-const API_VERSION = "2.2.1";
+const API_VERSION = "2.2.2";
 const PUBLIC_HEADERS = new Set(["authorization", "content-type", "idempotency-key", "x-request-id"]);
 const ENROLLMENT_KEYS = new Set([
   "first_name",

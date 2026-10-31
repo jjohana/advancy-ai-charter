@@ -38,7 +38,7 @@ Reviewed source banks are stored in:
 
 The reviewed French ADMIN question set is stored in `fr/questions.js`. `scripts/validate-french-quiz.mjs` checks its structure, all fifteen content slides of the current training, invite-only access, source coverage, scenario mix, balanced A-E answer positions, option-by-option feedback, and client/server answer-key alignment. The review record is in `docs/assessment-fr-qa-report.md`.
 
-The current French question version is `2026-11-02-admin-fr`. The September question bank is archived in `question-banks/admin-fr-2026-09-25.json`, and the API retains its scoring key. Historical receipts identify their quiz version; existing invitations and attempt limits are preserved.
+The current French question version is `2026-11-02-admin-fr-r2`. The first November revision is archived in `question-banks/admin-fr-2026-11-02-r1.json`, alongside the September bank in `question-banks/admin-fr-2026-09-25.json`. The API retains both historical scoring definitions. Historical receipts identify their quiz version; existing invitations and attempt limits are preserved.
 
 ## Data and privacy
 

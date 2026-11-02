@@ -235,3 +235,8 @@ Production sequence:
 ## Capacity and cost posture
 
 For roughly 300 participants completing the unified questionnaire, the expected first-attempt volume is 300 submissions and the configured three-attempt ceiling is 900. Each attempt stores 20 selected-answer indexes, so storage and request volume remain tiny for Workers/D1. The operational risks are public-registration abuse, identity denial through pre-registration, quota abuse, and recovery; database capacity is not the concern. Monitor Worker errors, D1 latency/write failures, `400/409/429` trends, and daily health; configure Cloudflare account budget alerts before sharing broadly.
+
+
+### French ADMIN shared enrollment
+
+`POST /v2/admin-enroll` exchanges a shared `enr_` bearer for an existing invitation only. Configure the server-only `ADMIN_FRENCH_SHARED_ACCESS` secret as JSON with `version: 1`, `access_token_hash` (lowercase SHA-256 hex of the shared token), `expires_at` (canonical UTC ISO timestamp with milliseconds), and `members` mapping existing lowercase participant UUIDs to their existing `inv_` tokens. The mapping is limited to 1 à 90 members and 50,000 characters; never commit or log its contents. The endpoint requires the usual allowed origin, rate limits, privacy acknowledgement and UUID idempotency key. Only an enabled French ADMIN assignment may be claimed. Claims preserve existing identities, invitation hashes, sessions, attempts and quotas; an exact retry uses the original key and payload. A different key or payload cannot recover a claimed invitation. This is a self-declared work identity, not verified mailbox ownership or SSO.

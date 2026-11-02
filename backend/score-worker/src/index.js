@@ -8,7 +8,7 @@ import {
   scoreAnswers
 } from "./quizzes.js";
 
-const API_VERSION = "2.2.2";
+const API_VERSION = "2.3.0";
 const PUBLIC_HEADERS = new Set(["authorization", "content-type", "idempotency-key", "x-request-id"]);
 const ENROLLMENT_KEYS = new Set([
   "first_name",
@@ -602,7 +602,7 @@ function allowedEmailDomains(env) {
   return new Set(String(env.ALLOWED_EMAIL_DOMAINS || "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean));
 }
 
-export function validateEnrollmentPayload(payload, env) {
+export function validateEnrollmentPayload(payload, env, adminFrench = false) {
   assertExactKeys(payload, ENROLLMENT_KEYS, [...ENROLLMENT_KEYS], "enrollment");
   const firstName = strictString(payload.first_name, "first_name", 120);
   const lastName = strictString(payload.last_name, "last_name", 120);
@@ -613,7 +613,7 @@ export function validateEnrollmentPayload(payload, env) {
     throw new HttpError(400, "EMAIL_DOMAIN_NOT_ALLOWED", "The email is not in an allowed domain.");
   }
   const quizId = strictString(payload.quiz_id, "quiz_id", 80);
-  if (!DEFAULT_QUIZ_IDS.includes(quizId)) {
+  if (adminFrench ? quizId !== "advancy-ai-admin-fr" : !DEFAULT_QUIZ_IDS.includes(quizId)) {
     throw new HttpError(400, "INVALID_QUIZ_ID", "quiz_id must identify a current combined assessment.");
   }
   const expectedPrivacyVersion = String(env.PRIVACY_NOTICE_VERSION || "2026-07-09");
@@ -778,6 +778,72 @@ async function handleEnrollment(request, env, requestId, publicAccess = false) {
     participant: { display_name: `${stored.first_name} ${stored.last_name}` },
     expires_at: stored.expires_at,
     request_id: requestId
+  }, requestId);
+}
+
+
+// This server-only allowlist contains existing opaque identities and invite credentials.
+function adminFrenchAccess(env) {
+  try {
+    const raw = String(env.ADMIN_FRENCH_SHARED_ACCESS || "");
+    if (raw.length > 50000) throw new Error();
+    const config = JSON.parse(raw);
+    if (!isPlainObject(config) || Object.keys(config).sort().join(",") !== "access_token_hash,expires_at,members,version" ||
+        config.version !== 1 || !/^[0-9a-f]{64}$/.test(config.access_token_hash) ||
+        typeof config.expires_at !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(config.expires_at) ||
+        !Number.isFinite(Date.parse(config.expires_at)) || new Date(config.expires_at).toISOString() !== config.expires_at ||
+        Date.parse(config.expires_at) <= Date.now() || !isPlainObject(config.members)) throw new Error();
+    const members = Object.entries(config.members);
+    if (members.length < 1 || members.length > 90 || members.some(([id, token]) =>
+      !UUID_RE.test(id) || id !== id.toLowerCase() || typeof token !== "string" || !INVITE_RE.test(token))) throw new Error();
+    return config;
+  } catch {
+    throw new HttpError(503, "SELF_ENROLLMENT_NOT_CONFIGURED", "Shared enrollment is unavailable.");
+  }
+}
+
+async function handleAdminFrenchEnrollment(request, env, requestId) {
+  const config = adminFrenchAccess(env);
+  const supplied = bearerToken(request);
+  if (!ENROLLMENT_TOKEN_RE.test(supplied) || !(await safeSecretEqual(await sha256Hex(supplied), config.access_token_hash))) {
+    throw new HttpError(401, "ENROLLMENT_UNAUTHORIZED", "The enrollment credential is invalid.");
+  }
+  const key = validateIdempotencyKey(request);
+  const input = validateEnrollmentPayload(await readJson(request, 10_000), env, true);
+  await requireEnrollmentRateLimit(request, env, input.email);
+  const ids = Object.keys(config.members);
+  const matches = await env.DB.prepare(`SELECT id, cohort_id FROM participants
+    WHERE email = ? COLLATE NOCASE AND id IN (${ids.map(() => "?").join(",")}) LIMIT 2`)
+    .bind(input.email, ...ids).all();
+  if (matches.results.length !== 1) {
+    throw new HttpError(403, "PARTICIPANT_NOT_INVITED", "This email is not invited to this assessment.");
+  }
+  const participant = matches.results[0];
+  const inviteToken = config.members[participant.id];
+  const tokenHash = await sha256Hex(inviteToken);
+  const keyHash = await sha256Hex(`advancy-enrollment-idempotency-v1\u0000${key}`);
+  const fingerprint = await enrollmentFingerprint(input, participant.cohort_id);
+  // All validity and claim checks belong to the same atomic statement. This also
+  // makes retries contingent on the credential and assignment still being valid.
+  const stored = await env.DB.prepare(`
+    UPDATE participants SET enrollment_idempotency_hash = ?, enrollment_fingerprint = ?
+    WHERE id = ? AND token_hash = ? AND active = 1 AND revoked_at IS NULL
+      AND julianday(expires_at) > julianday('now')
+      AND EXISTS (SELECT 1 FROM cohorts c WHERE c.id = participants.cohort_id AND c.active = 1
+        AND julianday(c.starts_at) <= julianday('now') AND julianday(c.expires_at) > julianday('now'))
+      AND EXISTS (SELECT 1 FROM participant_quizzes pq WHERE pq.participant_id = participants.id
+        AND pq.quiz_id = ? AND pq.enabled = 1)
+      AND ((enrollment_idempotency_hash IS NULL AND enrollment_fingerprint IS NULL
+        AND NOT EXISTS (SELECT 1 FROM participants other WHERE other.cohort_id = participants.cohort_id
+          AND other.id <> participants.id AND other.enrollment_idempotency_hash = ?))
+        OR (enrollment_idempotency_hash = ? AND enrollment_fingerprint = ?))
+    RETURNING id, first_name, last_name, expires_at
+  `).bind(keyHash, fingerprint, participant.id, tokenHash, input.quizId, keyHash, keyHash, fingerprint).first();
+  if (!stored) throw new HttpError(409, "ENROLLMENT_USED", "This enrollment is unavailable or has already been claimed.");
+  return jsonResponse(200, {
+    ok: true, participant_id: stored.id, invite_token: inviteToken,
+    participant: { display_name: `${stored.first_name} ${stored.last_name}` },
+    expires_at: stored.expires_at, request_id: requestId
   }, requestId);
 }
 
@@ -1118,14 +1184,15 @@ async function preflight(request, env, requestId) {
 async function routeRequest(request, env, requestId) {
   const url = new URL(request.url);
   const path = url.pathname;
-  if (request.method === "OPTIONS" && (path === "/v2/enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit")) return preflight(request, env, requestId);
+  if (request.method === "OPTIONS" && (path === "/v2/enroll" || path === "/v2/admin-enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit")) return preflight(request, env, requestId);
   if (request.method === "GET" && path === "/health") return handleHealth(env, requestId);
 
-  if (path === "/v2/enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit") {
+  if (path === "/v2/enroll" || path === "/v2/admin-enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit") {
     const origin = requirePublicOrigin(request, env);
     await requirePublicRateLimit(request, env);
     let response;
     if (request.method === "POST" && path === "/v2/enroll") response = await handleEnrollment(request, env, requestId);
+    else if (request.method === "POST" && path === "/v2/admin-enroll") response = await handleAdminFrenchEnrollment(request, env, requestId);
     else if (request.method === "POST" && path === "/v2/public-enroll") response = await handleEnrollment(request, env, requestId, true);
     else if (request.method === "GET" && path === "/v2/session") response = await handleSession(request, env, requestId);
     else if (request.method === "POST" && path === "/v2/submit") response = await handleSubmit(request, env, requestId);

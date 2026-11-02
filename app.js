@@ -19,6 +19,7 @@
     privacyNoticeVersion: "2026-07-09",
     apiBase: "",
     scoreEndpoint: "",
+    protectedEnrollmentPath: "/v2/enroll",
     storageNamespace: "",
     trainingEvaluation: null,
     ...window.quizConfig
@@ -400,7 +401,9 @@
         safeSessionRemove(enrollmentIdempotencyStorageKey);
       } else if (validEnrollmentFragment) {
         safeSessionSet(enrollmentStorageKey, fromEnrollmentFragment);
-        safeSessionRemove(inviteStorageKey);
+        if (config.protectedEnrollmentPath !== "/v2/admin-enroll" || previousEnrollment !== fromEnrollmentFragment) {
+          safeSessionRemove(inviteStorageKey);
+        }
         if (previousEnrollment !== fromEnrollmentFragment) {
           safeSessionRemove(enrollmentIdempotencyStorageKey);
         }
@@ -1153,7 +1156,9 @@
         "Accept": "application/json"
       };
       if (state.enrollmentToken) registrationHeaders.Authorization = "Bearer " + state.enrollmentToken;
-      const registrationPath = state.publicEnrollment ? "/v2/public-enroll" : "/v2/enroll";
+      const protectedPath = config.protectedEnrollmentPath === "/v2/admin-enroll"
+        ? "/v2/admin-enroll" : "/v2/enroll";
+      const registrationPath = state.publicEnrollment ? "/v2/public-enroll" : protectedPath;
       const response = await fetchJsonWithRetry(apiBase() + registrationPath, {
         method: "POST",
         mode: "cors",
@@ -1170,7 +1175,9 @@
         });
       });
       safeSessionSet(inviteStorageKey, response.invite_token);
-      safeSessionRemove(enrollmentStorageKey);
+      if (config.protectedEnrollmentPath !== "/v2/admin-enroll" || state.publicEnrollment) {
+        safeSessionRemove(enrollmentStorageKey);
+      }
       safeSessionRemove(enrollmentIdempotencyStorageKey);
       state.inviteToken = response.invite_token;
       state.enrollmentToken = "";

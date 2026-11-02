@@ -8,7 +8,7 @@ import {
   scoreAnswers
 } from "./quizzes.js";
 
-const API_VERSION = "2.3.0";
+const API_VERSION = "2.4.0";
 const PUBLIC_HEADERS = new Set(["authorization", "content-type", "idempotency-key", "x-request-id"]);
 const ENROLLMENT_KEYS = new Set([
   "first_name",
@@ -482,6 +482,143 @@ async function handleSession(request, env, requestId) {
   }, requestId);
 }
 
+
+const PROGRESS_KEYS = [
+  "session_id", "test_id", "quiz_version", "draft_id", "baseline_attempts_used",
+  "attempt_started_at", "privacy_notice_version", "privacy_acknowledged"
+];
+function progressQuiz(testId, version) {
+  if (testId !== "advancy-ai-admin-fr" || !findQuiz(testId, version))
+    throw new HttpError(400, "UNKNOWN_QUIZ_VERSION", "The assessment id or version is not supported.");
+}
+async function progressSnapshot(env, session, version, requestId, status = 200) {
+  const row = await env.DB.prepare(`SELECT d.*, (SELECT COUNT(*) FROM attempts WHERE session_id = ?) AS attempts_used
+    FROM (SELECT 1) x LEFT JOIN attempt_drafts d ON d.session_id = ? AND d.quiz_version = ?
+    AND d.baseline_attempts_used = (SELECT COUNT(*) FROM attempts WHERE session_id = ?)`)
+    .bind(session.session_id, session.session_id, version, session.session_id).first();
+  const count = Number(row.attempts_used);
+  return jsonResponse(status, {
+    ok: true,
+    session_id: session.session_id,
+    quiz_id: session.quiz_id,
+    quiz_version: version,
+    attempts_used: count,
+    max_attempts: session.max_attempts_override ?? envInteger(env.MAX_ATTEMPTS_PER_QUIZ, 3, 1, 20),
+    draft: row.draft_id ? {
+      draft_id: row.draft_id,
+      baseline_attempts_used: Number(row.baseline_attempts_used),
+      answers: [...row.answer_sequence].map(Number),
+      attempt_started_at: row.attempt_started_at,
+      updated_at: row.updated_at
+    } : null,
+    request_id: requestId
+  }, requestId);
+}
+async function handleProgress(request, env, requestId, reset = false) {
+  if (request.method === "GET") {
+    const params = new URL(request.url).searchParams;
+    for (const key of params.keys()) {
+      if (!["test_id", "quiz_version"].includes(key) || params.getAll(key).length !== 1) {
+        throw new HttpError(400, "UNKNOWN_QUERY_PARAMETER", "Invalid query parameter.");
+      }
+    }
+    const testId = strictString(params.get("test_id"), "test_id", 80);
+    const version = strictString(params.get("quiz_version"), "quiz_version", 40);
+    progressQuiz(testId, version);
+    return progressSnapshot(env, await participantSession(request, env, testId), version, requestId);
+  }
+  const payload = await readJson(request, 5000);
+  const keys = [...PROGRESS_KEYS, reset ? "previous_draft_id" : "answers"];
+  assertExactKeys(payload, new Set(keys), keys, "progress");
+  const testId = strictString(payload.test_id, "test_id", 80);
+  const version = strictString(payload.quiz_version, "quiz_version", 40);
+  progressQuiz(testId, version);
+  const sessionId = strictString(payload.session_id, "session_id", 36);
+  const draftId = strictString(payload.draft_id, "draft_id", 36).toLowerCase();
+  if (!UUID_RE.test(sessionId) || !UUID_RE.test(draftId)) throw new HttpError(400, "INVALID_FIELD", "Invalid session or draft id.");
+  const previous = reset ? strictString(payload.previous_draft_id, "previous_draft_id", 36).toLowerCase() : null;
+  if (reset && (!UUID_RE.test(previous) || previous === draftId)) throw new HttpError(400, "INVALID_FIELD", "Invalid previous draft id.");
+  const baseline = strictInteger(payload.baseline_attempts_used, "baseline_attempts_used", 0, 20);
+  const started = strictIsoDate(payload.attempt_started_at, "attempt_started_at");
+  if (Date.parse(started) > Date.now() + 5 * 60 * 1000) throw new HttpError(400, "INVALID_TIMING", "attempt_started_at is too far in the future.");
+  const privacy = strictString(payload.privacy_notice_version, "privacy_notice_version", 40);
+  const expected = String(env.PRIVACY_NOTICE_VERSION || "2026-07-09");
+  if (privacy !== expected || payload.privacy_acknowledged !== true) throw new HttpError(428, "PRIVACY_NOTICE_REQUIRED", "The current privacy notice must be acknowledged.", {expected_version:expected});
+  if (!reset && (!Array.isArray(payload.answers) || payload.answers.length > 20 || payload.answers.some(x => !Number.isInteger(x) || x < 0 || x > 4))) throw new HttpError(400, "INVALID_ANSWERS", "answers must be a prefix of at most 20 choices.");
+  const session = await participantSession(request, env, testId);
+  if (session.session_id !== sessionId) throw new HttpError(403, "SESSION_MISMATCH", "This invitation does not authorize the supplied session.");
+  const sequence = reset ? "" : payload.answers.join("");
+  const nonce = crypto.randomUUID();
+  // A single statement guards the baseline, immutable prefix, and reset tombstones.
+  const result = await env.DB.prepare(`
+    INSERT INTO attempt_drafts (
+      session_id, quiz_version, baseline_attempts_used, draft_id, insert_nonce,
+      previous_draft_id, answer_sequence, attempt_started_at, privacy_notice_version,
+      privacy_acknowledged, updated_at
+    )
+    SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?
+    WHERE (SELECT COUNT(*) FROM attempts WHERE session_id = ?) = ?
+      AND ? < ?
+      AND NOT EXISTS (
+        SELECT 1 FROM attempt_draft_tombstones
+        WHERE session_id = ? AND quiz_version = ? AND baseline_attempts_used = ? AND draft_id = ?
+      )
+    ON CONFLICT(session_id, quiz_version, baseline_attempts_used) DO UPDATE SET
+      draft_id = excluded.draft_id,
+      previous_draft_id = CASE
+        WHEN attempt_drafts.draft_id = excluded.draft_id THEN attempt_drafts.previous_draft_id
+        ELSE excluded.previous_draft_id
+      END,
+      answer_sequence = CASE
+        WHEN length(excluded.answer_sequence) > length(attempt_drafts.answer_sequence)
+          OR (? AND attempt_drafts.draft_id <> excluded.draft_id) THEN excluded.answer_sequence
+        ELSE attempt_drafts.answer_sequence
+      END,
+      attempt_started_at = excluded.attempt_started_at,
+      privacy_notice_version = excluded.privacy_notice_version,
+      updated_at = excluded.updated_at
+    WHERE (SELECT COUNT(*) FROM attempts WHERE session_id = excluded.session_id) = excluded.baseline_attempts_used
+      AND (
+        (? = 0 AND attempt_drafts.draft_id = excluded.draft_id
+          AND attempt_drafts.attempt_started_at = excluded.attempt_started_at
+          AND (
+            substr(excluded.answer_sequence, 1, length(attempt_drafts.answer_sequence)) = attempt_drafts.answer_sequence
+            OR substr(attempt_drafts.answer_sequence, 1, length(excluded.answer_sequence)) = excluded.answer_sequence
+          )
+        )
+        OR (? = 1 AND (
+          attempt_drafts.draft_id = excluded.previous_draft_id
+          OR (attempt_drafts.draft_id = excluded.draft_id
+            AND attempt_drafts.previous_draft_id = excluded.previous_draft_id
+            AND attempt_drafts.attempt_started_at = excluded.attempt_started_at)
+        ))
+      )
+    RETURNING insert_nonce
+  `)
+    .bind(
+      sessionId, version, baseline, draftId, nonce, previous, sequence, started, privacy,
+      new Date().toISOString(), sessionId, baseline, baseline,
+      session.max_attempts_override ?? envInteger(env.MAX_ATTEMPTS_PER_QUIZ, 3, 1, 20),
+      sessionId, version, baseline, draftId, reset ? 1 : 0, reset ? 1 : 0, reset ? 1 : 0
+    ).first();
+  if (!result) {
+    const count = await env.DB.prepare("SELECT COUNT(*) AS count FROM attempts WHERE session_id=?").bind(sessionId).first();
+    if (Number(count.count) !== baseline) throw new HttpError(409, "PROGRESS_STALE", "The attempt count has changed.");
+    throw new HttpError(409, "PROGRESS_CONFLICT", "The draft conflicts with saved progress.");
+  }
+  return progressSnapshot(env, session, version, requestId, result.insert_nonce === nonce ? 201 : 200);
+}
+async function cleanupDrafts(env, sessionId) {
+  try {
+    await env.DB.prepare(`
+      DELETE FROM attempt_drafts WHERE session_id = ?
+      AND baseline_attempts_used < (SELECT COUNT(*) FROM attempts WHERE session_id = ?)
+    `).bind(sessionId, sessionId).run();
+  } catch {
+    // Submission remains authoritative even if cleanup fails.
+  }
+}
+
 function validateIdempotencyKey(request) {
   const key = request.headers.get("Idempotency-Key") || "";
   if (!UUID_RE.test(key)) {
@@ -543,7 +680,7 @@ async function handleSubmit(request, env, requestId) {
   const fingerprint = await submissionFingerprint(parsed);
   const prior = await attemptByIdempotency(env, session.session_id, idempotencyKey);
   assertIdempotentMatch(prior, fingerprint);
-  if (prior) return submissionResponse(prior, requestId, true);
+  if (prior) { await cleanupDrafts(env, session.session_id); return submissionResponse(prior, requestId, true); }
 
   const maxAttempts = session.max_attempts_override ?? envInteger(env.MAX_ATTEMPTS_PER_QUIZ, 3, 1, 20);
   const result = scoreAnswers(parsed.quiz, parsed.answers);
@@ -565,6 +702,19 @@ async function handleSubmit(request, env, requestId) {
       COALESCE((SELECT MAX(attempt_number) FROM attempts WHERE session_id = ?), 0) + 1,
       ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     WHERE (SELECT COUNT(*) FROM attempts WHERE session_id = ?) < ?
+      AND (? <> 'advancy-ai-admin-fr' OR (
+        NOT EXISTS (
+          SELECT 1 FROM attempt_draft_tombstones t
+          WHERE t.session_id = ? AND t.quiz_version = ? AND t.draft_id = ?
+        )
+        AND NOT EXISTS (
+          SELECT 1 FROM attempt_drafts d
+          WHERE d.session_id = ?
+            AND d.baseline_attempts_used = (SELECT COUNT(*) FROM attempts WHERE session_id = ?)
+            AND (d.quiz_version <> ? OR d.draft_id <> ? OR d.attempt_started_at <> ?
+              OR substr(?, 1, length(d.answer_sequence)) <> d.answer_sequence)
+        )
+      ))
   `).bind(
     attemptId, receiptId, session.session_id, parsed.testId, parsed.quizVersion, idempotencyKey,
     fingerprint,
@@ -575,16 +725,25 @@ async function handleSubmit(request, env, requestId) {
     evaluation.codex_workflow_confidence, evaluation.materials_quality, evaluation.pace_and_depth,
     evaluation.overall_satisfaction, evaluation.recommend_training,
     evaluation.most_valuable_takeaway, evaluation.improvement_suggestion,
-    evaluation.suggested_ai_automation_use_cases, session.session_id, maxAttempts
+    evaluation.suggested_ai_automation_use_cases, session.session_id, maxAttempts,
+    parsed.testId, session.session_id, parsed.quizVersion, idempotencyKey,
+    session.session_id, session.session_id, parsed.quizVersion, idempotencyKey,
+    parsed.startedAt, parsed.answers.join("")
   ).run();
 
   let stored = await attemptByIdempotency(env, session.session_id, idempotencyKey);
   if (stored) {
     assertIdempotentMatch(stored, fingerprint);
     const inserted = Number(insertion.meta?.changes || 0) > 0;
+    await cleanupDrafts(env, session.session_id);
     return submissionResponse(stored, requestId, !inserted, inserted ? 201 : 200);
   }
 
+  const count = await env.DB.prepare("SELECT COUNT(*) AS count FROM attempts WHERE session_id = ?")
+    .bind(session.session_id).first();
+  if (Number(count.count) < maxAttempts && parsed.testId === "advancy-ai-admin-fr") {
+    throw new HttpError(409, "PROGRESS_CONFLICT", "The submission conflicts with saved progress.");
+  }
   const latest = await latestAttempt(env, session.session_id);
   throw new HttpError(409, "ATTEMPT_LIMIT_REACHED", "The maximum number of attempts has been reached.", {
     max_attempts: maxAttempts,
@@ -1184,10 +1343,10 @@ async function preflight(request, env, requestId) {
 async function routeRequest(request, env, requestId) {
   const url = new URL(request.url);
   const path = url.pathname;
-  if (request.method === "OPTIONS" && (path === "/v2/enroll" || path === "/v2/admin-enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit")) return preflight(request, env, requestId);
+  if (request.method === "OPTIONS" && (path === "/v2/enroll" || path === "/v2/admin-enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/progress" || path === "/v2/progress/reset" || path === "/v2/submit" || path === "/submit")) return preflight(request, env, requestId);
   if (request.method === "GET" && path === "/health") return handleHealth(env, requestId);
 
-  if (path === "/v2/enroll" || path === "/v2/admin-enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/submit" || path === "/submit") {
+  if (path === "/v2/enroll" || path === "/v2/admin-enroll" || path === "/v2/public-enroll" || path === "/v2/session" || path === "/v2/progress" || path === "/v2/progress/reset" || path === "/v2/submit" || path === "/submit") {
     const origin = requirePublicOrigin(request, env);
     await requirePublicRateLimit(request, env);
     let response;
@@ -1195,6 +1354,8 @@ async function routeRequest(request, env, requestId) {
     else if (request.method === "POST" && path === "/v2/admin-enroll") response = await handleAdminFrenchEnrollment(request, env, requestId);
     else if (request.method === "POST" && path === "/v2/public-enroll") response = await handleEnrollment(request, env, requestId, true);
     else if (request.method === "GET" && path === "/v2/session") response = await handleSession(request, env, requestId);
+    else if (request.method === "GET" && path === "/v2/progress") response = await handleProgress(request, env, requestId);
+    else if (request.method === "POST" && (path === "/v2/progress" || path === "/v2/progress/reset")) response = await handleProgress(request, env, requestId, path.endsWith("/reset"));
     else if (request.method === "POST" && path === "/v2/submit") response = await handleSubmit(request, env, requestId);
     else if (request.method === "POST" && path === "/submit") response = await legacySubmit(request, env, requestId);
     else throw new HttpError(405, "METHOD_NOT_ALLOWED", "The method is not allowed for this endpoint.");

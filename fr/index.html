@@ -63,10 +63,14 @@
             <span>Score actuel</span>
             <strong id="score">0 / 0</strong>
           </div>
-          <div data-testid="secure-access" hidden>
+          <div data-testid="secure-access">
             <span id="participant-name">Invitation ADMIN requise</span>
             <span id="session-status" class="session-status" data-testid="session-status" role="status" aria-live="polite">Vérification de votre invitation ADMIN…</span>
             <span id="attempt-status"></span>
+            <p>Votre accès personnel est conservé sur ce navigateur jusqu’à son expiration pour reprendre votre questionnaire après fermeture de l’onglet.</p>
+            <button type="button" id="forget-access" class="button button-neutral">Oublier mon accès sur cet appareil</button>
+            <p id="draft-status" role="status" aria-live="polite"></p>
+            <button type="button" id="draft-retry" class="button button-neutral" hidden>Réessayer l’enregistrement</button>
           </div>
 
           <div class="topic-overview">
@@ -118,7 +122,7 @@
   </footer>
 
   <noscript><p class="noscript">JavaScript est nécessaire pour vérifier l’invitation et lancer le questionnaire.</p></noscript>
-  <script src="questions.js?v=20261102-5"></script>
-  <script src="../app.js?v=20261102-3"></script>
+  <script src="questions.js?v=20261102-6"></script>
+  <script src="../app.js?v=20261102-4"></script>
 </body>
 </html>

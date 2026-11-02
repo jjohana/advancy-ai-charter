@@ -7,7 +7,7 @@ const id='11111111-1111-4111-8111-111111111111', key='33333333-3333-4333-8333-33
 const hash=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(x=>x.toString(16).padStart(2,'0')).join('');
 const body={first_name:'Pretend',last_name:'Name',email:'person@example.com',quiz_id:'advancy-ai-admin-fr',privacy_notice_version:'2026-07-09',privacy_acknowledged:true};
 async function setup(){
- const db=new DatabaseSync(':memory:'); for(const f of ['0001_hardened_assessments.sql','0002_enrollment_idempotency.sql','0003_add_admin_french_quiz.sql']) db.exec(readFileSync(new URL('../migrations/'+f,import.meta.url),'utf8'));
+ const db=new DatabaseSync(':memory:'); for(const f of ['0001_hardened_assessments.sql','0002_enrollment_idempotency.sql','0003_add_admin_french_quiz.sql','0004_attempt_drafts.sql']) db.exec(readFileSync(new URL('../migrations/'+f,import.meta.url),'utf8'));
  db.exec("INSERT INTO cohorts(id,name,active,starts_at,expires_at) VALUES ('test','Test',1,'2020-01-01','2099-01-01')");
  db.prepare("INSERT INTO participants(id,cohort_id,first_name,last_name,email,token_hash,active,expires_at) VALUES (?,'test','Real','Person','person@example.com',?,1,'2099-01-01')").run(id,await hash(invite));
  db.prepare("INSERT INTO participant_quizzes(session_id,participant_id,quiz_id,max_attempts_override) VALUES ('22222222-2222-4222-8222-222222222222',?,'advancy-ai-admin-fr',3)").run(id);

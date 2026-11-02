@@ -21,6 +21,7 @@ assert.equal(config.protectedEnrollmentPath, "/v2/admin-enroll");
 assert.ok(config.errorMessages.participant_not_invited, "nonmembers need a clear French error");
 assert.match(config.ui.registerIntro, /n’est pas vérifiée/, "identity assurance must be clear");
 assert.equal(config.privacyNoticeVersion, "2026-07-09");
+assert.equal(config.serverProgress, true);
 assert.equal(config.passThreshold, 0.7);
 assert.equal(config.apiBase, "https://advancy-ai-score-api.advancy-ai-training.workers.dev");
 assert.ok(config.ui && config.errorMessages, "the French interface copy is required");

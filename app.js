@@ -22,6 +22,7 @@
     protectedEnrollmentPath: "/v2/enroll",
     storageNamespace: "",
     trainingEvaluation: null,
+    serverProgress: false,
     ...window.quizConfig
   };
   const ui = {
@@ -117,6 +118,7 @@
   const letters = ["A", "B", "C", "D", "E"];
   const storageSuffix = config.storageNamespace ? ":" + config.storageNamespace : "";
   const inviteStorageKey = "advancy-assessment-invite-v2" + storageSuffix;
+  const rememberedInviteKey = "advancy-assessment-remembered-invite-v1" + storageSuffix;
   const enrollmentStorageKey = "advancy-assessment-enrollment-v2" + storageSuffix;
   const enrollmentIdempotencyStorageKey = "advancy-assessment-enrollment-idempotency-v2" + storageSuffix;
   const pendingStorageKey = ["advancy-assessment-pending-v2", config.quizId, config.quizVersion].join(":");
@@ -181,7 +183,14 @@
     baselineAttemptsUsed: 0,
     attemptStartedAt: new Date().toISOString(),
     idempotencyKey: createId(),
-    progressKey: ""
+    progressKey: "",
+    progressInFlight: null,
+    progressQueued: false,
+    progressConflict: false,
+    progressResetting: false,
+    progressStoredLocally: false,
+    enrollmentFingerprint: "",
+    rememberedFingerprint: ""
   };
 
   class RequestError extends Error {
@@ -372,8 +381,9 @@
   function safeLocalSet(key, value) {
     try {
       window.localStorage.setItem(key, value);
+      return true;
     } catch {
-      // Progress recovery is helpful but not required to complete the quiz.
+      return false;
     }
   }
 
@@ -385,6 +395,15 @@
     }
   }
 
+  async function fingerprintEnrollment(token) {
+    if (!enrollmentPattern.test(token) || !window.crypto || !window.crypto.subtle) return "";
+    try {
+      const bytes = new TextEncoder().encode(token);
+      const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest), function (byte) { return byte.toString(16).padStart(2, "0"); }).join("");
+    } catch { return ""; }
+  }
+
   function captureInviteToken() {
     const hash = window.location.hash.replace(/^#/, "");
     const params = new URLSearchParams(hash);
@@ -394,6 +413,25 @@
     const validInviteFragment = invitePattern.test(fromInviteFragment);
     const validEnrollmentFragment = enrollmentPattern.test(fromEnrollmentFragment);
     const previousEnrollment = safeSessionGet(enrollmentStorageKey);
+    let remembered = "";
+    if (config.serverProgress) {
+      try {
+        const entry = JSON.parse(safeLocalGet(rememberedInviteKey) || "null");
+        if (entry && invitePattern.test(entry.token) && validIsoTimestamp(entry.expires_at) && Date.parse(entry.expires_at) > Date.now()) {
+          remembered = entry.token;
+          state.rememberedFingerprint = /^[a-f0-9]{64}$/.test(entry.enrollment_fingerprint || "") ? entry.enrollment_fingerprint : "";
+        } else { state.rememberedFingerprint = ""; safeLocalRemove(rememberedInviteKey); }
+      } catch { safeLocalRemove(rememberedInviteKey); }
+      if (params.has("invite")) {
+        if (fromInviteFragment !== remembered) safeLocalRemove(rememberedInviteKey);
+        state.rememberedFingerprint = "";
+        remembered = "";
+      } else if (params.has("enroll") && (!validEnrollmentFragment || !state.enrollmentFingerprint ||
+          state.enrollmentFingerprint !== state.rememberedFingerprint)) {
+        remembered = "";
+        state.rememberedFingerprint = "";
+      }
+    }
     if (hasCredentialFragment) {
       if (validInviteFragment) {
         safeSessionSet(inviteStorageKey, fromInviteFragment);
@@ -414,7 +452,7 @@
       }
       window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
     }
-    const storedInvite = safeSessionGet(inviteStorageKey);
+    const storedInvite = safeSessionGet(inviteStorageKey) || remembered;
     const storedEnrollment = safeSessionGet(enrollmentStorageKey);
     const inviteToken = validInviteFragment
       ? fromInviteFragment
@@ -441,7 +479,7 @@
   }
 
   function canStart() {
-    return state.sessionReady && privacyAcknowledged() && !state.accessError;
+    return state.sessionReady && privacyAcknowledged() && !state.accessError && !state.progressConflict && !state.progressResetting;
   }
 
   function score() {
@@ -467,7 +505,7 @@
 
   function saveProgress() {
     if (!state.progressKey || state.resultSubmitted) return;
-    safeLocalSet(state.progressKey, JSON.stringify({
+    state.progressStoredLocally = safeLocalSet(state.progressKey, JSON.stringify({
       schema_version: 2,
       session_id: state.session && state.session.session_id,
       quiz_id: config.quizId,
@@ -482,6 +520,137 @@
       attempt_started_at: state.attemptStartedAt,
       idempotency_key: state.idempotencyKey
     }));
+  }
+
+  function progressPrefix() {
+    const prefix = [];
+    for (const answer of state.answers) {
+      if (answer === null) break;
+      prefix.push(answer);
+    }
+    return prefix;
+  }
+
+  function progressStatus(message, retry) {
+    const node = document.querySelector("#draft-status");
+    const button = document.querySelector("#draft-retry");
+    if (node) node.textContent = message;
+    if (button) button.hidden = !retry;
+  }
+
+  function validateProgressResponse(payload) {
+    const draft = payload.draft;
+    if (payload.ok !== true || payload.session_id !== state.session.session_id || payload.quiz_id !== config.quizId ||
+        payload.quiz_version !== config.quizVersion || payload.attempts_used !== state.session.attempts_used ||
+        payload.max_attempts !== state.session.max_attempts || !uuidPattern.test(String(payload.request_id || "")) ||
+        !(draft === null || (isPlainObject(draft) && uuidPattern.test(String(draft.draft_id || "")) &&
+          draft.baseline_attempts_used === payload.attempts_used && validIsoTimestamp(draft.attempt_started_at) &&
+          Date.parse(draft.attempt_started_at) <= Date.now() + 5 * 60 * 1000 && validIsoTimestamp(draft.updated_at) &&
+          Array.isArray(draft.answers) && draft.answers.length <= questions.length &&
+          draft.answers.every(function (x) { return Number.isInteger(x) && x >= 0 && x <= 4; })))) throw invalidContract();
+    return payload;
+  }
+
+  function progressRequest(path, body) {
+    const isGet = !body;
+    const query = isGet ? "?test_id=" + encodeURIComponent(config.quizId) + "&quiz_version=" + encodeURIComponent(config.quizVersion) : "";
+    return fetchJsonWithRetry(apiBase() + path + query, {
+      method: isGet ? "GET" : "POST", mode: "cors", cache: "no-store", referrerPolicy: "no-referrer",
+      keepalive: !isGet,
+      headers: { "Authorization": "Bearer " + state.inviteToken, "Accept": "application/json", ...(isGet ? {} : { "Content-Type": "application/json" }) },
+      ...(isGet ? {} : { body: JSON.stringify(body) }), validate: validateProgressResponse
+    });
+  }
+
+  function progressBody() {
+    return { session_id: state.session.session_id, test_id: config.quizId, quiz_version: config.quizVersion,
+      draft_id: state.idempotencyKey, baseline_attempts_used: state.baselineAttemptsUsed,
+      answers: progressPrefix(), attempt_started_at: state.attemptStartedAt,
+      privacy_notice_version: config.privacyNoticeVersion, privacy_acknowledged: true };
+  }
+
+  function queueProgress() {
+    if (!config.serverProgress || !state.sessionReady || state.resultSubmitted || state.progressConflict || state.progressResetting) return Promise.resolve();
+    state.progressQueued = true;
+    if (state.progressInFlight) return state.progressInFlight;
+    state.progressInFlight = (async function () {
+      while (state.progressQueued) {
+        state.progressQueued = false;
+        const body = progressBody();
+        progressStatus("Enregistrement…", false);
+        try {
+          const response = await progressRequest("/v2/progress", body);
+          if (!response.draft || response.draft.draft_id !== body.draft_id ||
+              !body.answers.every(function (x, i) { return response.draft.answers[i] === x; })) throw invalidContract();
+          const current = progressPrefix();
+          const remote = response.draft.answers;
+          if (!current.slice(0, Math.min(current.length, remote.length)).every(function (x, i) { return x === remote[i]; })) {
+            throw new RequestError("progress conflict", { code: "progress_conflict" });
+          }
+          if (remote.length > current.length) { applyDraft(response.draft); renderQuestion(); }
+          progressStatus("Réponses enregistrées : " + remote.length + " / " + questions.length + ".", false);
+        } catch (error) {
+          state.progressQueued = false;
+          if (error.code === "progress_conflict" || error.code === "progress_stale") {
+            state.progressConflict = true;
+            progressStatus("La progression a changé dans un autre onglet. Rechargez cette page pour la reprendre.", false);
+            renderQuestion();
+          } else progressStatus(state.progressStoredLocally
+            ? "Réponses conservées sur cet appareil uniquement. Réessayez l’enregistrement."
+            : "Enregistrement impossible. Les réponses ne sont pas conservées sur cet appareil ; réessayez.", true);
+          throw error;
+        }
+      }
+    })().finally(function () { state.progressInFlight = null; });
+    return state.progressInFlight;
+  }
+
+  function applyDraft(draft) {
+    state.answers = draft.answers.concat(Array(questions.length - draft.answers.length).fill(null));
+    state.idempotencyKey = draft.draft_id;
+    state.attemptStartedAt = draft.attempt_started_at;
+    state.baselineAttemptsUsed = draft.baseline_attempts_used;
+    state.currentIndex = Math.min(draft.answers.length, questions.length - 1);
+    state.submitted = draft.answers.length === questions.length;
+    state.selectedIndex = state.submitted ? state.answers[state.currentIndex] : null;
+    saveProgress();
+  }
+
+  async function reconcileProgress(restored) {
+    const response = await progressRequest("/v2/progress");
+    const draft = response.draft;
+    const local = restored && state.baselineAttemptsUsed === state.session.attempts_used ? progressPrefix() : null;
+    const localSelection = local && !state.submitted && state.currentIndex === local.length ? state.selectedIndex : null;
+    function restoreSelection() {
+      if (localSelection !== null && local && progressPrefix().length === local.length && state.currentIndex === local.length) {
+        state.selectedIndex = localSelection; saveProgress();
+      }
+    }
+    if (draft && local) {
+      const compatible = draft.draft_id === state.idempotencyKey && draft.attempt_started_at === state.attemptStartedAt &&
+        local.slice(0, Math.min(local.length, draft.answers.length)).every(function (x, i) { return x === draft.answers[i]; });
+      if (!compatible) {
+        applyDraft(draft);
+        progressStatus("Une autre progression a été retrouvée sur le serveur.", false);
+        return true;
+      }
+      if (local.length > draft.answers.length) {
+        applyDraft({ ...draft, answers: local });
+        queueProgress().catch(function () {});
+      } else {
+        applyDraft(draft);
+        progressStatus("Réponses enregistrées : " + draft.answers.length + " / " + questions.length + ".", false);
+      }
+      restoreSelection();
+      return true;
+    }
+    if (draft) { applyDraft(draft); progressStatus("Réponses enregistrées : " + draft.answers.length + " / " + questions.length + ".", false); return true; }
+    if (local) { applyDraft({ draft_id: state.idempotencyKey, attempt_started_at: state.attemptStartedAt,
+      baseline_attempts_used: state.baselineAttemptsUsed, answers: local });
+      restoreSelection();
+      if (local.length) queueProgress().catch(function () {});
+      return true; }
+    return false;
   }
 
   function restoreProgress() {
@@ -783,8 +952,15 @@
     if (cardNode) cardNode.setAttribute("aria-busy", "true");
     state.sessionRetryable = false;
     state.accessError = "";
+    const incoming = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const explicitCredential = incoming.has("invite") || incoming.has("enroll");
+    if (config.serverProgress) {
+      const enrollmentSource = incoming.has("enroll") ? incoming.get("enroll") :
+        incoming.has("invite") ? "" : safeSessionGet(enrollmentStorageKey);
+      state.enrollmentFingerprint = await fingerprintEnrollment(enrollmentSource || "");
+    }
     const capturedInvite = captureInviteToken();
-    state.inviteToken = capturedInvite || (invitePattern.test(state.inviteToken) ? state.inviteToken : "");
+    state.inviteToken = capturedInvite || (!explicitCredential && invitePattern.test(state.inviteToken) ? state.inviteToken : "");
     if (!state.inviteToken) {
       if (state.enrollmentToken || state.publicEnrollment) {
         state.sessionLoading = false;
@@ -836,7 +1012,10 @@
       displaySession(payload);
       if (privacyInput) privacyInput.disabled = !state.sessionReady;
       state.progressKey = progressStorageKey(payload.session_id);
-      const restored = restoreProgress();
+      if (config.serverProgress) safeLocalSet(rememberedInviteKey, JSON.stringify({ token: state.inviteToken, expires_at: payload.expires_at,
+        enrollment_fingerprint: state.enrollmentFingerprint || state.rememberedFingerprint || "" }));
+      let restored = restoreProgress();
+      if (config.serverProgress && payload.can_submit) restored = await reconcileProgress(restored);
       const progressBaseline = state.baselineAttemptsUsed;
       const pending = restorePendingSubmission(payload);
       const pendingWasRecorded = pending && pending.baseline_attempts_used < payload.attempts_used;
@@ -856,6 +1035,9 @@
         ? error.message
         : uiText("invitationVerificationFailed");
       state.sessionRetryable = Boolean(error && error.retryable);
+      if (config.serverProgress && error && !error.retryable && ([401, 403, 410].includes(error.status) || ["invalid_invitation", "invitation_invalid", "expired_invitation", "invitation_expired", "revoked_invitation", "participant_revoked"].includes(error.code))) {
+        safeLocalRemove(rememberedInviteKey); safeSessionRemove(inviteStorageKey); state.inviteToken = "";
+      }
       setSessionStatus(state.accessError, "session-error");
     } finally {
       state.sessionLoading = false;
@@ -1327,6 +1509,7 @@
         state.submitted = true;
         state.answers[state.currentIndex] = state.selectedIndex;
         saveProgress();
+        if (config.serverProgress) queueProgress().catch(function () {});
         renderQuestion("correction");
       });
       actions.appendChild(submit);
@@ -1627,6 +1810,10 @@
   }
 
   async function retrySubmission(statusNode) {
+    if (config.serverProgress && (state.progressConflict || state.progressResetting)) {
+      statusNode.textContent = "La progression a changé ou une réinitialisation est en cours. Rechargez la page avant de réessayer.";
+      return;
+    }
     if (state.submissionPending || state.resultSubmitted || !state.lastSubmissionBody) return;
     state.submissionPending = true;
     resultNode.setAttribute("aria-busy", "true");
@@ -1666,6 +1853,10 @@
   }
 
   async function submitAssessment(evaluation, statusNode) {
+    if (config.serverProgress && (state.progressConflict || state.progressResetting)) {
+      statusNode.textContent = "La progression a changé ou une réinitialisation est en cours. Rechargez la page avant de réessayer.";
+      return;
+    }
     if (state.submissionPending || state.resultSubmitted) return;
     if (state.lastSubmissionBody) {
       retrySubmission(statusNode);
@@ -1677,6 +1868,15 @@
     }
     state.submissionPending = true;
     resultNode.setAttribute("aria-busy", "true");
+    if (config.serverProgress) {
+      try { await queueProgress(); } catch (error) {
+        if (state.progressConflict) { state.submissionPending = false; resultNode.setAttribute("aria-busy", "false"); statusNode.textContent = "La progression a changé dans un autre onglet. Rechargez cette page."; return; }
+      }
+    }
+    if (config.serverProgress && (state.progressConflict || state.progressResetting)) {
+      state.submissionPending = false; resultNode.setAttribute("aria-busy", "false");
+      statusNode.textContent = "La progression a changé ou une réinitialisation est en cours. Rechargez la page avant de réessayer."; return;
+    }
     const payload = buildSubmissionPayload(evaluation);
     state.lastSubmissionPayload = JSON.parse(JSON.stringify(payload));
     state.lastSubmissionBody = JSON.stringify(state.lastSubmissionPayload);
@@ -1721,8 +1921,8 @@
     window.requestAnimationFrame(function () { title.focus(); });
   }
 
-  function restartAssessment(confirmed) {
-    if (state.submissionPending) return;
+  async function restartAssessment(confirmed) {
+    if (state.submissionPending || state.progressInFlight || state.progressResetting) return;
     if (state.session && state.session.can_submit === false) return;
     if (config.confirmRestart && confirmed !== true && !state.resultSubmitted && !state.recoveredSubmission &&
         (state.selectedIndex !== null || state.answers.some(function (answer) { return answer !== null; }))) {
@@ -1751,6 +1951,23 @@
       cancel.focus();
       return;
     }
+    if (config.serverProgress) {
+      if (!privacyAcknowledged()) { progressStatus("Cochez la confirmation de lecture de la notice avant de recommencer.", false); return; }
+      const newId = createId(), started = new Date().toISOString();
+      state.progressResetting = true;
+      progressStatus("Réinitialisation…", false);
+      try {
+        await progressRequest("/v2/progress/reset", { session_id: state.session.session_id, test_id: config.quizId,
+          quiz_version: config.quizVersion, previous_draft_id: state.idempotencyKey, draft_id: newId,
+          baseline_attempts_used: state.session.attempts_used, attempt_started_at: started,
+          privacy_notice_version: config.privacyNoticeVersion, privacy_acknowledged: true });
+        state.idempotencyKey = newId; state.attemptStartedAt = started; state.progressConflict = false;
+        progressStatus("Tentative réinitialisée.", false);
+      } catch (error) {
+        progressStatus("Réinitialisation impossible. Rechargez la page ou réessayez.", false);
+        return;
+      } finally { state.progressResetting = false; }
+    }
     state.recoveredSubmission = null;
     state.accessError = "";
     state.currentIndex = 0;
@@ -1762,8 +1979,7 @@
     clearPendingSubmission();
     state.answers = Array(questions.length).fill(null);
     state.baselineAttemptsUsed = state.session ? state.session.attempts_used : 0;
-    state.attemptStartedAt = new Date().toISOString();
-    state.idempotencyKey = createId();
+    if (!config.serverProgress) { state.attemptStartedAt = new Date().toISOString(); state.idempotencyKey = createId(); }
     safeLocalRemove(state.progressKey);
     clearResult();
     saveProgress();
@@ -1776,6 +1992,26 @@
     if (params.has("invite") || params.has("enroll")) window.location.reload();
   });
 
+  if (config.serverProgress) {
+    const retry = document.querySelector("#draft-retry");
+    if (retry) retry.addEventListener("click", function () { queueProgress().catch(function () {}); });
+    const forget = document.querySelector("#forget-access");
+    if (forget) forget.addEventListener("click", function () {
+      safeLocalRemove(rememberedInviteKey); safeSessionRemove(inviteStorageKey);
+      safeSessionRemove(enrollmentStorageKey); safeSessionRemove(enrollmentIdempotencyStorageKey);
+      if (state.progressKey) safeLocalRemove(state.progressKey);
+      safeSessionRemove(pendingStorageKey);
+      state.inviteToken = ""; state.enrollmentToken = ""; state.session = null; state.sessionReady = false;
+      state.answers = Array(questions.length).fill(null); state.currentIndex = 0; state.selectedIndex = null;
+      state.submitted = false; state.resultSubmitted = false; state.recoveredSubmission = null;
+      state.accessError = uiText("openInvitation");
+      if (participantNameNode) participantNameNode.textContent = "Accès oublié sur cet appareil";
+      if (attemptStatusNode) attemptStatusNode.textContent = "";
+      if (privacyInput) { privacyInput.checked = false; privacyInput.disabled = true; }
+      clearResult(); setSessionStatus(state.accessError, "session-error"); progressStatus("", false); renderQuestion();
+      window.location.reload();
+    });
+  }
   configureAssessment();
   if (questions.length !== 20) {
     state.accessError = uiText("unavailableAssessment");

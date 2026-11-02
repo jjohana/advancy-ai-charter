@@ -1,0 +1,67 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+import { webcrypto } from 'node:crypto';
+
+const source = readFileSync(new URL('../app.js', import.meta.url), 'utf8').replace('  configureAssessment();', '  window.__test = { state, queueProgress, reconcileProgress, progressPrefix, captureInviteToken, fingerprintEnrollment, submitAssessment, retrySubmission, validateProgressResponse, applyDraft, saveProgress }; return;\n  configureAssessment();');
+const store = () => { const m = new Map(); return { getItem: k => m.get(k) ?? null, setItem: (k,v) => m.set(k,String(v)), removeItem: k => m.delete(k) }; };
+const localStorage = store(), sessionStorage = store();
+const id = '11111111-1111-4111-8111-111111111111', other = '22222222-2222-4222-8222-222222222222';
+const started = new Date(Date.now()-10000).toISOString();
+const statuses = {};
+const resultNode = { setAttribute(){}, querySelector(){return null;}, querySelectorAll(){return [];} };
+const document = { title:'test', querySelector(sel) { if(sel === '#result') return resultNode; if(sel === '#privacy-acknowledged') return {checked:true}; if (sel === '#draft-status' || sel === '#draft-retry') return statuses[sel] ||= { textContent:'', hidden:true, addEventListener(){} }; return null; }, documentElement: {} };
+let handler = async () => { throw Error('unexpected fetch'); };
+const window = { quizQuestions: Array.from({length:20}, () => ({})), quizConfig: {serverProgress:true, quizId:'advancy-ai-admin-fr', quizVersion:'r3', privacyNoticeVersion:'2026-07-09', apiBase:'https://test.invalid'}, crypto:webcrypto, sessionStorage, localStorage, location:{hostname:'test.invalid', search:'', hash:'', pathname:'/fr/', reload() {}}, history:{replaceState(){}}, setTimeout, clearTimeout, addEventListener(){}, fetch:(...a)=>handler(...a) };
+window.top=window.self=window;
+vm.runInNewContext(source, {window, document, URLSearchParams, URL, AbortController, Uint8Array, Date, JSON, Set, Array, Object, Number, String, Boolean, Math, Promise, Error, RegExp, TextEncoder}, {filename:'app.js'});
+const t=window.__test, state=t.state;
+Object.assign(state, { session:{session_id:id, attempts_used:0, max_attempts:3}, sessionReady:true, inviteToken:'inv_'+'A'.repeat(43), progressKey:'progress', idempotencyKey:id, attemptStartedAt:started, baselineAttemptsUsed:0 });
+const response = draft => ({ok:true, session_id:id, quiz_id:'advancy-ai-admin-fr', quiz_version:'r3', attempts_used:0, max_attempts:3, draft, request_id:other});
+const draft = (answers, draftId=id) => ({draft_id:draftId, baseline_attempts_used:0, answers, attempt_started_at:started, updated_at:new Date().toISOString()});
+const reply = body => ({ok:true,status:200,headers:{get(){return null;}},json:async()=>body});
+let release, requests=[];
+handler = async (url, opts) => { const body=JSON.parse(opts.body); requests.push(body); assert.equal(opts.keepalive,true); if(requests.length===1) await new Promise(r=>release=r); return reply(response(draft(body.answers))); };
+state.answers[0]=1; t.saveProgress(); const first=t.queueProgress();
+assert.equal(JSON.parse(localStorage.getItem('progress')).answers[0],1, 'local write precedes network acknowledgement');
+state.answers[1]=2; t.saveProgress(); const second=t.queueProgress();
+assert.equal(requests.length,1, 'requests are serialized'); release(); await Promise.all([first,second]);
+assert.deepEqual(requests.map(x=>Array.from(x.answers)), [[1],[1,2]]);
+assert.equal(statuses['#draft-status'].textContent,'Réponses enregistrées : 2 / 20.');
+handler = async()=>reply(response(draft([1,2,3])));
+assert.equal(await t.reconcileProgress(true),true);
+assert.deepEqual(Array.from(t.progressPrefix()),[1,2,3]); assert.equal(state.currentIndex,3);
+// A choice that has not been validated is kept only in local state.
+state.selectedIndex=4; state.submitted=false; state.currentIndex=3;
+handler = async()=>reply(response(draft([1,2,3])));
+await t.reconcileProgress(true); assert.equal(state.selectedIndex,4);
+handler = async()=>reply(response(draft(Array(20).fill(1))));
+// Use a matching local draft to exercise full completion and correction recovery.
+state.answers=Array(20).fill(1); state.currentIndex=19; state.selectedIndex=1; state.submitted=true;
+await t.reconcileProgress(true); assert.equal(state.currentIndex,19); assert.equal(state.submitted,true);
+handler = async()=>reply(response(draft([4],other)));
+assert.equal(await t.reconcileProgress(true),true);
+assert.equal(state.idempotencyKey,other); assert.deepEqual(Array.from(t.progressPrefix()),[4]);
+let sent=0;
+handler = async()=>{sent++; return {ok:false,status:409,headers:{get(){return null;}},json:async()=>({error:{code:'PROGRESS_CONFLICT'}})};};
+await assert.rejects(t.queueProgress()); assert.equal(state.progressConflict,true); await t.queueProgress(); assert.equal(sent,1);
+const submitStatus={textContent:''}; await t.submitAssessment(null,submitStatus); await t.submitAssessment(null,submitStatus);
+state.lastSubmissionBody='{}'; await t.retrySubmission(submitStatus); assert.equal(sent,1,'no final submission after conflict, including repeated clicks and retries'); state.lastSubmissionBody='';
+const future=draft([1]); future.attempt_started_at=new Date(Date.now()+60000).toISOString();
+assert.equal(t.validateProgressResponse(response(future)).draft.attempt_started_at,future.attempt_started_at);
+const commonA='enr_'+'D'.repeat(43), commonB='enr_'+'E'.repeat(43);
+const fingerprintA=await t.fingerprintEnrollment(commonA), fingerprintB=await t.fingerprintEnrollment(commonB);
+const rememberedKey='advancy-assessment-remembered-invite-v1';
+function remember() { localStorage.setItem(rememberedKey,JSON.stringify({token:'inv_'+'B'.repeat(43),expires_at:new Date(Date.now()+60000).toISOString(),enrollment_fingerprint:fingerprintA})); }
+function closeTab() { sessionStorage.removeItem('advancy-assessment-invite-v2'); sessionStorage.removeItem('advancy-assessment-enrollment-v2'); }
+remember(); closeTab(); state.enrollmentFingerprint=fingerprintA; window.location.hash='#enroll='+commonA;
+assert.equal(t.captureInviteToken(),'inv_'+'B'.repeat(43),'same common link recovers after tab close');
+remember(); closeTab(); state.enrollmentFingerprint=fingerprintB; window.location.hash='#enroll='+commonB;
+assert.equal(t.captureInviteToken(),'','different common link never recovers previous invite');
+remember(); closeTab(); state.enrollmentFingerprint=''; window.location.hash='#enroll=invalid';
+assert.equal(t.captureInviteToken(),'','invalid common link never recovers previous invite');
+remember(); closeTab(); state.enrollmentFingerprint=''; window.location.hash='';
+assert.equal(t.captureInviteToken(),'inv_'+'B'.repeat(43),'clean URL recovers after tab close');
+remember(); closeTab(); window.location.hash='#invite=inv_'+'C'.repeat(43);
+assert.equal(t.captureInviteToken(),'inv_'+'C'.repeat(43),'explicit individual invitation wins');
+console.log('Frontend autosave: serialized saves, local-first, resume, conflicts, submission guard and invitation binding passed.');

@@ -17,6 +17,9 @@ assert.equal(config.quizId, "advancy-ai-admin-fr");
 assert.equal(config.quizName, "Evaluation IA - ADMIN");
 assert.equal(config.quizVersion, ADMIN_FRENCH_QUIZ_VERSION);
 assert.equal(config.storageNamespace, "admin-fr");
+assert.equal(config.protectedEnrollmentPath, "/v2/admin-enroll");
+assert.ok(config.errorMessages.participant_not_invited, "nonmembers need a clear French error");
+assert.match(config.ui.registerIntro, /n’est pas vérifiée/, "identity assurance must be clear");
 assert.equal(config.privacyNoticeVersion, "2026-07-09");
 assert.equal(config.passThreshold, 0.7);
 assert.equal(config.apiBase, "https://advancy-ai-score-api.advancy-ai-training.workers.dev");
@@ -127,3 +130,46 @@ for (const contract of [
 }
 
 console.log(`Validated ${questions.length} French ADMIN questions against all 15 content slides: ${scenarioCount} scenarios, ${questions.length - scenarioCount} knowledge checks, invite-only access, balanced A-E answers, complete feedback and matching server scoring.`);
+
+// Exercise the actual controller's capture and successful exchange with a fictitious participant.
+const controller = readFileSync(new URL("../app.js", import.meta.url), "utf8");
+const captureSource = controller.slice(controller.indexOf("  function captureInviteToken()"), controller.indexOf("  function privacyAcknowledged()"));
+const submitSource = controller.slice(controller.indexOf("  async function submitEnrollment("), controller.indexOf("  function ", controller.indexOf("  async function submitEnrollment(")));
+assert.ok(captureSource.includes("return inviteToken") && submitSource.includes("loadSession()"));
+const tokenA = "enr_" + "A".repeat(43);
+const tokenB = "enr_" + "B".repeat(43);
+const invite = "inv_" + "C".repeat(43);
+const testContext = {
+  URLSearchParams, config: { protectedEnrollmentPath: "/v2/admin-enroll", quizId: "advancy-ai-admin-fr" },
+  state: {}, store: new Map(), inviteStorageKey: "invite", enrollmentStorageKey: "enroll",
+  enrollmentIdempotencyStorageKey: "idempotency", publicEnrollmentMetaNode: null,
+  invitePattern: /^inv_[A-Za-z0-9_-]{43}$/, enrollmentPattern: /^enr_[A-Za-z0-9_-]{43}$/,
+  uuidPattern: /^[0-9a-f-]{36}$/i, createId: () => "123e4567-e89b-42d3-a456-426614174000",
+  window: { location: { hash: "#enroll=" + tokenA, pathname: "/fr/", search: "" }, history: { replaceState() { testContext.window.location.hash = ""; } } },
+  document: { title: "Test" }, cardNode: { setAttribute() {} }, privacyInput: null, participantNameNode: null,
+  uiText: (key) => key, enrollmentFormPayload: () => ({ payload: { email: "synthetic@advancy.com" } }),
+  apiBase: () => "https://example.test", validateEnrollmentResponse: () => true, setSessionStatus() {},
+  fetchJsonWithRetry: async (url) => { assert.equal(url, "https://example.test/v2/admin-enroll"); return { invite_token: invite, participant: { display_name: "Test" } }; }
+};
+testContext.safeSessionGet = (key) => testContext.store.get(key) || "";
+testContext.safeSessionSet = (key, value) => testContext.store.set(key, value);
+testContext.safeSessionRemove = (key) => testContext.store.delete(key);
+vm.createContext(testContext);
+vm.runInContext(captureSource + submitSource + "\nthis.capture = captureInviteToken; this.submit = submitEnrollment;", testContext);
+testContext.loadSession = () => testContext.capture();
+assert.equal(testContext.capture(), "");
+await testContext.submit({ elements: [] }, {});
+assert.equal(testContext.store.get("invite"), invite);
+assert.equal(testContext.store.get("enroll"), tokenA);
+assert.equal(testContext.store.has("idempotency"), false);
+testContext.window.location.hash = "#enroll=" + tokenA;
+assert.equal(testContext.capture(), invite, "same link should recover the individual invitation in the original tab");
+assert.equal(testContext.window.location.hash, "", "credential fragment must be scrubbed");
+testContext.window.location.hash = "#enroll=" + tokenB;
+assert.equal(testContext.capture(), "", "a different common link must not reuse the invitation");
+assert.equal(testContext.store.has("invite"), false);
+testContext.config.protectedEnrollmentPath = "/v2/enroll";
+testContext.store.set("invite", invite);
+testContext.window.location.hash = "#enroll=" + tokenB;
+assert.equal(testContext.capture(), "", "the existing English enrollment behavior is unchanged");
+console.log("Validated same-tab common-link recovery, fragment scrubbing and link isolation.");

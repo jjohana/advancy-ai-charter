@@ -691,6 +691,7 @@
     focusedFeedback: true,
     confirmRestart: true,
     privacyNoticeVersion: "2026-07-09",
+    serverProgress: true,
     apiBase: "https://advancy-ai-score-api.advancy-ai-training.workers.dev",
     passThreshold: 0.7,
     correctionTitle: "Correction et explications",

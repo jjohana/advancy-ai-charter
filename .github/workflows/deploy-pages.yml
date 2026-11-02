@@ -27,6 +27,7 @@ jobs:
       - run: node --check app.js
       - run: node scripts/validate-quiz.mjs
       - run: node scripts/validate-french-quiz.mjs
+      - run: node scripts/test-french-autosave.mjs
       - run: node scripts/validate-full-contract.mjs
       - name: Build minimal static artifact
         shell: bash
